@@ -266,6 +266,45 @@ purpose.
 
 ---
 
+## Scenario overlays — additive layers that never restate canonical
+
+An overlay adds a layer canonical does not contain. It is generated
+independently, carries its own locked figures, and **restates nothing here**.
+A figure produced by an overlay is never a canonical figure and never
+supersedes one.
+
+| Overlay | What it adds | Status |
+|---------|--------------|--------|
+| `cinderhaven-promo-response` | A causal promo signal: a curated promo-event calendar, a promo-responsive scan series, and quarantined ground truth | Additive, seed-locked, v0.0.1 |
+
+**Why it exists.** `seed_shared.py` writes promotions as random calendar rows
+and `seed_scan_data.py` never reads them, so the SSOT scan series contains no
+lift, no post-promo dip and no cannibalization. Incrementality cannot be
+measured against a series that has no promo response in it.
+
+**What it does not touch.** The package never regenerates, modifies, **or
+reads** `raw.scan_data`. It has no database driver, makes no network call, and
+reads no file outside itself; upstream values are transcribed into its own
+`constants.py`, pinned at platform SHA `0f300ef`, with a source comment per
+block. Trailing-52-week scan revenue of **$32,323,139.62** is therefore
+untouched by construction, not by convention.
+
+**Same namespace, different rows.** Identifiers are key-compatible — canonical
+SKU codes, `RET-*-S####` store IDs, Saturday week-endings — so one company
+reads consistently across tools. Row *membership* is drawn independently and
+does not match `raw.scan_data`. Do not join the layer 1:1 to canonical scan
+data, and do not sum its units or dollars onto canonical actuals.
+
+**Its figures are locked in its own repo, not here.** The overlay's implied
+trailing-52-week revenue is **$40,210,520.02** on 1,340,462 rows — a scenario
+figure, versioned in that package's `FIGURES.md`. It is **not** a restatement
+of scan revenue and must never be cited as one: it is a promoted series, and
+it moves by design whenever the promo layer is retuned. Canonical's
+$32,323,139.62 is the promo-free figure and remains the only scan-revenue
+number this file carries.
+
+---
+
 ## Brand
 
 | Fact | Value | Notes |
