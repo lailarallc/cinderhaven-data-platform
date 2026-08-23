@@ -275,7 +275,7 @@ supersedes one.
 
 | Overlay | What it adds | Status |
 |---------|--------------|--------|
-| `cinderhaven-promo-response` | A causal promo signal: a curated promo-event calendar, a promo-responsive scan series, and quarantined ground truth | Additive, seed-locked, v0.1.1 (`7cfe95c8e014bc7dec30801efbf27b6d27418f3b`) |
+| `cinderhaven-promo-response` | A causal promo signal: a curated promo-event calendar, a promo-responsive scan series, and quarantined ground truth | Additive, seed-locked, v0.3.0 (`6556460000d56fd2df1c89c59f592f363b93245c`) |
 
 **Why it exists.** `seed_shared.py` writes promotions as random calendar rows
 and `seed_scan_data.py` never reads them, so the SSOT scan series contains no
