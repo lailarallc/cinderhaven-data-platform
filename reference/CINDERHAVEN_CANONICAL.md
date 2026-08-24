@@ -275,7 +275,7 @@ supersedes one.
 
 | Overlay | What it adds | Status |
 |---------|--------------|--------|
-| `cinderhaven-promo-response` | A causal promo signal: a curated promo-event calendar, a promo-responsive scan series, and quarantined ground truth | Additive, seed-locked, v0.3.0 (`6556460000d56fd2df1c89c59f592f363b93245c`) |
+| `cinderhaven-promo-response` | A causal promo signal: a curated promo-event calendar, a promo-responsive scan series, and quarantined ground truth | Additive, seed-locked, v0.4.0 (`6399990fdc4fabb2b21c1c5e84db29b610e7731f`) |
 
 **Why it exists.** `seed_shared.py` writes promotions as random calendar rows
 and `seed_scan_data.py` never reads them, so the SSOT scan series contains no
@@ -302,6 +302,15 @@ of scan revenue and must never be cited as one: it is a promoted series, and
 it moves by design whenever the promo layer is retuned. Canonical's
 $32,323,139.62 is the promo-free figure and remains the only scan-revenue
 number this file carries.
+
+**Trade spend is per-unit realistic, not portfolio realistic.** From v0.4.0 the
+overlay's trade rate is drawn per event as a negotiated allowance against
+wholesale, so per-unit promotion economics are defensible. Portfolio trade
+spend is **not**: only about 1% of the overlay's volume runs on promotion,
+against 20-40% for a real brand, so total trade spend is far below the
+industry norm and must not be cited as a spend benchmark. That is a calendar
+density property of the overlay, stated in its `FIGURES.md` as a locked figure
+and explicitly not a gate.
 
 ---
 
