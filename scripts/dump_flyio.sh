@@ -40,10 +40,19 @@ echo "Running pg_dump ..."
 # truth is excluded deliberately and must stay excluded. It holds the planted
 # ground truth (injection_ledger, corruption_ledger, promo_events,
 # outage_episodes, defect_ledger) that estimation-path code must provably
-# never read. A dump is the widest egress path there is: this file feeds
-# docker-compose through init-db.sh, which restores as superuser, so without
-# this exclusion every local dev environment would hold the answer key in the
-# clear -- and the dump file on disk would be a second copy of it.
+# never read. A dump is the widest egress path ON THE ESTIMATION PATH: this
+# file feeds docker-compose through init-db.sh, which restores as superuser,
+# so without this exclusion every local dev environment would hold the answer
+# key in the clear -- and the dump file on disk would be a second copy of it.
+#
+# The qualifier matters and the earlier unqualified superlative was wrong.
+# Fly.io's automatic volume snapshots copy the whole disk and no
+# --exclude-schema exists at that layer, so they are strictly wider. They are
+# also OUT OF MODEL by design: the quarantine makes accuracy claims provable,
+# it is not DRM. A person with Fly org access restoring a snapshot to look is
+# the same actor as one who opens the truth parquet, and the guarantee was
+# never aimed at them. In-scope egress is anything on the estimation path or
+# in a consuming repo -- which this dump is, which is why this flag exists.
 #
 # Note --no-privileges below: the dump strips GRANTs, so a restored copy
 # carries no role protection even if truth had it in production. Excluding
