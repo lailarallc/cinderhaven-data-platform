@@ -33,9 +33,24 @@ trap cleanup EXIT
 sleep 3
 
 echo "Running pg_dump ..."
-# Dump all schemas — dbt creates public_staging, public_intermediate,
+# Dump all schemas EXCEPT truth — dbt creates public_staging, public_intermediate,
 # public_marts (default schema naming with target schema = public).
 # Raw source tables live in the raw schema.
+#
+# truth is excluded deliberately and must stay excluded. It holds the planted
+# ground truth (injection_ledger, corruption_ledger, promo_events,
+# outage_episodes, defect_ledger) that estimation-path code must provably
+# never read. A dump is the widest egress path there is: this file feeds
+# docker-compose through init-db.sh, which restores as superuser, so without
+# this exclusion every local dev environment would hold the answer key in the
+# clear -- and the dump file on disk would be a second copy of it.
+#
+# Note --no-privileges below: the dump strips GRANTs, so a restored copy
+# carries no role protection even if truth had it in production. Excluding
+# the schema is therefore the only control on this path, not one of two.
+#
+# Added 2026-09-02, before the truth schema exists, so it cannot be forgotten
+# once it does. It matches nothing today. That is intended, not dead config.
 pg_dump \
     --host=localhost \
     --port="$LOCAL_PORT" \
@@ -46,6 +61,7 @@ pg_dump \
     --if-exists \
     --clean \
     --exclude-schema=information_schema \
+    --exclude-schema=truth \
     --exclude-schema='pg_*' \
     > "$DUMP_FILE"
 
