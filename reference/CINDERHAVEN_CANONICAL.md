@@ -696,6 +696,8 @@ freeze guard (`check_canonical.py`) is the gate.
 
 ## What changed from the pre-reconciliation state
 
+> **Historical snapshot (pre-2026-06-14).** The "Correct value" column is what was correct *at the time of that reconciliation*. Two rows have since been superseded themselves: "95%" internal OTIF (now **99.2% internal fill / 84.5% Walmart OTIF**, see `fulfillment:` in `canonical_values.yml` and § SUPERSEDES) and "$1.65M" deduction backlog (now **$1.35M**). Do not copy values from this table into a live surface.
+
 | Old value | Correct value | Appears in |
 |-----------|---------------|-----------|
 | 90 SKUs | **50 SKUs** | product-data-health-audit, contract-to-cash (hardcoded), old docs |

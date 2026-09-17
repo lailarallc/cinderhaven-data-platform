@@ -1,8 +1,8 @@
 {
  "_generated": {
-  "generated": "2026-08-01",
+  "generated": "2026-09-17",
   "generator": "scripts/verify_canonical.py",
-  "platform_head": "c4ea09e",
+  "platform_head": "d4ff96c",
   "source": "reference/canonical_values.yml",
   "verified_against_production": "2026-07-29"
  },
@@ -217,6 +217,68 @@
    "trailing_12m": 49,
    "trailing_24m": 56,
    "trailing_36m": 49
+  }
+ },
+ "fulfillment": {
+  "fill_rate_internal_pct": {
+   "cy2023": 99.24,
+   "cy2024": 99.26,
+   "cy2025": 99.21,
+   "full_corpus": 99.23,
+   "trailing_12m": 99.21,
+   "trailing_24m": 99.23,
+   "trailing_36m": 99.23
+  },
+  "gap_walmart_pts": {
+   "cy2023": 14.99,
+   "cy2024": 14.34,
+   "cy2025": 15.09,
+   "full_corpus": 14.78,
+   "trailing_12m": 15.09,
+   "trailing_24m": 14.71,
+   "trailing_36m": 14.79
+  },
+  "in_full_walmart_pct": {
+   "cy2023": 86.37,
+   "cy2024": 86.79,
+   "cy2025": 86.2,
+   "full_corpus": 86.47,
+   "trailing_12m": 86.2,
+   "trailing_24m": 86.5,
+   "trailing_36m": 86.46
+  },
+  "on_time_walmart_pct": {
+   "cy2023": 97.67,
+   "cy2024": 97.9,
+   "cy2025": 97.63,
+   "full_corpus": 97.74,
+   "trailing_12m": 97.63,
+   "trailing_24m": 97.76,
+   "trailing_36m": 97.73
+  },
+  "otif_portfolio_pct": {
+   "cy2023": 88.23,
+   "cy2024": 88.36,
+   "cy2025": 87.88,
+   "full_corpus": 88.16,
+   "trailing_12m": 87.88,
+   "trailing_24m": 88.12,
+   "trailing_36m": 88.16
+  },
+  "otif_walmart_pct": {
+   "cy2023": 84.25,
+   "cy2024": 84.92,
+   "cy2025": 84.12,
+   "full_corpus": 84.45,
+   "trailing_12m": 84.12,
+   "trailing_24m": 84.52,
+   "trailing_36m": 84.44
+  },
+  "provenance": "recomputed 2026-09-17 from otif-blind-spot scripts/cache/platform_fulfillment.json (read-only Fly proxy pull 2026-06-30); pending canonical_gather.sql",
+  "rendered_pair": "99% / 84%",
+  "shipments": {
+   "all_retailers_full_corpus": 46760,
+   "walmart_full_corpus": 10124
   }
  },
  "margin": {
@@ -446,6 +508,18 @@
   {
    "reason": "retired figure, no-$ form",
    "token": "82,924"
+  },
+  {
+   "reason": "retired OTIF internal/retailer-scored pair (superseded 2026-06-14); current fulfillment.* = 99.2% / 84.5%, rendered 99% / 84%",
+   "token": "95%/86%"
+  },
+  {
+   "reason": "retired homepage/journey rendering (\"you ship 95% complete\"); current is 99% complete",
+   "token": "95% complete"
+  },
+  {
+   "reason": "retired homepage/journey rendering (\"Walmart scores you at 86%\"); current is 84%",
+   "token": "scores you at 86%"
   },
   {
    "reason": "retired all-in trade cost (old seed rates); current ~$3.6M/yr",
