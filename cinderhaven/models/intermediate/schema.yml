@@ -147,7 +147,8 @@ models:
       Per-SKU fully loaded contribution (retailer channel). Grain is one row
       per SKU. Revenue minus COGS, promotional trade spend, chargebacks, and
       order-level deductions prorated by revenue share.
-      COGS formula: cases_ordered × case_pack_qty × cogs_per_unit (B2B).
+      COGS formula: units_ordered × cogs_per_unit (units_ordered is already
+      in units; see a6b4d20).
     columns:
       - name: sku
         tests: [unique, not_null]

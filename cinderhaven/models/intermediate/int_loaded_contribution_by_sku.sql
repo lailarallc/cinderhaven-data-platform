@@ -1,7 +1,10 @@
 -- Grain: one row per SKU (retailer channel only, 2024-2027 window)
 -- Full loaded contribution = gross_revenue minus COGS, trade spend,
 -- chargebacks, and prorated deductions.
--- COGS formula: units_ordered * case_pack_qty * cogs_per_unit (B2B case-level)
+-- COGS formula: units_ordered * cogs_per_unit. units_ordered is already in
+-- units (priced per unit at order-line generation); multiplying by
+-- case_pack_qty inflated COGS 6-24x per SKU. Same fix as a6b4d20 in
+-- mart_channel_contribution.
 
 with order_lines as (
     select
@@ -15,7 +18,7 @@ with order_lines as (
 ),
 
 product_master as (
-    select sku, case_pack_qty, product_line
+    select sku, product_line
     from {{ ref('stg_product_master') }}
 ),
 
@@ -66,6 +69,7 @@ allocated_deductions as (
 revenue_by_sku as (
     select
         sku,
+        -- holds units, not cases (the column name is historical)
         sum(units_ordered)                               as total_cases_ordered,
         sum(line_total)                                  as gross_revenue
     from order_lines
@@ -78,8 +82,8 @@ select
     r.total_cases_ordered,
     r.gross_revenue,
 
-    -- COGS: cases ordered × units per case × cost per unit
-    r.total_cases_ordered * pm.case_pack_qty * sc.cogs_per_unit         as total_cogs,
+    -- COGS: units ordered × cost per unit
+    r.total_cases_ordered * sc.cogs_per_unit                            as total_cogs,
 
     coalesce(ts.total_promo_cost, 0)                                    as trade_spend,
     coalesce(cb.total_chargebacks, 0)                                   as total_chargebacks,
@@ -87,21 +91,21 @@ select
 
     -- Loaded contribution
     r.gross_revenue
-        - (r.total_cases_ordered * pm.case_pack_qty * sc.cogs_per_unit)
+        - (r.total_cases_ordered * sc.cogs_per_unit)
         - coalesce(ts.total_promo_cost, 0)
         - coalesce(cb.total_chargebacks, 0)
         - coalesce(ad.total_allocated_deductions, 0)                    as loaded_contribution,
 
     -- Per-unit loaded contribution (per individual unit sold, not per case)
     case
-        when r.total_cases_ordered * pm.case_pack_qty > 0
+        when r.total_cases_ordered > 0
         then round((
             r.gross_revenue
-                - (r.total_cases_ordered * pm.case_pack_qty * sc.cogs_per_unit)
+                - (r.total_cases_ordered * sc.cogs_per_unit)
                 - coalesce(ts.total_promo_cost, 0)
                 - coalesce(cb.total_chargebacks, 0)
                 - coalesce(ad.total_allocated_deductions, 0)
-        )::numeric / (r.total_cases_ordered * pm.case_pack_qty), 4)
+        )::numeric / (r.total_cases_ordered), 4)
         else null
     end                                                                  as loaded_contribution_per_unit,
 
@@ -110,7 +114,7 @@ select
         when r.gross_revenue > 0
         then round((
             r.gross_revenue
-                - (r.total_cases_ordered * pm.case_pack_qty * sc.cogs_per_unit)
+                - (r.total_cases_ordered * sc.cogs_per_unit)
                 - coalesce(ts.total_promo_cost, 0)
                 - coalesce(cb.total_chargebacks, 0)
                 - coalesce(ad.total_allocated_deductions, 0)

@@ -253,19 +253,22 @@ Each entry:
 - **Do not:** Add platform-detection logic or multiple fallback paths.
   If dbt isn't on PATH, the error from Dagster is clear enough.
 
-### 2026-05-17 — mart_channel_contribution COGS must be channel-aware
+### ~~2026-05-17 — mart_channel_contribution COGS must be channel-aware~~
 
-- **Why:** fct_orders unifies B2B and DTC into one table, but the
+- ~~**Why:** fct_orders unifies B2B and DTC into one table, but the
   quantity column has different semantics per channel. B2B quantity is
   cases (needs case_pack_qty × cogs_per_unit). DTC quantity is
   individual units from Shopify (needs cogs_per_unit only). A uniform
   formula either under-counts B2B COGS (3.4%) or inflates DTC (457%).
   The fix: `CASE WHEN channel = 'DTC' THEN quantity * cogs_per_unit
-  ELSE quantity * case_pack_qty * cogs_per_unit END`.
-- **Scope:** cinderhaven/models/marts/mart_channel_contribution.sql —
-  and any future mart that computes COGS from fct_orders × dim_products.
-- **Do not:** Apply case_pack_qty uniformly across channels. Any new
-  COGS calculation must check channel first.
+  ELSE quantity * case_pack_qty * cogs_per_unit END`.~~
+- ~~**Scope:** cinderhaven/models/marts/mart_channel_contribution.sql —
+  and any future mart that computes COGS from fct_orders × dim_products.~~
+- ~~**Do not:** Apply case_pack_qty uniformly across channels. Any new
+  COGS calculation must check channel first.~~
+- **Superseded by:** 2026-09-28 — Order-line quantities are units in
+  every channel (Reversed / Superseded, below). Retired 2026-09-28: the
+  premise "B2B quantity is cases" is false for the current seeder.
 
 ### 2026-06-13 — Recovery metrics use two denominators; never pair 16% with 65%
 - **Why:** 16% is recovery per all deduction dollars (exposure diagnostic).
@@ -330,3 +333,27 @@ When a decision is overturned:
 3. Note the link in both directions
 
 This preserves the history of why something is the way it is.
+
+### 2026-09-28 — Order-line quantities are units in every channel; never multiply them by case_pack_qty
+
+- **Why:** The seeders write `units_ordered` as units priced per unit
+  (seed_retailer.py draws 24–144 units at `msrp × WHOLESALE_MULT`;
+  seed_distributor.py draws 48–360 units priced the same way), so COGS
+  is `units_ordered × cogs_per_unit`. The 2026-05-17 entry (above, struck) said B2B quantity
+  is cases. a6b4d20 (2026-06-12) removed the case-pack multiplier from
+  mart_channel_contribution, but the 05-17 entry was never retired and
+  int_loaded_contribution_by_sku kept the multiplier until 2026-09-28.
+  It overstated COGS 6–24x per SKU (~13.45x across the portfolio) and
+  put every SKU's loaded margin at -246% to -934% in
+  sku-rationalization-framework, which published "all margins negative"
+  as a finding. All structural tests passed both times.
+- **Scope:** Every model that computes COGS or margin from order-line
+  units (retailer, distributor, DTC).
+- **Do not:** Multiply order-line units by case_pack_qty. Use
+  case_pack_qty only to convert units to cases (divide, as
+  canonical_gather.sql `volume.cases_b2b` does). Give any new COGS or
+  margin model a plausibility band test
+  (assert_channel_contribution_margin_in_band,
+  assert_sku_loaded_margin_in_band).
+- **Supersedes:** 2026-05-17 — mart_channel_contribution COGS must be
+  channel-aware.
