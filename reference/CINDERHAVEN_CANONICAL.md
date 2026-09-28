@@ -388,7 +388,7 @@ See each repo for derivation details.
 | Figure | Value | Engagement | Status |
 |--------|-------|------------|--------|
 | SKU rationalization — kill candidates | 19 of 50 | sku-rationalization-framework | ✅ Confirmed |
-| SKU rationalization — fix-or-kill | 14 of 50 | sku-rationalization-framework | ✅ Corrected 2026-07-30 — current scored data (19 kill / 14 fix-or-kill / 16 maintain / 1 double-down); the repo's HANDOFF documents "22" as a stale count already fixed in-tool |
+| SKU rationalization — fix-or-kill | 13 of 50 | sku-rationalization-framework | ✅ Corrected 2026-09-28 — case-pack COGS fix (platform 4e9f37a, rescore d9795c5): 19 kill / 13 fix-or-kill / 15 maintain / 3 double-down; kill membership changed (out SB-001/004/005/007/009; in AS-009, DG-010, PS-004, PS-010, SC-004) |
 | Product data — annualized cost | **$93K** | product-data-health-audit | ✅ Confirmed (causal attribution; 281 of 2,873 retailer chargebacks are data-defect) |
 | Deductions — total backlog | $1.35M | retailer-deduction-recovery | ✅ Confirmed (16,917 rows cross-channel) |
 | Deductions — recovery per all deduction $ | ~15% | retailer-deduction-recovery | ✅ Confirmed (14.69%) |
@@ -1106,7 +1106,9 @@ Nothing is wired to these tables. No tool, mart or dbt model reads the
 
 | Dead value | What it was | Why it's wrong |
 |------------|-------------|----------------|
-| 22 of 50 fix-or-kill | SKU rationalization quadrant count | Stale pre-recalibration count (repo HANDOFF); current scored data: 14 of 50 |
+| 22 of 50 fix-or-kill | SKU rationalization quadrant count | Stale pre-recalibration count (repo HANDOFF); current scored data: 13 of 50 |
+| 14 of 50 fix-or-kill | SKU rationalization quadrant count | Pre-fix count; the case-pack COGS bug made every loaded margin negative (fixed 2026-09-28, platform 4e9f37a); current: 13 of 50 |
+| −246% to −934% loaded margins | SKU loaded margin range | Case-pack COGS bug overstated COGS 6–24×; current range is +31% to +62% |
 | $861K forward exposure | Deduction post-audit forward exposure, carried "awaiting regen" | No pipeline produces this figure — the 2026-07-30 regen confirmed no forward-exposure output exists in retailer-deduction-recovery. Retired; a real post-audit exposure model must exist before any figure returns |
 | $826K silent write-offs | Undisputed deduction dollars | Regenerated 2026-07-30: $877,620.27 (10,906 undisputed rows) |
 | $32.8M as the trade-rate denominator | Pre-drift trailing-52w scan figure the 2026-06 trade block was rated on | Re-rated 2026-07-30 on the verified $32,323,139.62; rates unchanged (rate-card-driven), dollar figures re-measured |
