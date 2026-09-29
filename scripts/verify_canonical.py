@@ -54,7 +54,7 @@ DOCUMENTED = {
     "Chargebacks retailer": 2_873,
     "Chargebacks distributor": 484,
     "OTIF internal fill": 0.9923,
-    "OTIF Walmart retailer-scored": 0.8445,
+    "Walmart shipments on time and complete": 0.8445,
     "OTIF total exposure ($)": 57_196,
     "Short-ship total 3yr ($)": 894_174,
     "Channel retail advantage / $1M ($)": 54_000,
@@ -193,7 +193,7 @@ def from_json():
     o = load("published/otif-blind-spot/frontend/src/data/summary.json")
     if o:
         rec("OTIF internal fill", o.get("internal_fill_rate"))
-        rec("OTIF Walmart retailer-scored", o.get("retailer_otif"))
+        rec("Walmart shipments on time and complete", o.get("retailer_otif"))
     oe = load("published/otif-blind-spot/frontend/src/data/exposure.json")
     if oe:
         rec("OTIF total exposure ($)", round(oe.get("total_exposure", 0)))

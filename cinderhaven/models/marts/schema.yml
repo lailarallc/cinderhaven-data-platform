@@ -65,8 +65,7 @@ models:
   - name: fct_retailer_receipt_lines
     description: >
       Per-SKU receiving lines — what the retailer reports receiving vs.
-      what shipped, with discrepancy_reason. Feeds receiving-discrepancy
-      chargebacks and the retailer-scored OTIF gap.
+      what shipped, with discrepancy_reason. Feeds receiving-discrepancy chargebacks and the share of shipments received complete.
     columns:
       - name: shipment_id
         tests: [not_null]

@@ -1,8 +1,8 @@
 {
  "_generated": {
-  "generated": "2026-09-17",
+  "generated": "2026-09-29",
   "generator": "scripts/verify_canonical.py",
-  "platform_head": "d4ff96c",
+  "platform_head": "e4058e8",
   "source": "reference/canonical_values.yml",
   "verified_against_production": "2026-07-29"
  },
@@ -510,7 +510,7 @@
    "token": "82,924"
   },
   {
-   "reason": "retired OTIF internal/retailer-scored pair (superseded 2026-06-14); current fulfillment.* = 99.2% / 84.5%, rendered 99% / 84%",
+   "reason": "retired OTIF internal/retailer pair (superseded 2026-06-14); current fulfillment.* = 99.2% fill / 84.5% of Walmart shipments on time and complete, rendered 99% / 84%",
    "token": "95%/86%"
   },
   {
@@ -518,8 +518,32 @@
    "token": "95% complete"
   },
   {
-   "reason": "retired homepage/journey rendering (\"Walmart scores you at 86%\"); current is 84%",
+   "reason": "retired homepage/journey rendering (\"Walmart scores you at 86%\"); 84% is not a Walmart score either \u2014 see 2026-09-29 relabel",
    "token": "scores you at 86%"
+  },
+  {
+   "reason": "retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart's OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)",
+   "token": "Walmart scores you at 84%"
+  },
+  {
+   "reason": "retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart's OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)",
+   "token": "scores you at 84%"
+  },
+  {
+   "reason": "retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart's OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)",
+   "token": "Walmart Scores You 84%"
+  },
+  {
+   "reason": "retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart's OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)",
+   "token": "retailer-scored OTIF"
+  },
+  {
+   "reason": "retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart's OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)",
+   "token": "Walmart-scored"
+  },
+  {
+   "reason": "retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart's OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)",
+   "token": "84% OTIF"
   },
   {
    "reason": "retired all-in trade cost (old seed rates); current ~$3.6M/yr",

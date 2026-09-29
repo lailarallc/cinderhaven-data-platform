@@ -238,7 +238,7 @@ DISTRIBUTOR_SHORTFALL_MIX = {
 }
 
 # Design §1.5 — receiving-discrepancy rate per retailer (share of shipment lines).
-# Tuned to realistic CPG ranges (0.6-1.0%) so the retailer-scored in-full rate
+# Tuned to realistic CPG ranges (0.6-1.0%) so the shipment-level received-complete rate
 # (receipt lines, used by the OTIF pipeline) lands in the 85-93% target band.
 RECEIVING_DISCREPANCY_RATE = {
     "walmart": 0.006,

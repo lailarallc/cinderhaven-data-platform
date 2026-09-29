@@ -210,24 +210,31 @@ fulfillment:
   # production 2026-07-29). NOT yet emitted by canonical_gather.sql -- fold it in
   # on the next production run, as with price_history.
   #
-  # DEFINITIONS (the tool's, verbatim):
+  # DEFINITIONS (relabelled 2026-09-29):
   #   fill_rate_internal_pct  = units shipped / units ordered, ALL retailer
   #                             shipments, measured at the brand's dock.
-  #   otif_walmart_pct        = share of Walmart shipments both on time
-  #                             (delivered <= requested_ship_date + 3d MABD) and
-  #                             in full (units RECEIVED >= units ordered) --
-  #                             the retailer's dock, not the brand's.
-  #   on_time / in_full       = the two components; the gap is ~85% in-full.
-  #   otif_portfolio_pct      = same scoring, all six retailers.
-  #   gap_walmart_pts         = fill_rate_internal_pct - otif_walmart_pct.
+  #   otif_walmart_pct        = share of Walmart shipments on time AND fully
+  #                             received (on time = delivered <= requested_ship_date
+  #                             + 3d MABD; fully received = units RECEIVED >= units
+  #                             ordered).
+  #   on_time_walmart_pct     = share of Walmart shipments on time.
+  #   in_full_walmart_pct     = share of Walmart shipments fully received (POs
+  #                             received complete).
+  #   otif_portfolio_pct      = same as otif_walmart_pct, all retailers.
+  #   gap_walmart_pts         = internal unit fill minus otif_walmart_pct.
+  #   rendered_pair           = "99% unit fill / 84% of Walmart shipments on time
+  #                             and complete".
+  #   None of these is Walmart's OTIF scorecard (case-level 95.6% on-time /
+  #   97.9% in-full, 2025).
   # PERIODS by po_date. full_corpus = all 46,760 rows incl. 112 orders dated
   # 2026-01-01..02 (the orders tail) -- it is what otif.lailarallc.com renders
   # (99.2% / 84.5% / 14.8 pts) and what the .md documents. Every period rounds
   # to the same integer pair, so marketing copy renders "99% / 84%".
   # Walmart's own goals for context (8th & Walton, as of 2024-03): 95% in-full
   # for all suppliers; 90% on-time prepaid / 98% on-time collect; miss = 3% of
-  # COGS on the failing cases, billed quarterly. 84% is penalty territory, not
-  # an automatic delisting -- that conversation belongs to the merchant team.
+  # COGS on the failing cases, billed quarterly. 84% is the share of Walmart
+  # shipments on time and complete, not Walmart's OTIF score; Walmart's
+  # case-level OTIF passes (95.6% on-time / 97.9% in-full, 2025).
   provenance: 'recomputed 2026-09-17 from otif-blind-spot scripts/cache/platform_fulfillment.json (read-only Fly proxy pull 2026-06-30); pending canonical_gather.sql'
   fill_rate_internal_pct:
     cy2023: 99.24
@@ -616,9 +623,15 @@ supersedes:
   - {token: '$82,924', reason: 'retired figure (not a current canonical value)'}
   - {token: '82,924', reason: 'retired figure, no-$ form'}
   # OTIF pair -- retired 2026-06-14, still rendered on the homepage until 2026-09-17
-  - {token: '95%/86%', reason: 'retired OTIF internal/retailer-scored pair (superseded 2026-06-14); current fulfillment.* = 99.2% / 84.5%, rendered 99% / 84%'}
+  - {token: '95%/86%', reason: 'retired OTIF internal/retailer pair (superseded 2026-06-14); current fulfillment.* = 99.2% fill / 84.5% of Walmart shipments on time and complete, rendered 99% / 84%'}
   - {token: '95% complete', reason: 'retired homepage/journey rendering ("you ship 95% complete"); current is 99% complete'}
-  - {token: 'scores you at 86%', reason: 'retired homepage/journey rendering ("Walmart scores you at 86%"); current is 84%'}
+  - {token: 'scores you at 86%', reason: 'retired homepage/journey rendering ("Walmart scores you at 86%"); 84% is not a Walmart score either — see 2026-09-29 relabel'}
+  - {token: 'Walmart scores you at 84%', reason: 'retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart''s OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)'}
+  - {token: 'scores you at 84%', reason: 'retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart''s OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)'}
+  - {token: 'Walmart Scores You 84%', reason: 'retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart''s OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)'}
+  - {token: 'retailer-scored OTIF', reason: 'retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart''s OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)'}
+  - {token: 'Walmart-scored', reason: 'retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart''s OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)'}
+  - {token: '84% OTIF', reason: 'retired 2026-09-29: 84% is the share of Walmart shipments on time and complete, not Walmart''s OTIF score (case-level 95.6% on-time / 97.9% in-full, 2025)'}
   # Trade / all-in — retired (current ~$3.6M/yr all-in, 11.0%)
   - {token: '$5.4M', reason: 'retired all-in trade cost (old seed rates); current ~$3.6M/yr'}
   - {token: '$7.2M', reason: 'retired May-2026 SQLite all-in export; current ~$3.6M/yr'}

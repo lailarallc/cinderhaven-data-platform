@@ -405,9 +405,9 @@ See each repo for derivation details.
 | Short-ship — total cost (annual) | $298,058 | short-ship-cost | ✅ Confirmed (verified 2026-06-26) |
 | Short-ship — dimension count | 4 | short-ship-cost | ✅ Confirmed |
 | OTIF — internal fill rate (portfolio) | 99.2% | cinderhaven-data-platform | ✅ Confirmed (tuned 2026-06-20) |
-| OTIF — retailer-scored (Walmart) | 84.5% | cinderhaven-data-platform | ✅ Confirmed (tuned 2026-06-20) |
-| OTIF — retailer-scored (portfolio) | 88.2% | cinderhaven-data-platform | ✅ Confirmed (OTIF pipeline run, commit 22f91c9) |
-| OTIF — gap (Walmart) | 14.8 pts | cinderhaven-data-platform | ✅ Confirmed (tuned 2026-06-20) |
+| Walmart shipments on time and complete | 84.5% | cinderhaven-data-platform | ✅ Confirmed (tuned 2026-06-20; relabelled 2026-09-29 — not Walmart's OTIF score) |
+| Shipments on time and complete (portfolio) | 88.2% | cinderhaven-data-platform | ✅ Confirmed (OTIF pipeline run, commit 22f91c9; relabelled 2026-09-29) |
+| Fill vs complete-shipment gap (Walmart) | 14.8 pts | cinderhaven-data-platform | ✅ Confirmed (tuned 2026-06-20; relabelled 2026-09-29) |
 | OTIF — annual fines (measured) | $23,697 | cinderhaven-data-platform | ✅ Confirmed (tuned 2026-06-20) |
 | OTIF — annual velocity damage (modeled) | $33,500 | cinderhaven-data-platform | ✅ Confirmed (tuned 2026-06-20) |
 | OTIF — total annual exposure | $57,197 | cinderhaven-data-platform | ✅ Confirmed (tuned 2026-06-20) |
@@ -419,6 +419,8 @@ See each repo for derivation details.
 | Trade — all-in (trailing-52w) | ~$3.6M/yr, 11.0% of scan revenue | trade-spend-data-diagnostic | ✅ Confirmed (relocked 2026-06-20) |
 | Trade — operational waste | ~$380K/yr | trade-spend-data-diagnostic | ✅ Confirmed (relocked 2026-06-20) |
 | Trade — chargebacks | 3,357 (2,873 ret + 484 dist) | cinderhaven-data-platform | ✅ Confirmed (causal, event-driven; tuned 2026-06-20; slotting fix removed 6 fake retailer chargebacks 2026-06-28; verified live 2026-06-30) |
+
+> Note (2026-09-29): the OTIF rows above are shipment-level, not Walmart's scorecard. $23,697 is Walmart chargebacks (short-ship, late delivery, receiving discrepancies), not OTIF fines. Walmart's case-level OTIF passes: 95.6% on-time, 97.9% in-full (2025, all 12 months). Labels kept because check_canonical.py parses them.
 
 **Product data $93K note:** The causal fulfillment regen attributes only 281 of 2,873 retailer chargebacks to Path A data-defects (the remaining 2,592 are fulfillment-event-driven), producing **$93K/yr** in data-attributable chargeback cost — within design doc §5.1's ~$50–95K/yr estimate. Supersedes the pre-causal $458K (which annualized 677 retailer chargebacks / $686,534 / 18mo and attributed all chargebacks to data quality), as well as the earlier $461K (pre-date-shift window), $430K (stale cache), and $296K (pre-reseed calibration). All superseded.
 
@@ -696,7 +698,7 @@ freeze guard (`check_canonical.py`) is the gate.
 
 ## What changed from the pre-reconciliation state
 
-> **Historical snapshot (pre-2026-06-14).** The "Correct value" column is what was correct *at the time of that reconciliation*. Two rows have since been superseded themselves: "95%" internal OTIF (now **99.2% internal fill / 84.5% Walmart OTIF**, see `fulfillment:` in `canonical_values.yml` and § SUPERSEDES) and "$1.65M" deduction backlog (now **$1.35M**). Do not copy values from this table into a live surface.
+> **Historical snapshot (pre-2026-06-14).** The "Correct value" column is what was correct *at the time of that reconciliation*. Two rows have since been superseded themselves: "95%" internal OTIF (now **99.2% internal fill / 84.5% of Walmart shipments on time and complete**, see `fulfillment:` in `canonical_values.yml` and § SUPERSEDES) and "$1.65M" deduction backlog (now **$1.35M**). Do not copy values from this table into a live surface.
 
 | Old value | Correct value | Appears in |
 |-----------|---------------|-----------|

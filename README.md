@@ -34,7 +34,7 @@ Seven published projects read from these marts — none generates its own sample
 | [retailer-deduction-recovery](https://github.com/MsShawnP/retailer-deduction-recovery) | Deduction recovery — $1.35M backlog, five compounding operational failures, recovery simulation | [deductions.lailarallc.com](https://deductions.lailarallc.com) |
 | [short-ship-cost](https://github.com/MsShawnP/short-ship-cost) | Short-ship cost — $894K over three years across four cost dimensions ($298K/yr) | [shortships.lailarallc.com](https://shortships.lailarallc.com) |
 | [trade-spend-leakage](https://github.com/MsShawnP/trade-spend-leakage) | Trade spend forensics — double-funded promotions, phantom promos, rate discrepancies | [trade-spend.lailarallc.com](https://trade-spend.lailarallc.com) |
-| [otif-blind-spot](https://github.com/MsShawnP/otif-blind-spot) | OTIF diagnostic — 99.2% internal vs 84.5% Walmart-scored, $57K/yr exposure | [otif.lailarallc.com](https://otif.lailarallc.com) |
+| [otif-blind-spot](https://github.com/MsShawnP/otif-blind-spot) | OTIF diagnostic — 99.2% internal fill vs 84.5% of Walmart shipments on time and complete, $57K/yr exposure | [otif.lailarallc.com](https://otif.lailarallc.com) |
 | [contract-to-cash](https://github.com/MsShawnP/contract-to-cash) | Revenue lifecycle — traces every invoiced dollar to cash receipt (87¢ per dollar) | [cash.lailarallc.com](https://cash.lailarallc.com) |
 | [where-the-money-comes-from](https://github.com/MsShawnP/where-the-money-comes-from) | Channel profitability — ~$54K more contribution per $1M deployed to retail vs distribution | [capital.lailarallc.com](https://capital.lailarallc.com) |
 
