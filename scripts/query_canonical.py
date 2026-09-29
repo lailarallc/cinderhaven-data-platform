@@ -1,8 +1,10 @@
 """Query every canonical figure from the Postgres replica for Group F validation."""
+import os
+
 import psycopg2
 
 conn = psycopg2.connect(host="localhost", port=5432, dbname="cinderhaven",
-                        user="postgres", password="postgres")
+                        user="postgres", password=os.environ["POSTGRES_PASSWORD"])
 cur = conn.cursor()
 
 def f(v):
