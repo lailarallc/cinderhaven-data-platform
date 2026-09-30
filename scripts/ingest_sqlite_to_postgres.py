@@ -17,6 +17,8 @@ import time
 import psycopg2
 from dotenv import load_dotenv
 
+import prod_guard
+
 SQLITE_PATH = r"C:\Users\mssha\projects\active\cinderhaven-data\data\cinderhaven_product_master.db"
 
 SKIP_TABLES = {"sqlite_sequence"}
@@ -37,9 +39,12 @@ def _load_env():
 
 def get_pg_connection():
     _load_env()
+    host = os.getenv("POSTGRES_PROXY_HOST", "localhost")
+    port = int(os.getenv("POSTGRES_PROXY_PORT", "5432"))
+    prod_guard.check(host=host, port=port)  # refuses a fly tunnel to production
     return psycopg2.connect(
-        host=os.getenv("POSTGRES_PROXY_HOST", "localhost"),
-        port=int(os.getenv("POSTGRES_PROXY_PORT", "5432")),
+        host=host,
+        port=port,
         dbname=os.getenv("POSTGRES_DB", "cinderhaven"),
         user=os.getenv("POSTGRES_USER", "postgres"),
         password=os.getenv("POSTGRES_PASSWORD"),

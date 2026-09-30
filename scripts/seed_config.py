@@ -10,6 +10,8 @@ import os
 import random
 from datetime import date
 
+import prod_guard
+
 # ── FROZEN (cinderhaven-data-v2) ────────────────────────────────────
 # Editing any value below re-baselines the entire portfolio.
 # Additive regens MUST NOT touch this block.
@@ -22,6 +24,8 @@ DATABASE_URL = os.environ.get(
     "DATABASE_URL",
     f"host=localhost port=5432 dbname=cinderhaven user=postgres password={os.environ.get('POSTGRES_PASSWORD', '')}"
 )
+# Every importer is a seed script that writes to DATABASE_URL; refuse a fly tunnel to production.
+prod_guard.check(DATABASE_URL)
 
 # -- Retailers (5 contracted + 1 regional group) --
 

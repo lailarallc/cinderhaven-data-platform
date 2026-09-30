@@ -26,6 +26,8 @@ from datetime import date, timedelta
 import psycopg2
 import psycopg2.extras
 
+import prod_guard
+
 # Isolated RNG stream — cannot cascade into trade/count generation.
 SEED = 800
 
@@ -420,6 +422,7 @@ def simulate(products, demand, shipped, stockout_weeks, slug_skus, rng):
 
 def main():
     rng = random.Random(SEED)
+    prod_guard.check(DATABASE_URL)  # refuses a fly tunnel to production
     conn = psycopg2.connect(DATABASE_URL)
     conn.autocommit = False
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)

@@ -7,6 +7,7 @@ preserving the full dependency graph (staging → intermediate → marts).
 from dagster import AssetExecutionContext
 from dagster_dbt import DbtCliResource, dbt_assets, DagsterDbtTranslator
 
+from . import prod_guard
 from .project import DBT_PROJECT_DIR, DBT_PROFILES_DIR, DBT_EXECUTABLE
 
 
@@ -26,4 +27,6 @@ dbt_manifest_path = dbt_resource.cli(
 @dbt_assets(manifest=dbt_manifest_path)
 def cinderhaven_dbt_assets(context: AssetExecutionContext, dbt: DbtCliResource):
     """Materialize all dbt models as Dagster assets."""
+    # dbt connects on its own. Target is the `cinderhaven` profile in ~/.dbt/profiles.yml.
+    prod_guard.check(host="localhost", port=5432)
     yield from dbt.cli(["build"], context=context).stream()
