@@ -261,3 +261,15 @@ model must follow actual join keys (sku), not assumed ones (upc/gtin).
 Shipped cinderhaven-data-platform: Postgres on Fly.io, 34 dbt models,
 132 tests, Dagster orchestration, dbt docs on GitHub Pages. All 19
 tasks complete.
+
+---
+
+## Improvement History
+
+### 2026-10-01 — Audit (health check only)
+- **Findings:** 0 critical, 7 important, 4 nice-to-have
+- **Top concerns:** The README Quick start fails: scripts/dump_flyio.sh proxies to Fly app `cinderhaven-data-platform-db`, which does not exist (the real app is cinderhaven-db), and the README runs `docker compose up` before the dump, so init-db.sh warns and exits with an empty database. Verification judged this stale docs rather than a broken system (prod workflows use cinderhaven-db; HANDOFF documents the seed_all.py path) so it is counted as important.
+- **Other items:** dbt docs badge/link 404s (Pages not re-enabled after the move to lailarallc; docs snapshot from 2026-05-18). README stats stale (claims 38/38/27/313 vs 41 raw, 41 staging, 32 marts, 87 models, 371 tests) and still calls the root canonical pointer the source of truth. Prod-guard wiring tests never run in CI and pytest is undeclared. HANDOFF (last 2026-07-29) and PLAN active arc (June) lag ~30 commits. CLAUDE.md stack section is still template text and its design-system path is broken. Four DECISIONS entries from 2026-07-29 sit only on unmerged origin/claude/cinderhaven-verify-enrich-het3l0. Nice: canon's "$296K superseded" lines read ambiguously now that $296K/yr is the live short-ship figure; 11 stale remote branches (8 merged, 3 carrying the abandoned May 17 integrity layer); 640 MB June prod dump and two detached worktrees in the working dir (gitignored); repo-level POSTGRES_PASSWORD Actions secret conflicts with the org-secrets policy unless documented as an exception.
+- **Verified OK:** Security, code-quality and data-correctness reviews done manually (/security-review and /ce:review not callable from the subagent). gitleaks history clean apart from 3 placeholder DSNs; .gitignore covers secrets, dumps and *.db; pre-commit gitleaks hook configured. Every Postgres writer is behind prod_guard; vendored guard copies identical. No model multiplies order quantities by case_pack_qty after the 2026-09-28 fix; short-ship canon internally consistent (887,699/3 = $296K/yr); drift gate clean (41 retired tokens). CI and canonical-drift green on a62695f. Tests: no listeners on 5432-5434/15432-15433; tests/test_prod_guard_wiring.py 4 passed, 1 deselected (system Python, DB env vars unset); check_canonical_drift.py clean. Skipped: Dagster guard test and dbt parse (writes outside repo); check_canonical.py, verify_canonical.py, dbt build/test, test_costing_integrity.sql (needs prod DB). Step 2 interview skipped (batch mode). No untracked files left behind.
+- **Action taken:** Audit only — no fixes this session
+- **Next review:** 2026-10-22
