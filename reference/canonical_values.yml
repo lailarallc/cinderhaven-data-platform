@@ -616,7 +616,6 @@ supersedes:
   - {token: '$461,000', reason: 'retired PDHA product-data cost, full form'}
   - {token: '$458K', reason: 'retired PDHA product-data cost (pre-causal placeholder); current is $93K'}
   - {token: '$430K', reason: 'retired PDHA product-data cost (stale cache); current is $93K'}
-  - {token: '$296K', reason: 'retired PDHA product-data cost (pre-reseed calibration); current is $93K'}
   # Panel projection factor k — absent metric, retired proxy values
   - {token: '166.488', reason: 'retired panel projection factor k; k is absent (no table/column) — see absent.panel_projection_factor_k. NB: bare "166.5" is intentionally NOT a token — it collides with legitimate $166.50 money values in deduction/chargeback data.'}
   # OTIF / misc retired dollar figure
@@ -652,3 +651,9 @@ supersedes:
   - {token: '$228,845', reason: 'retired retailer-chargeback annual figure; current cy2025 retailer chargeback amount is $134,314.20'}
   - {token: '83 cents arrived', reason: 'retired lifecycle rendering (the-ten-decisions/contract-to-cash "83 cents arrived"); current is 87¢. Scoped to the full phrase so it does NOT collide with the LIVE bare "83 cents" DTC-margin figure in channel-profitability-analysis.'}
   - {token: '$500 per load', reason: 'retired per-load ASN/short-ship penalty assumption. Allowlisted in the-ten-decisions/research/cinderhaven-findings.md (research notes only) where it is a stated assumption, not a canonical figure.'}
+  # Short-ship re-derived 2026-09-30 (Walmart fine: 3% of wholesale on short
+  # cases, whole-case rounding). $296K was un-retired the same day: it had
+  # retired the old PDHA product-data cost, which has no live copies, and is
+  # now the current short-ship annual figure.
+  - {token: '$298K', reason: 'short-ship pre-2026-09-30 Walmart rule; current $296K/yr, $888K/3yr'}
+  - {token: '$894K', reason: 'short-ship pre-2026-09-30 Walmart rule; current $296K/yr, $888K/3yr'}

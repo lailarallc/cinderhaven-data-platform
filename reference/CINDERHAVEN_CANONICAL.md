@@ -398,11 +398,11 @@ See each repo for derivation details.
 | Fulfillment — portfolio fill rate (retailer) | 99.2% | cinderhaven-data-platform | ✅ Confirmed (tuned 2026-06-20; verified 2026-06-26) |
 | Fulfillment — portfolio fill rate (distributor) | 99.5% | cinderhaven-data-platform | ✅ Confirmed (tuned 2026-06-20; verified 2026-06-26) |
 | Short-ship — forgone revenue (3yr) | $523,326 | short-ship-cost | ✅ Confirmed (verified 2026-06-26) |
-| Short-ship — compliance fines (3yr) | $164,543 | short-ship-cost | ✅ Confirmed (verified 2026-06-26) |
+| Short-ship — compliance fines (3yr) | $158,068 | short-ship-cost | ✅ Recomputed 2026-09-30 (Walmart fine: wholesale price, whole cases; c2136a9) |
 | Short-ship — chargebacks (3yr) | $118,814 | short-ship-cost | ✅ Confirmed (verified 2026-06-26) |
 | Short-ship — deductions (3yr) | $87,490 | short-ship-cost | ✅ Confirmed (verified 2026-06-26) |
-| Short-ship — total cost (3yr) | $894,174 | short-ship-cost | ✅ Confirmed (verified 2026-06-26) |
-| Short-ship — total cost (annual) | $298,058 | short-ship-cost | ✅ Confirmed (verified 2026-06-26) |
+| Short-ship — total cost (3yr) | $887,699 | short-ship-cost | ✅ Recomputed 2026-09-30 (c2136a9) |
+| Short-ship — total cost (annual) | $295,900 | short-ship-cost | ✅ Recomputed 2026-09-30 (c2136a9) |
 | Short-ship — dimension count | 4 | short-ship-cost | ✅ Confirmed |
 | OTIF — internal fill rate (portfolio) | 99.2% | cinderhaven-data-platform | ✅ Confirmed (tuned 2026-06-20) |
 | Walmart shipments on time and complete | 84.5% | cinderhaven-data-platform | ✅ Confirmed (tuned 2026-06-20; relabelled 2026-09-29 — not Walmart's OTIF score) |
@@ -498,7 +498,7 @@ Usage rule: The 15% recovered / 42% win rate / 65% never filed are the same-deno
 
 | Lifecycle (retailer wholesale) | "87 cents per invoiced wholesale dollar (86–88¢ band)" |
 | Short-ship cost (annual) | "~$300K/yr in fulfillment shortfall costs across four dimensions" |
-| Short-ship cost (3yr) | "$894K in total fulfillment shortfall costs over 36 months" |
+| Short-ship cost (3yr) | "$888K in total fulfillment shortfall costs over 36 months" |
 | Short-ship framing | "99% unit fill still costs $300K/yr — the gap between unit fill and in-full is where the money hides" |
 | Thesis range | "$1.4M to $2.3M a year in quantifiable operational cost across eight decisions" |
 
@@ -585,6 +585,7 @@ Distributor lifecycle: 93.13¢ per $ and combined wholesale 89.08¢ (verified 20
 | 69.3% synthetic fill rate | Superseded 2026-06-14, short-ship project order generator retired, replaced by platform causal fill rates (92%/94%) | |
 | 8-dimension short-ship cost model | Superseded 2026-06-14, replaced by 4-dimension model grounded in platform events | |
 | $6,581,205 total 3yr / $2,193,735 annual short-ship cost | Pre-tuning short-ship totals | Superseded 2026-06-26, replaced by $894K/3yr ($298K/yr) after fill rate retuning to 99.2%/99.5%. Old 92%/94% unit fill targets produced per-retailer fills too low to sustain the relationship. |
+| $894,174 / $298,058 / $164,543 short-ship totals | Pre-2026-09-30 Walmart rule (3% of line COGS when line fill < 98%) | Superseded 2026-09-30 — Walmart fine now 3% of wholesale on short cases, whole-case rounding; $887,699 / $295,900 / $158,068 |
 | 92.0% retailer / 94.2% distributor fill rates | Pre-tuning unit fill rates | Superseded 2026-06-26, replaced by 99.2%/99.5%. Old rates reflected deep concentrated shortfalls; new rates reflect shallow widespread shortfalls consistent with specialty food operations. |
 
 ---

@@ -1,8 +1,8 @@
 {
  "_generated": {
-  "generated": "2026-09-29",
+  "generated": "2026-10-01",
   "generator": "scripts/verify_canonical.py",
-  "platform_head": "e4058e8",
+  "platform_head": "deb0175",
   "source": "reference/canonical_values.yml",
   "verified_against_production": "2026-07-29"
  },
@@ -494,10 +494,6 @@
    "token": "$430K"
   },
   {
-   "reason": "retired PDHA product-data cost (pre-reseed calibration); current is $93K",
-   "token": "$296K"
-  },
-  {
    "reason": "retired panel projection factor k; k is absent (no table/column) \u2014 see absent.panel_projection_factor_k. NB: bare \"166.5\" is intentionally NOT a token \u2014 it collides with legitimate $166.50 money values in deduction/chargeback data.",
    "token": "166.488"
   },
@@ -592,6 +588,14 @@
   {
    "reason": "retired per-load ASN/short-ship penalty assumption. Allowlisted in the-ten-decisions/research/cinderhaven-findings.md (research notes only) where it is a stated assumption, not a canonical figure.",
    "token": "$500 per load"
+  },
+  {
+   "reason": "short-ship pre-2026-09-30 Walmart rule; current $296K/yr, $888K/3yr",
+   "token": "$298K"
+  },
+  {
+   "reason": "short-ship pre-2026-09-30 Walmart rule; current $296K/yr, $888K/3yr",
+   "token": "$894K"
   }
  ],
  "trade": {

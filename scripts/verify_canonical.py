@@ -56,7 +56,7 @@ DOCUMENTED = {
     "OTIF internal fill": 0.9923,
     "Walmart shipments on time and complete": 0.8445,
     "OTIF total exposure ($)": 57_196,
-    "Short-ship total 3yr ($)": 894_174,
+    "Short-ship total 3yr ($)": 887_699,
     "Channel retail advantage / $1M ($)": 54_000,
     "PDHA product-data cost ($/yr)": 93_000,
     "Trade all-in ($/yr)": 3_600_000,
