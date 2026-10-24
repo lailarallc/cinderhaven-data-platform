@@ -9,6 +9,66 @@ For things that didn't work, see FAILURES.md.
 
 ---
 
+## 2026-07-29 (wrap) — cost-side data model, production deploy, period-explicit canonical; all merged to main
+
+**Started from:** Phase 1 complete (entry below). User directed the full
+enrichment arc across several turns.
+
+**Did (four arcs, all merged to main at `0ea3961` via squashed PR #2):**
+- **Cost side.** New isolated `costing` schema — `fct_product_costs`,
+  `fct_inventory_snapshot`, `dim_suppliers`, `fct_supplier_invoices`, plus
+  production runs, inventory lots, lot balances, and a lot→shipment→store
+  bridge. Five named margin lines (gross-at-standard 51.98%, contribution
+  49.01%, gross-at-landed ~43.5%, loaded-at-standard 42.5% flat,
+  loaded-at-actual 42.3% blended). PPV carries the compression (standard
+  frozen at launch; actual walks 45.0→42.4→39.6). CCC 119.7 (t36m,
+  production). Additive-only: nine protected tables byte-identical before/after.
+  No cross-schema FKs (DROP SCHEMA raw CASCADE would silently drop them);
+  integrity in the generator + `tests/test_costing_integrity.sql`. Stored
+  totals are GENERATED STORED.
+- **Production deploy.** Dispatch-only workflow `deploy-costing.yml` with a
+  pre-flight guard (halts if `costing` holds rows unless force_recreate).
+  First install — `costing` did not previously exist. Every acceptance figure
+  matched the replica; integrity clean. One-cent divergence on
+  `fct_retailer_payments` + `mart_channel_contribution` diagnosed as a
+  different seed run, not tampering (it foots, raw=mart, only float-rounded
+  currency columns differ).
+- **Period-explicit canonical.** Rebuilt `CINDERHAVEN_CANONICAL.md` →
+  `reference/` so every value carries a basis AND a period; added
+  machine-readable `reference/canonical_values.yml` keyed
+  `metric.basis.period`; root pointer left behind. Default period **cy2025**
+  (≡ trailing_12m). Headline: prior canonical figures were silently
+  trailing-36m, which is why cy2025 tools read as failing (DIO 127.3=t36m,
+  cy2025=134.6). Guards hard-fail if the file is missing;
+  `verify_canonical.py` reads the YAML. Three findings recorded not smoothed:
+  2024 revenue is a velocity peak on a shrinking door base; authorizations
+  9,943/0/49 is an initial-load artifact; promo spend + deauths are zero in
+  cy2025 (windows ended 2024). Values VERIFIED-AGAINST-PRODUCTION via
+  read-only workflow.
+- **CI bug fixed.** `canonical-drift.yml` had hardcoded the literal string
+  `REDACTED` as the Postgres password since `a4cebc4` — the drift check had
+  **never** authenticated. `f97abbf` interpolates `$POSTGRES_PASSWORD`; drift
+  now green against production.
+
+**State:** main `0ea3961`, clean. PR #1 (Phase 1 + cost side) and PR #2
+(period-explicit canonical) both merged. Designated branch recreated from main
+for this wrap. `costing.*` live in production, nine protected tables intact,
+**nothing wired to `costing.*`** — no tool, no dbt model, no live app.
+Local replica is ephemeral to the container. flyctl/Fly creds are NOT in the
+session; all production work went through dispatch-only GitHub Actions
+(FLY_API_TOKEN + POSTGRES_PASSWORD secrets). Remote branch deletion is blocked
+from the session env (git proxy + REST both refuse); user deletes branches.
+
+**Next (post-CEO-window, separate work):** wire tools to `costing.*` one at a
+time (recall-blast-radius, the four margin tools, Spin Rate migration, etc.).
+The four UNSOURCED hypotheses (trade-spend trajectory, best-seller-worst-margin,
+master-data degradation, deduction learning curve) still need SPINS/Nielsen
+checks before becoming demo numbers. `reference/COST-SIDE-DATA-SPEC.md` was
+referenced by the user but never existed in the repo — schemas were designed
+from the prompt.
+
+---
+
 ## 2026-07-29 — Phase 1: canonical verified against Postgres, both contradictions resolved, pre-Phase-2 baseline recorded
 
 **Started from:** Two-phase instruction from user. Phase 1 (measure,

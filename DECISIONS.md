@@ -17,6 +17,67 @@ Each entry:
 
 ---
 
+## Canonical & Data Model
+
+### 2026-07-29 — Default period for any unqualified "annual" figure is cy2025
+- **Decision:** When canonical states a figure without a period, it means
+  cy2025 (2025-01-01 … 2025-12-31). Every other period is a named variant,
+  not a discrepancy.
+- **Why:** Tools kept reading as "failing" against canonical when they were
+  measuring a different window, not a different number — every prior headline
+  figure was silently trailing-36-months (e.g. DIO 127.3=t36m, cy2025=134.6).
+  cy2025 is chosen over other defaults because scan data ends 2025-12-27, so
+  trailing-12-months resolves to the identical window — it collapses two
+  candidate defaults into one definition instead of leaving rival readings.
+- **Scope:** global — `reference/CINDERHAVEN_CANONICAL.md`,
+  `reference/canonical_values.yml`, every downstream tool citing canonical.
+- **Do not:** cite a canonical figure without its period; treat a
+  named-variant period as drift.
+
+### 2026-07-29 — There are five margin lines; always name the basis
+- **Decision:** Cinderhaven has five distinct, all-real margin figures —
+  gross-at-standard (51.98%), contribution after commercial costs (49.01%),
+  gross-at-landed (~43.5%, legacy), loaded-at-standard (42.5%), and
+  loaded-at-actual (42.3% blended). Cite the basis with the number, always.
+- **Why:** They differ because a CFO expects them to (COGS-narrow vs
+  fully-loaded contribution are different P&L lines). Presenting one without
+  its basis reads as the can't-keep-numbers-straight defect this warehouse's
+  canonical exists to kill. Loaded-at-standard is flat by construction (frozen
+  standard); loaded-at-actual carries the PPV compression.
+- **Scope:** global — anything quoting Cinderhaven margin.
+- **Do not:** compute margin from `manufactured_cost_per_unit` and call it the
+  loaded margin (that is loaded-at-actual, not -at-standard); modify
+  `raw.sku_costs` wholesale/cogs to hit a spread target (moves every published
+  margin).
+
+### 2026-07-29 — contract-to-cash's uncollected-receivables copy is wrong
+- **Decision:** The narrative attributing part of the invoiced-vs-collected
+  gap to uncollected receivables must be rewritten. Uncollected receivables
+  are **$0** by construction.
+- **Why:** `invoiced == gross_payments` to the cent because
+  `generate_remittances()` partitions every order into exactly one
+  retailer-month remittance and `net = gross − total_deductions`; the schema
+  has no aging bucket, bad-debt, or unpaid-invoice concept. The entire gap is
+  trade allowances, deductions, chargebacks, and a timing residual.
+- **Scope:** contract-to-cash hero copy; any tool implying AR.
+- **Do not:** present AR as a number; it is absent-structural, not zero.
+
+### 2026-07-29 — The 22–55% SKU-margin-spread target was invented; retire it
+- **Decision:** The "roughly 22–55%" SKU loaded-margin spread target is
+  retired as unsourced. The criterion is **width ≥ 30 points, position
+  inherited from `raw.sku_costs`**. Achieved and canonical: 25.81–60.94%
+  (35.1-point width).
+- **Why:** The target was an invented illustration of "wide spread," same
+  class as the trade-spend trajectory and best-seller-worst-margin claims
+  already retracted. What mattered was width, and the build exceeds it. The
+  position is inherited from frozen wholesale/cogs; the only way to move it is
+  to modify protected pricing data, which moves every published margin.
+- **Scope:** cost-side SKU margin; `fct_product_costs`.
+- **Do not:** treat a red check against the old 22–55% as a real failure — the
+  check is wrong; this decision is the fix.
+
+---
+
 ## Infrastructure & Ops
 
 ### 2026-07-02 — Stop guessing at cinderhaven-db's flypgadmin credential; rebuild or escalate instead
