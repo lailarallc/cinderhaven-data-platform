@@ -275,7 +275,7 @@ supersedes one.
 
 | Overlay | What it adds | Status |
 |---------|--------------|--------|
-| `cinderhaven-promo-response` | A causal promo signal: a curated promo-event calendar, a promo-responsive scan series, and quarantined ground truth | Additive, seed-locked, v0.6.1 (`bdb08c6900880469ff0242e9f1c4fc9841a46267`) |
+| `cinderhaven-promo-response` | A causal promo signal: a curated promo-event calendar, a promo-responsive scan series, and quarantined ground truth | Additive, seed-locked, v0.6.2 (`820e19358ed7e17e4b31ef0277f4ecbedce64262`) |
 
 **Why it exists.** `seed_shared.py` writes promotions as random calendar rows
 and `seed_scan_data.py` never reads them, so the SSOT scan series contains no
@@ -305,7 +305,7 @@ revenue and must never be cited as one, and it moves by design whenever the prom
 layer, its prices, or its mix are retuned. Canonical's $32,323,139.62 is the
 promo-free figure and remains the only scan-revenue number this file carries.
 
-**Trade spend is realistic at both scales, as of v0.6.1.** The overlay's trade
+**Trade spend is realistic at both scales, as of v0.6.2.** The overlay's trade
 rate is drawn per event as a negotiated allowance against wholesale, so per-unit
 economics are defensible. The portfolio figure is realistic too: about 29% of the
 overlay's volume runs on promotion (a real specialty brand: 20-40%), and
