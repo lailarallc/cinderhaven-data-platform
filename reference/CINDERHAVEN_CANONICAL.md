@@ -275,7 +275,7 @@ supersedes one.
 
 | Overlay | What it adds | Status |
 |---------|--------------|--------|
-| `cinderhaven-promo-response` | A causal promo signal: a curated promo-event calendar, a promo-responsive scan series, and quarantined ground truth | Additive, seed-locked, v0.6.2 (`820e19358ed7e17e4b31ef0277f4ecbedce64262`) |
+| `cinderhaven-promo-response` | A causal promo signal: a curated promo-event calendar, a promo-responsive scan series, and quarantined ground truth | Additive, seed-locked, v0.7.0 (`ff596fe4599c3e6ab82451683bd13f36f22298a2`) |
 
 **Why it exists.** `seed_shared.py` writes promotions as random calendar rows
 and `seed_scan_data.py` never reads them, so the SSOT scan series contains no
@@ -293,19 +293,22 @@ untouched by construction, not by convention.
 SKU codes, `RET-*-S####` store IDs, Saturday week-endings — so one company
 reads consistently across tools. Row *membership* is drawn independently and
 does not match `raw.scan_data`. Do not join the layer 1:1 to canonical scan
-data, and do not sum its units or dollars onto canonical actuals.
+data, and do not sum its units or dollars onto canonical actuals. **Since v0.7.0
+the overlay also launches and exits items**: launched SKUs carry package-only
+codes that continue each line's numbering and exist nowhere in the SSOT, and an
+exited item's scan simply ends. Canonical's 50 SKUs are unchanged.
 
 **Its figures are locked in its own repo, not here.** The overlay's implied
-trailing-52-week revenue is **$46,753,366.78** on 1,340,462 rows — a scenario
-figure, versioned in that package's `FIGURES.md`. It **rose again at v0.6.0**:
-everyday list prices now move (staggered annual increases) and demand drifts
-toward premium, so the promoted series carries more revenue than at v0.5.0. That
+trailing-52-week revenue is **$48,174,865.10** on 1,293,126 rows — a scenario
+figure, versioned in that package's `FIGURES.md`. It **moved again at v0.7.0**:
+the portfolio now churns (new items launch and ramp, old ones fade and exit), on
+top of v0.6.0's moving list prices and premium drift. That
 movement is the overlay working, not drift — it is **not** a restatement of scan
 revenue and must never be cited as one, and it moves by design whenever the promo
 layer, its prices, or its mix are retuned. Canonical's $32,323,139.62 is the
 promo-free figure and remains the only scan-revenue number this file carries.
 
-**Trade spend is realistic at both scales, as of v0.6.2.** The overlay's trade
+**Trade spend is realistic at both scales, as of v0.7.0.** The overlay's trade
 rate is drawn per event as a negotiated allowance against wholesale, so per-unit
 economics are defensible. The portfolio figure is realistic too: about 29% of the
 overlay's volume runs on promotion (a real specialty brand: 20-40%), and
