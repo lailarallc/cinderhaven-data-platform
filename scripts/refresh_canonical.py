@@ -4,6 +4,8 @@
 Copies the platform's synced artifacts into this repo:
   reference/canonical_values.json  (the machine-readable canon; tests read it)
   reference/supersedes.txt         (retired-figure list; the drift gate reads it)
+  reference/retailer_display_labels.json (public labels for trade partners;
+                                    tool UIs and check_retailer_labels.py read it)
   scripts/check_canonical_drift.py (the drift gate itself — synced so every repo
                                     runs the SAME, current gate implementation)
   scripts/refresh_canonical.py     (this script — self-syncs so the next refresh
@@ -32,7 +34,9 @@ REPO = Path(__file__).resolve().parent.parent
 ARTIFACTS = (
     ("reference", "canonical_values.json", "reference"),
     ("reference", "supersedes.txt", "reference"),
+    ("reference", "retailer_display_labels.json", "reference"),
     ("scripts", "check_canonical_drift.py", "scripts"),
+    ("scripts", "check_retailer_labels.py", "scripts"),
     ("scripts", "refresh_canonical.py", "scripts"),
 )
 
