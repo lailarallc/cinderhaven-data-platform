@@ -31,6 +31,9 @@ def load_names() -> list[str]:
     names = [v["name"] for grp in ("retailers", "distributors") for v in data[grp].values()
              if v["name"] != v["label"]]
     names += ["DPI"]
+    # All-caps forms appear in IDs and codes (RET-KROGER-S0021, DPO-KEHE-...). Not a plain
+    # case-insensitive match: "sprouts" the vegetable is not Sprouts the retailer.
+    names += [n.upper() for n in names] + ["KEHE"]
     return sorted(set(names), key=len, reverse=True)
 
 
