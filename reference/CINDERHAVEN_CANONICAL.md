@@ -352,6 +352,10 @@ that package's `FIGURES.md`.
 
 ---
 
+## Public display labels
+
+Public surfaces never put a real trade-partner name beside a Cinderhaven dollar figure (decided 2026-11-05). The label map is `reference/retailer_display_labels.json` (Walmart shows as "national mass retailer", UNFI as "distributor A", and so on). `scripts/refresh_canonical.py` vendors it along with `scripts/check_retailer_labels.py`, the gate that enforces it. The dataset keeps the real names. A real name stays only for the partner's own published rule, code, fee, or window with no Cinderhaven dollar figure beside it.
+
 ## Channels
 
 | Fact | Value | Source |
