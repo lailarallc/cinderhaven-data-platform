@@ -1,6 +1,6 @@
 {
   "_about": "Public display labels for Cinderhaven's trade partners. The dataset keeps the real names (seed_config.py, Postgres); every public surface (blog posts, /work pages, tool UIs) shows the label instead whenever a Cinderhaven dollar figure is in the same sentence, table row, chart, or card. A real name stays only for the retailer's own published rule, code, fee, or window with no Cinderhaven dollar figure beside it. Decided 2026-11-05 (lailara-website DECISIONS). Vendored to every tool repo by scripts/refresh_canonical.py; scripts/check_retailer_labels.py enforces it on text.",
-  "version": "2026-11-05",
+  "version": "2026-11-05.2",
   "retailers": {
     "RET-WALMART":    {"name": "Walmart",        "label": "national mass retailer"},
     "RET-COSTCO":     {"name": "Costco",         "label": "club retailer"},
@@ -13,5 +13,9 @@
     "DIST-UNFI": {"name": "UNFI",          "label": "distributor A"},
     "DIST-KEHE": {"name": "KeHE",          "label": "distributor B"},
     "DIST-DPI":  {"name": "DPI Northwest", "label": "distributor C"}
+  },
+  "other_partners": {
+    "_about": "Real retailers named in Cinderhaven copy that are not in the dataset roster. Keyed by a label-map id only; no dataset table uses these ids.",
+    "X-TARGET": {"name": "Target", "label": "national discount retailer"}
   }
 }

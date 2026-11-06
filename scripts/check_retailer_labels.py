@@ -28,8 +28,9 @@ def load_names() -> list[str]:
         print(f"ERROR: {LABELS} missing; run scripts/refresh_canonical.py", file=sys.stderr)
         sys.exit(2)
     data = json.loads(LABELS.read_text(encoding="utf-8"))
-    names = [v["name"] for grp in ("retailers", "distributors") for v in data[grp].values()
-             if v["name"] != v["label"]]
+    names = [v["name"] for grp in ("retailers", "distributors", "other_partners")
+             for k, v in data.get(grp, {}).items()
+             if not k.startswith("_") and v["name"] != v["label"]]
     names += ["DPI"]
     # All-caps forms appear in IDs and codes (RET-KROGER-S0021, DPO-KEHE-...). Not a plain
     # case-insensitive match: "sprouts" the vegetable is not Sprouts the retailer.
