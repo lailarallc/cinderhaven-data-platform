@@ -34,7 +34,9 @@ def load_names() -> list[str]:
     names += ["DPI"]
     # All-caps forms appear in IDs and codes (RET-KROGER-S0021, DPO-KEHE-...). Not a plain
     # case-insensitive match: "sprouts" the vegetable is not Sprouts the retailer.
-    names += [n.upper() for n in names] + ["KEHE"]
+    # EDI partner codes join the name to a suffix, so \bWALMART\b misses them
+    # (edi-reconciliation-tool renders WALMARTUS beside dollar figures).
+    names += [n.upper() for n in names] + ["KEHE", "WALMARTUS"]
     return sorted(set(names), key=len, reverse=True)
 
 
