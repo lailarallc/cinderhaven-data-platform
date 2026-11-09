@@ -38,7 +38,10 @@ CREATE TABLE truth.injection_ledger (
     preventable_by           TEXT CHECK (preventable_by IN ('item_setup_preflight', 'three_way_match',
                                  'deduction_validation', 'edi_reconciliation', 'receiving_audit',
                                  'po_acknowledgment', 'price_book_governance', 'none')),
-    cost_if_caught           NUMERIC(12,2) CHECK (cost_if_caught > 0),          -- never zero: A6.12's floor
+    -- A6.12's ratio, cost when caught by the named control / cost when not caught
+    -- (expected_cost), floored at 0.02: catching costs labor. Dollars are derived
+    -- at read (cost_if_caught * expected_cost), never stored (owner, 2026-11-09).
+    cost_if_caught           NUMERIC(5,4) CHECK (cost_if_caught >= 0.02),
     benchmark_detection_rate NUMERIC(5,4) CHECK (benchmark_detection_rate >= 0
                                  AND benchmark_detection_rate < 1),               -- A6.13, per control
     CHECK (detected_date IS NULL OR detected_date >= occurred_date)

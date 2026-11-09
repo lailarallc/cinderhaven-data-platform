@@ -110,6 +110,7 @@ def test_truth_populated_is_false_where_truth_does_not_exist(cur):
 @pytest.mark.parametrize("bad", [
     "preventable_by = 'manual_review'",
     "cost_if_caught = 0",
+    "cost_if_caught = 0.0199",
     "benchmark_detection_rate = 1",
 ])
 def test_injection_ledger_rejects_values_outside_its_constraints(db, bad):
@@ -144,3 +145,16 @@ def test_rerunning_the_voidfinder_seeder_keeps_the_readers_grants(cur):
     seed_void_patterns.seed_addresses(cur)
     cur.execute("SELECT has_table_privilege('cinderhaven_reader', 'voidfinder.store_addresses', 'SELECT')")
     assert cur.fetchone()[0] is True
+
+
+def test_cost_if_caught_is_a_ratio_at_or_above_a612s_floor(cur):
+    # A6.12: a ratio, floor 0.02; dollars are derived at read, so a dollar figure
+    # does not fit the column.
+    cur.execute("INSERT INTO truth.injection_ledger (row_class, occurred_date, actor, error_type, entity_type, "
+                "entity_id, expected_cost, cost_if_caught) VALUES ('injected_error', '2024-01-01', 'retailer', "
+                "'duplicate_deduction', 'deduction', 'D1', 400.00, 0.02) RETURNING cost_if_caught * expected_cost")
+    assert float(cur.fetchone()[0]) == 8.0
+    with pytest.raises(psycopg2.errors.NumericValueOutOfRange):
+        cur.execute("INSERT INTO truth.injection_ledger (row_class, occurred_date, actor, error_type, "
+                    "entity_type, entity_id, cost_if_caught) VALUES ('injected_error', '2024-01-01', 'retailer', "
+                    "'duplicate_deduction', 'deduction', 'D2', 120.00)")
