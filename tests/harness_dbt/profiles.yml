@@ -1,0 +1,14 @@
+# dbt profile for the test harness's off-host instance only. Every value comes
+# from tests/harness.env (loaded by tests/harness.py); nothing here is a secret.
+cinderhaven:
+  target: harness
+  outputs:
+    harness:
+      type: postgres
+      host: "{{ env_var('HARNESS_PG_HOST') }}"
+      port: "{{ env_var('HARNESS_PG_PORT') | int }}"
+      user: "{{ env_var('HARNESS_PG_USER') }}"
+      password: "{{ env_var('HARNESS_PG_PASSWORD') }}"
+      dbname: "{{ env_var('HARNESS_PG_DB') }}"
+      schema: public
+      threads: 4

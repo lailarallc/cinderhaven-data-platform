@@ -45,3 +45,6 @@ backup-*.sql
 *.key
 credentials.*
 secrets.*
+
+# Test harness: generated local test credentials (U3)
+tests/harness.env

@@ -12,5 +12,21 @@ services:
       - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/01-init.sh:ro
       - ./data:/data:ro
 
+  # The test harness's off-host instance (U3). Its own credentials, generated
+  # into tests/harness.env by tests/make_harness_env.py (a separate local test
+  # set, U18 2026-10-20); no production dump is mounted, the harness rebuilds it
+  # from DDL. Start with: docker compose --env-file tests/harness.env up -d harness-db
+  harness-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${HARNESS_PG_DB:?run python tests/make_harness_env.py}
+      POSTGRES_USER: ${HARNESS_PG_USER:?run python tests/make_harness_env.py}
+      POSTGRES_PASSWORD: ${HARNESS_PG_PASSWORD:?run python tests/make_harness_env.py}
+    ports:
+      - "127.0.0.1:${HARNESS_PG_PORT:-55432}:5432"
+    volumes:
+      - harness_pgdata:/var/lib/postgresql/data
+
 volumes:
   pgdata:
+  harness_pgdata:
