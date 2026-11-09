@@ -28,15 +28,16 @@ def load_names() -> list[str]:
         print(f"ERROR: {LABELS} missing; run scripts/refresh_canonical.py", file=sys.stderr)
         sys.exit(2)
     data = json.loads(LABELS.read_text(encoding="utf-8"))
-    names = [v["name"] for grp in ("retailers", "distributors", "other_partners")
-             for k, v in data.get(grp, {}).items()
-             if not k.startswith("_") and v["name"] != v["label"]]
-    names += ["DPI"]
+    partners = [v for grp in ("retailers", "distributors", "other_partners")
+                for k, v in data.get(grp, {}).items()
+                if not k.startswith("_") and v["name"] != v["label"]]
+    names = [v["name"] for v in partners]
     # All-caps forms appear in IDs and codes (RET-KROGER-S0021, DPO-KEHE-...). Not a plain
     # case-insensitive match: "sprouts" the vegetable is not Sprouts the retailer.
-    # EDI partner codes join the name to a suffix, so \bWALMART\b misses them
-    # (edi-reconciliation-tool renders WALMARTUS beside dollar figures).
-    names += [n.upper() for n in names] + ["KEHE", "WALMARTUS"]
+    names += [n.upper() for n in names]
+    # Codes the upper-cased name misses (WMT, KGR, WHOLEFOODS, DPI, the WALMARTUS EDI
+    # partner code) are aliases in the map, so a new tool code is a map edit, not a gate edit.
+    names += [a for v in partners for a in v.get("aliases", [])]
     return sorted(set(names), key=len, reverse=True)
 
 
