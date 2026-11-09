@@ -27,9 +27,9 @@ from seed_config import DATABASE_URL
 
 
 def execute_ddl(conn):
-    """Run raw_schema.sql to drop and recreate the raw schema."""
-    ddl_path = Path(__file__).parent.parent / "sql" / "raw_schema.sql"
-    ddl = ddl_path.read_text()
+    """Run raw_schema.sql and truth_schema.sql to drop and recreate both schemas."""
+    sql_dir = Path(__file__).parent.parent / "sql"
+    ddl = (sql_dir / "raw_schema.sql").read_text() + "\n" + (sql_dir / "truth_schema.sql").read_text()
 
     # Also drop dbt schemas so they get rebuilt clean
     preamble = """
@@ -43,7 +43,16 @@ def execute_ddl(conn):
     cur.execute(ddl)
     conn.commit()
     cur.close()
-    print("DDL executed — raw schema recreated, dbt schemas dropped.")
+    print("DDL executed — raw and truth schemas recreated, dbt schemas dropped.")
+
+
+def report_truth(conn):
+    """Report truth as populated or not, never as a count (plan U4, path 7: an
+    aggregate of truth is truth, and this log is persisted)."""
+    cur = conn.cursor()
+    cur.execute("SELECT public.truth_populated()")
+    print(f"  truth populated: {'yes' if cur.fetchone()[0] else 'no'}")
+    cur.close()
 
 
 def run_generator(module_name: str):
@@ -111,6 +120,7 @@ def main():
     print("\nStep 7: Verifying...")
     conn = psycopg2.connect(DATABASE_URL)
     verify_counts(conn)
+    report_truth(conn)
     conn.close()
 
     elapsed = time.time() - start

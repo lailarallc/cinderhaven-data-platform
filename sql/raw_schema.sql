@@ -494,3 +494,18 @@ CREATE TABLE raw.scan_data (
 );
 CREATE INDEX idx_scan_data_store ON raw.scan_data(store_id);
 CREATE INDEX idx_scan_data_week ON raw.scan_data(week_ending);
+
+-- Ownership (owned sequences follow their table) and grants travel with the schema (plan U4; roles in sql/truth_roles.sql):
+-- DROP SCHEMA raw CASCADE takes its grants with it, so every rebuild restates them.
+DO $$
+DECLARE t record;
+BEGIN
+    EXECUTE 'ALTER SCHEMA raw OWNER TO cinderhaven_generator';
+    FOR t IN SELECT c.relname, c.relkind FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+             WHERE n.nspname = 'raw' AND c.relkind IN ('r', 'p') LOOP
+        EXECUTE format('ALTER %s raw.%I OWNER TO cinderhaven_generator',
+                       'TABLE', t.relname);
+    END LOOP;
+END $$;
+GRANT USAGE ON SCHEMA raw TO cinderhaven_dbt, cinderhaven_reader, cinderhaven_validator;
+GRANT SELECT ON ALL TABLES IN SCHEMA raw TO cinderhaven_dbt, cinderhaven_reader, cinderhaven_validator;

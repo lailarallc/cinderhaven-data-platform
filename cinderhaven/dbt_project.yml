@@ -15,8 +15,16 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Grants (plan U4; roles in sql/truth_roles.sql): the reader and validator roles
+# read every model the dbt role builds. +grants covers the relations; schema
+# USAGE is granted after the run, for each schema the run built.
+on-run-end:
+  - "{% for s in schemas %}grant usage on schema {{ s }} to cinderhaven_reader, cinderhaven_validator;{% endfor %}"
+
 models:
   cinderhaven:
+    +grants:
+      select: ['cinderhaven_reader', 'cinderhaven_validator']
     staging:
       +materialized: view
       +schema: staging

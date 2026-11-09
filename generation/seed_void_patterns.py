@@ -327,6 +327,11 @@ def seed_addresses(cur) -> int:
         )
         """
     )
+    # Grants beside the CREATE SCHEMA (plan U4; roles in sql/truth_roles.sql).
+    cur.execute("ALTER SCHEMA voidfinder OWNER TO cinderhaven_generator")
+    cur.execute("ALTER TABLE voidfinder.store_addresses OWNER TO cinderhaven_generator")
+    cur.execute("GRANT USAGE ON SCHEMA voidfinder TO cinderhaven_reader, cinderhaven_validator")
+    cur.execute("GRANT SELECT ON ALL TABLES IN SCHEMA voidfinder TO cinderhaven_reader, cinderhaven_validator")
     cur.execute("DELETE FROM voidfinder.store_addresses")
     cur.execute("SELECT store_id, state FROM raw.stores ORDER BY store_id")
     rows = cur.fetchall()

@@ -156,3 +156,18 @@ CREATE INDEX idx_inv_snapshot_date ON costing.fct_inventory_snapshot(snapshot_da
 CREATE INDEX idx_lot_balances_date ON costing.fct_lot_balances(snapshot_date);
 CREATE INDEX idx_supplier_inv_date ON costing.fct_supplier_invoices(invoice_date);
 CREATE INDEX idx_product_costs_per ON costing.fct_product_costs(cost_period);
+
+-- Ownership (owned sequences follow their table) and grants travel with the schema (plan U4; roles in sql/truth_roles.sql):
+-- DROP SCHEMA costing CASCADE takes its grants with it, so every rebuild restates them.
+DO $$
+DECLARE t record;
+BEGIN
+    EXECUTE 'ALTER SCHEMA costing OWNER TO cinderhaven_generator';
+    FOR t IN SELECT c.relname, c.relkind FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+             WHERE n.nspname = 'costing' AND c.relkind IN ('r', 'p') LOOP
+        EXECUTE format('ALTER %s costing.%I OWNER TO cinderhaven_generator',
+                       'TABLE', t.relname);
+    END LOOP;
+END $$;
+GRANT USAGE ON SCHEMA costing TO cinderhaven_dbt, cinderhaven_reader, cinderhaven_validator;
+GRANT SELECT ON ALL TABLES IN SCHEMA costing TO cinderhaven_dbt, cinderhaven_reader, cinderhaven_validator;

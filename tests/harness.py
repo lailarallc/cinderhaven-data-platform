@@ -106,9 +106,21 @@ def run_seed(run_seed: int = 0) -> list:
     vals = harness_values()
     guard(vals)
     timings: list = []
+    t0 = time.time()
+    apply_roles(vals)
+    timings.append(("sql/truth_roles.sql", time.time() - t0))
     for label, cmd, cwd in SEED_STEPS:
         _run(label, cmd, vals, cwd, timings)
     return timings
+
+
+def apply_roles(vals: dict[str, str]) -> None:
+    """Apply sql/truth_roles.sql as the harness instance's administrator (its
+    bootstrap superuser): the one administrator connection the plan keeps."""
+    import psycopg2
+    print("\n== sql/truth_roles.sql", flush=True)
+    with psycopg2.connect(dsn(vals), connect_timeout=5) as conn, conn.cursor() as cur:
+        cur.execute((ROOT / "sql" / "truth_roles.sql").read_text())
 
 
 def run_build() -> list:
