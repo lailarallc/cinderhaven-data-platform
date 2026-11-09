@@ -53,7 +53,9 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install ./orchestration
+          # Pinned to the versions the Dagster guard test's faked manifest is
+          # proven on; unpinned, dagster-dbt 0.29.29 + dbt-core 1.12 reject it.
+          pip install ./orchestration "dagster==1.13.4" "dagster-dbt==0.29.4" "dbt-core==1.11.9"
 
       # Fast tier: no test here connects to a database (`db` marker excluded).
       # A skip fails the run (tests/skip_is_failure.py), so the Dagster guard
