@@ -95,6 +95,10 @@ def test_dagster_dbt_build_refuses_fly_tunnel_before_running_dbt(fly_tunnel, mon
                         lambda self, *a, **kw: types.SimpleNamespace(target_path=tmp_path))
     from cinderhaven_orchestration import project
     monkeypatch.setattr(project, "DBT_EXECUTABLE", sys.executable)  # resource checks the path exists
+    # project.py points at ~/.dbt, a machine-local profile CI does not have (U4 path 5
+    # commits orchestration/profiles.yml); the resource only checks a profiles.yml is there.
+    (tmp_path / "profiles.yml").write_text("cinderhaven: {}\n")
+    monkeypatch.setattr(project, "DBT_PROFILES_DIR", tmp_path)
     assets = _fresh_import("cinderhaven_orchestration.assets")
 
     ran = []
