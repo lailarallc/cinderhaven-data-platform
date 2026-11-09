@@ -129,7 +129,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/cinderhaven
           ALLOW_PROD_DB: "1"  # this step writes production on purpose; see scripts/prod_guard.py
-        run: python scripts/seed_costing.py
+        run: python generation/seed_costing.py
 
       # ── STEP 3 — prove the hard rule held ─────────────────────────
       - name: "Step 3: re-hash and fail on ANY delta"

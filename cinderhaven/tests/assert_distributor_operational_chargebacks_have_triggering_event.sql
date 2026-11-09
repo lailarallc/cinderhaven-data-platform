@@ -5,7 +5,7 @@
 -- broke (a regression to the pre-causal pattern, where operational
 -- chargebacks were independent random draws).
 --
--- Join rules mirror the generator (scripts/seed_distributor.py,
+-- Join rules mirror the generator (generation/seed_distributor.py,
 -- generate_operational_chargebacks):
 --   short_ship    -> a shorted shipment line, same distributor + SKU,
 --                    chargeback month = ship month
@@ -17,7 +17,7 @@
 --                    delivery month
 --
 -- The 12-day window mirrors DIST_DELIVERY_WINDOW_DAYS in
--- scripts/seed_config.py (frozen block). There is no
+-- generation/seed_config.py (frozen block). There is no
 -- receiving_discrepancy category on this channel (design §1.6: no
 -- receipt lines — distributor discrepancies arrive via deductions).
 -- The kept quality-linked chargebacks (damaged, pricing_error) are out

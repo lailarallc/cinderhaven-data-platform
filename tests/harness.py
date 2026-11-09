@@ -87,10 +87,10 @@ def _run(label: str, cmd: list[str], vals: dict[str, str], cwd: Path, timings: l
 
 
 SEED_STEPS = [
-    ("seed_all.py", [sys.executable, "scripts/seed_all.py"], ROOT),
+    ("seed_all.py", [sys.executable, "generation/seed_all.py"], ROOT),
     ("dbt run: staging", dbt_cmd("run", "--select", "staging"), ROOT / "cinderhaven"),
-    ("seed_costing.py", [sys.executable, "scripts/seed_costing.py"], ROOT),
-    ("seed_product_master_history.py", [sys.executable, "scripts/seed_product_master_history.py"], ROOT),
+    ("seed_costing.py", [sys.executable, "generation/seed_costing.py"], ROOT),
+    ("seed_product_master_history.py", [sys.executable, "generation/seed_product_master_history.py"], ROOT),
 ]
 BUILD_STEPS = [("dbt build: all", dbt_cmd("build"), ROOT / "cinderhaven")]
 

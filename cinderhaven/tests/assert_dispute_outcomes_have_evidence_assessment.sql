@@ -6,8 +6,8 @@
 -- a random label and outcomes were a flat draw).
 --
 -- Two violation classes, mirroring the generator
--- (scripts/seed_retailer.py assemble_evidence /
--- scripts/seed_distributor.py assemble_evidence):
+-- (generation/seed_retailer.py assemble_evidence /
+-- generation/seed_distributor.py assemble_evidence):
 --
 --   missing assessment — the dispute does not join to the fulfillment
 --     rows the assessment is assembled from (deduction -> order ->

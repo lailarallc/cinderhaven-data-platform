@@ -11,7 +11,7 @@ Tables generated:
 Requires seed_shared.py to have been run first (products exist).
 
 Usage:
-    python scripts/seed_dtc.py
+    python generation/seed_dtc.py
 """
 from __future__ import annotations
 

@@ -1,6 +1,6 @@
 """The prod guard sits in front of every write path to Postgres.
 
-The seed scripts, seed_costing.py, ingest_sqlite_to_postgres.py and the Dagster
+The seed scripts (generation/), seed_costing.py, ingest_sqlite_to_postgres.py and the Dagster
 `dbt build` all default to localhost:5432 -- a `fly proxy` tunnel to production
 when one is open. These tests fake a flyctl listener and assert nothing connects.
 
@@ -16,11 +16,25 @@ import pathlib
 import pytest
 
 ROOT = pathlib.Path(__file__).parent.parent
-sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT / "scripts"))  # ingest_sqlite_to_postgres.py
+sys.path.insert(0, str(ROOT / "generation"))  # the seeders (U4 moved them out of scripts/)
 sys.path.insert(0, str(ROOT / "orchestration"))
 
-import prod_guard  # noqa: E402  (scripts/prod_guard.py)
+import prod_guard  # noqa: E402  (generation/prod_guard.py; the copies are byte-identical, tested below)
 import psycopg2  # noqa: E402
+
+GUARD_COPIES = ("scripts/prod_guard.py", "generation/prod_guard.py",
+                "orchestration/cinderhaven_orchestration/prod_guard.py")
+
+
+def test_the_vendored_prod_guard_copies_are_byte_identical():
+    texts = {p: (ROOT / p).read_bytes().replace(b"\r\n", b"\n") for p in GUARD_COPIES}
+    assert len(set(texts.values())) == 1, f"prod_guard copies differ: {sorted(texts)}"
+
+
+def test_every_seeder_lives_in_generation_and_none_in_scripts():
+    assert not list((ROOT / "scripts").glob("seed_*.py")), "a seeder is back in scripts/"
+    assert len(list((ROOT / "generation").glob("seed_*.py"))) == 10
 
 
 @pytest.fixture

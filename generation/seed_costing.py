@@ -13,7 +13,7 @@ Stable and hardcoded: freight rates by NMFC class, shelf life by product line,
 supplier payment terms, lot-to-store allocation policy.
 
 Usage:
-    DATABASE_URL=... python scripts/seed_costing.py
+    DATABASE_URL=... python generation/seed_costing.py
 """
 from __future__ import annotations
 

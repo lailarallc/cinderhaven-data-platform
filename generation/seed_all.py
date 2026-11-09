@@ -10,7 +10,7 @@
      never-scanned cluster, went-dark scatter, and store addresses)
 
 Usage:
-    python scripts/seed_all.py
+    python generation/seed_all.py
 
 Requires:
     - flyctl proxy running (localhost:5432)

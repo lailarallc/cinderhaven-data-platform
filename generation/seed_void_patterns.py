@@ -31,7 +31,7 @@ Runs AFTER seed_scan_data. Deterministic: isolated RNG streams
 rule-based (no randomness).
 
 Usage:
-    python scripts/seed_void_patterns.py
+    python generation/seed_void_patterns.py
 """
 from __future__ import annotations
 

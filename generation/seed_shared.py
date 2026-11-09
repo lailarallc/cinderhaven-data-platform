@@ -12,7 +12,7 @@ Tables generated:
   - promotions (promotional events)
 
 Usage:
-    python scripts/seed_shared.py
+    python generation/seed_shared.py
 """
 from __future__ import annotations
 

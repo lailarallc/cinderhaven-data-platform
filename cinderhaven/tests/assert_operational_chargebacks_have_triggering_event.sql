@@ -6,7 +6,7 @@
 -- pattern, where operational chargebacks were independent random
 -- draws).
 --
--- Join rules mirror the generator (scripts/seed_retailer.py,
+-- Join rules mirror the generator (generation/seed_retailer.py,
 -- generate_operational_chargebacks):
 --   short_ship            -> a shorted shipment line, same retailer +
 --                            SKU, chargeback month = ship month
@@ -20,7 +20,7 @@
 --                            chargeback month = delivery month
 --
 -- The MABD values mirror RETAILER_TRANSIT_DAYS (upper bound) +
--- RETAILER_OTIF_WINDOW_DAYS in scripts/seed_config.py (frozen block).
+-- RETAILER_OTIF_WINDOW_DAYS in generation/seed_config.py (frozen block).
 -- Path A data-defect chargebacks (label_fine, damaged, pricing_error)
 -- are out of scope: they are triggered by product-data defects
 -- (triggered_by_field), not fulfillment events.

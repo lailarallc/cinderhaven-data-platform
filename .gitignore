@@ -48,3 +48,4 @@ secrets.*
 
 # Test harness: generated local test credentials (U3)
 tests/harness.env
+tests/harness_dbt/.user.yml
