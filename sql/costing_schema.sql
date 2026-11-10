@@ -171,3 +171,5 @@ BEGIN
 END $$;
 GRANT USAGE ON SCHEMA costing TO cinderhaven_dbt, cinderhaven_reader, cinderhaven_validator;
 GRANT SELECT ON ALL TABLES IN SCHEMA costing TO cinderhaven_dbt, cinderhaven_reader, cinderhaven_validator;
+-- pg_dump reads each serial's sequence: the reader's dump needs SELECT on them.
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA costing TO cinderhaven_reader;

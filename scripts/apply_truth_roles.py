@@ -63,6 +63,7 @@ def change_list(cur, dbt_login: str | None) -> list[str]:
             out.append(f"ALTER {KIND[kind]} {s}.{name} OWNER: {owner} -> cinderhaven_generator")
         readers = "cinderhaven_reader, cinderhaven_validator" + ("" if s == "voidfinder" else ", cinderhaven_dbt")
         out.append(f"GRANT USAGE ON SCHEMA {s}, SELECT ON ALL TABLES IN SCHEMA {s} TO {readers}")
+        out.append(f"GRANT SELECT ON ALL SEQUENCES IN SCHEMA {s} TO cinderhaven_reader")
     out.append("CREATE OR REPLACE FUNCTION public.truth_populated() (SECURITY DEFINER, owner "
                "cinderhaven_generator; EXECUTE to reader, validator, generator)")
     if dbt_login:

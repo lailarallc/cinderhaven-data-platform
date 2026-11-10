@@ -58,6 +58,7 @@ BEGIN
             END LOOP;
             EXECUTE format('GRANT USAGE ON SCHEMA %I TO cinderhaven_reader, cinderhaven_validator', s);
             EXECUTE format('GRANT SELECT ON ALL TABLES IN SCHEMA %I TO cinderhaven_reader, cinderhaven_validator', s);
+            EXECUTE format('GRANT SELECT ON ALL SEQUENCES IN SCHEMA %I TO cinderhaven_reader', s);
             IF s <> 'voidfinder' THEN
                 EXECUTE format('GRANT USAGE ON SCHEMA %I TO cinderhaven_dbt', s);
                 EXECUTE format('GRANT SELECT ON ALL TABLES IN SCHEMA %I TO cinderhaven_dbt', s);
