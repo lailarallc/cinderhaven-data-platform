@@ -1,0 +1,4 @@
+jobs:
+  x:
+    steps:
+      - run: psql -c "select 1 from raw.stores"

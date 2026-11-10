@@ -176,6 +176,39 @@ Each entry:
 
 ---
 
+### 2026-11-09 — Truth exemptions: four file lists, and the aggregates allowed out of truth
+- **Decision:** Two kinds of exemption from the truth quarantine, pinned
+  separately. Adding to either needs an entry here, not a test edit.
+- **Kind 1, code that names truth (file paths, never directories):**
+  - AST gate (`tests/test_truth_gate.py` `AST_EXEMPT`): empty. Every
+    writer lives in `generation/`, outside every scan root.
+  - Text scan (`TEXT_SCAN_EXEMPT`): `sql/truth_schema.sql` and
+    `sql/truth_roles.sql`, whose job is to name the tables, plus
+    `cinderhaven/models/counterfactual/mart_counterfactual.sql`.
+  - dbt lineage walk and compiled-SQL scan
+    (`quarantine/dbt_lineage.py` `DBT_EXEMPT`):
+    `cinderhaven/models/counterfactual/mart_counterfactual.sql`, named now,
+    built in Phase 4 (N38) in its own schema under a narrower grant than
+    `public_marts`. Data flows one way, and only this mart may cross.
+  - Import ban (`tests/test_import_ban.py` `IMPORT_BAN_EXEMPT`): empty; U5
+    adds its two registry readers by path, each with its own entry.
+- **Kind 2, aggregates allowed out of truth (an aggregate of truth is
+  truth; nothing else leaves):**
+  - the populated yes/no that `public.truth_populated()` returns;
+  - `mart_counterfactual`, under its own grant (Phase 4);
+  - the scoring harness spec 04 places in the platform, when one is built:
+    outside every root, or in list 1 by an entry here;
+  - Lift Math's `ACCURACY_VIEW`, a consumer-side file with no platform
+    counterpart.
+- **Why:** Plan U4 (spec repo). The Lift Math pattern: an exemption costs a
+  visible line and a decision, never a quiet edit. A list of files and a
+  list of permitted aggregates are not one set, so they are pinned apart.
+- **Scope:** `quarantine/`, `tests/test_truth_gate.py`,
+  `tests/test_import_ban.py`, `tests/test_dbt_lineage.py`.
+- **Do not:** exempt a directory; exempt a file to get past prose that names
+  a truth table (reword it); build the needle by concatenation to get past
+  the gate.
+
 ## Orchestration
 
 ### 2026-05-13 — Dagster requires --working-directory pointing to orchestration/

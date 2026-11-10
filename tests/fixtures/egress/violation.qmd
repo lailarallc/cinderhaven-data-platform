@@ -1,0 +1,3 @@
+```{sql}
+select count(*) from truth.promo_events
+```
