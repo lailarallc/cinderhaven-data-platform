@@ -10,6 +10,11 @@ Copies the platform's synced artifacts into this repo:
                                     runs the SAME, current gate implementation)
   scripts/refresh_canonical.py     (this script — self-syncs so the next refresh
                                     is always the latest version)
+  quarantine/truth_gate.py, quarantine/text_scan.py
+                                   (the truth quarantine gate; a consumer runs
+                                    it over its own estimation code. A copy of
+                                    this script older than the gate delivers the
+                                    new script first and the gate on the next run)
 
 The platform regenerates the two reference artifacts on every
 `verify_canonical.py` run; the two scripts are maintained in the platform's
@@ -38,6 +43,10 @@ ARTIFACTS = (
     ("scripts", "check_canonical_drift.py", "scripts"),
     ("scripts", "check_retailer_labels.py", "scripts"),
     ("scripts", "refresh_canonical.py", "scripts"),
+    # The truth quarantine gate (plan U4): lands in the consumer's own
+    # quarantine/, outside its estimation code, as loose files.
+    ("quarantine", "truth_gate.py", "quarantine"),
+    ("quarantine", "text_scan.py", "quarantine"),
 )
 
 CANDIDATES = [
@@ -79,7 +88,7 @@ def main() -> int:
         (REPO / dest_dir).mkdir(parents=True, exist_ok=True)
         shutil.copyfile(platform / src_dir / name, REPO / dest_dir / name)
         print(f"  vendored {dest_dir}/{name}  <-  {platform.name}")
-    print("done. Review `git diff reference/ scripts/` and commit.")
+    print("done. Review `git diff reference/ scripts/ quarantine/` and commit.")
     return 0
 
 
