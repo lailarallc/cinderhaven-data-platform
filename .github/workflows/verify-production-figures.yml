@@ -32,7 +32,9 @@ jobs:
     env:
       PGHOST: localhost
       PGPORT: "5432"
-      PGUSER: postgres
+      # The platform's workflow reader (DECISIONS#u4-custody-shape): POSTGRES_PASSWORD holds its
+      # password, not the superuser's, since the owner's apply on 2026-11-10.
+      PGUSER: cinderhaven_ci_reader
       PGDATABASE: cinderhaven
       PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
 
@@ -55,6 +57,18 @@ jobs:
             sleep 1
           done
           pg_isready -h localhost -p 5432
+
+      - name: "Refuse a superuser or a login with truth access (plan U4, path 5's pattern)"
+        run: |
+          read -r su reader truth < <(psql -tA -F ' ' -v ON_ERROR_STOP=1 -c "
+            SELECT rolsuper, pg_has_role(current_user, 'cinderhaven_reader', 'MEMBER'),
+                   CASE WHEN EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'truth')
+                        THEN has_schema_privilege(current_user, 'truth', 'USAGE') ELSE false END
+            FROM pg_roles WHERE rolname = current_user")
+          if [ "$su" != "f" ] || [ "$reader" != "t" ] || [ "$truth" != "f" ]; then
+            echo "::error::connected login is not a scoped reader (superuser=$su reader=$reader truth=$truth)"; exit 1
+          fi
+          echo "connected as a non-superuser reader with no truth access"
 
       - name: "Canonical gather — every metric by basis and period"
         run: |

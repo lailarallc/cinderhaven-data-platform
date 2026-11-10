@@ -81,12 +81,9 @@ def test_ingest_refuses_fly_tunnel_on_the_configured_port(fly_tunnel, monkeypatc
     assert seen == [15432], f"guard checked ports {seen}, expected [15432]"
 
 
-def test_dagster_dbt_build_refuses_fly_tunnel_before_running_dbt(fly_tunnel, monkeypatch, tmp_path):
-    dagster = pytest.importorskip("dagster")
+def _load_assets(monkeypatch, tmp_path):
+    """Import assets.py with a one-model manifest and a faked dbt CLI: no dbt, no database."""
     dagster_dbt = pytest.importorskip("dagster_dbt")
-    from cinderhaven_orchestration import prod_guard as orch_guard
-
-    monkeypatch.setattr(orch_guard, "_listener", lambda port: "flyctl")
     # assets.py runs `dbt parse` at import; hand it a one-model manifest instead
     # so the test needs neither dbt nor a database.
     manifest = {
@@ -109,11 +106,20 @@ def test_dagster_dbt_build_refuses_fly_tunnel_before_running_dbt(fly_tunnel, mon
                         lambda self, *a, **kw: types.SimpleNamespace(target_path=tmp_path))
     from cinderhaven_orchestration import project
     monkeypatch.setattr(project, "DBT_EXECUTABLE", sys.executable)  # resource checks the path exists
-    # project.py points at ~/.dbt, a machine-local profile CI does not have (U4 path 5
-    # commits orchestration/profiles.yml); the resource only checks a profiles.yml is there.
+    # project.py points at ~/.dbt, a machine-local profile CI does not have (Dagster's
+    # credential lives there, owner 2026-11-09); the resource only checks a profiles.yml is there.
     (tmp_path / "profiles.yml").write_text("cinderhaven: {}\n")
     monkeypatch.setattr(project, "DBT_PROFILES_DIR", tmp_path)
     assets = _fresh_import("cinderhaven_orchestration.assets")
+    return assets
+
+
+def test_dagster_dbt_build_refuses_fly_tunnel_before_running_dbt(fly_tunnel, monkeypatch, tmp_path):
+    dagster = pytest.importorskip("dagster")
+    from cinderhaven_orchestration import prod_guard as orch_guard
+
+    monkeypatch.setattr(orch_guard, "_listener", lambda port: "flyctl")
+    assets = _load_assets(monkeypatch, tmp_path)
 
     ran = []
     fake_dbt = types.SimpleNamespace(cli=lambda *a, **kw: ran.append(a) or pytest.fail("dbt ran"))
@@ -121,3 +127,23 @@ def test_dagster_dbt_build_refuses_fly_tunnel_before_running_dbt(fly_tunnel, mon
     with pytest.raises(orch_guard.ProdDatabaseError):
         list(assets.cinderhaven_dbt_assets.op.compute_fn.decorated_fn(context, fake_dbt))
     assert ran == [], "dbt build ran despite the fly tunnel"
+
+
+def test_dagster_checks_the_login_before_it_builds(monkeypatch, tmp_path):
+    # Path 5 (plan U4): run-operation assert_scoped_login runs, and finishes,
+    # before `dbt build` starts. A local, non-fly listener lets the guard pass.
+    dagster = pytest.importorskip("dagster")
+    from cinderhaven_orchestration import prod_guard as orch_guard
+    monkeypatch.delenv("ALLOW_PROD_DB", raising=False)
+    monkeypatch.setattr(orch_guard, "_listener", lambda port: "postgres")
+    assets = _load_assets(monkeypatch, tmp_path)
+
+    calls = []
+
+    def cli(args, **kw):
+        calls.append(args[0])
+        return types.SimpleNamespace(wait=lambda: calls.append("waited"),
+                                     stream=lambda: iter(()))
+    context = dagster.build_asset_context()
+    list(assets.cinderhaven_dbt_assets.op.compute_fn.decorated_fn(context, types.SimpleNamespace(cli=cli)))
+    assert calls == ["run-operation", "waited", "build"], calls

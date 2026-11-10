@@ -29,4 +29,7 @@ def cinderhaven_dbt_assets(context: AssetExecutionContext, dbt: DbtCliResource):
     """Materialize all dbt models as Dagster assets."""
     # dbt connects on its own. Target is the `cinderhaven` profile in ~/.dbt/profiles.yml.
     prod_guard.check(host="localhost", port=5432)
+    # Path 5 (plan U4): refuse a superuser or a login with truth access before
+    # building. Landed after the owner created cinderhaven_dagster (2026-11-10).
+    dbt.cli(["run-operation", "assert_scoped_login"], manifest=dbt_manifest_path).wait()
     yield from dbt.cli(["build"], context=context).stream()
