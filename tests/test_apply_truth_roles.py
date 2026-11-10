@@ -87,6 +87,44 @@ def test_apply_with_the_confirmation_transfers_ownership(probe):
     assert "CREATE ROLE" not in again.stdout
 
 
-def test_a_superuser_dbt_login_is_refused(probe):
-    r = _run(probe, "--dbt-login", probe["HARNESS_PG_USER"])
-    assert r.returncode != 0 and "superuser" in (r.stdout + r.stderr)
+def test_an_existing_role_is_never_taken_over_as_dagsters_login(probe):
+    r = _run(probe, "--dagster-login", probe["HARNESS_PG_USER"])
+    assert r.returncode != 0 and "exists" in (r.stdout + r.stderr)
+
+
+def test_the_dbt_schemas_go_to_the_dbt_role(probe):
+    with psycopg2.connect(harness.dsn(probe)) as conn, conn.cursor() as c:
+        c.execute("CREATE SCHEMA public_marts; CREATE TABLE public_marts.fct_x (x int)")
+    conn.close()
+    assert "ALTER SCHEMA public_marts OWNER" in _run(probe).stdout
+    assert _run(probe, "--apply", stdin="APPLY\n").returncode == 0
+    assert _owner(probe, "public_marts") == "cinderhaven_dbt"
+
+
+def test_dagsters_login_is_created_once_shown_once_and_works(probe):
+    name = "dagster_probe"
+    dry = _run(probe, "--dagster-login", name)
+    assert f"CREATE ROLE {name} LOGIN NOSUPERUSER" in dry.stdout and "shown once" in dry.stdout
+    r = _run(probe, "--apply", "--dagster-login", name, stdin="APPLY\n")
+    try:
+        assert r.returncode == 0, r.stderr
+        lines = r.stdout.splitlines()
+        password = lines[lines.index(next(l for l in lines if "shown ONCE" in l)) + 3].strip()
+        # The password works as a login, and the login is a non-superuser member of the dbt role.
+        login = dict(probe, HARNESS_PG_USER=name, HARNESS_PG_PASSWORD=password)
+        with psycopg2.connect(harness.dsn(login)) as conn, conn.cursor() as c:
+            c.execute("SELECT rolsuper, pg_has_role(current_user, 'cinderhaven_dbt', 'MEMBER') "
+                      "FROM pg_roles WHERE rolname = current_user")
+            assert c.fetchone() == (False, True)
+        conn.close()
+        # Stored as a SCRAM verifier, never the plaintext.
+        with psycopg2.connect(harness.dsn(probe)) as conn, conn.cursor() as c:
+            c.execute("SELECT rolpassword LIKE 'SCRAM-SHA-256$%%' FROM pg_authid WHERE rolname = %s", (name,))
+            assert c.fetchone()[0] is True
+        conn.close()
+        # A second run refuses to reset it.
+        assert _run(probe, "--dagster-login", name).returncode != 0
+    finally:
+        with psycopg2.connect(harness.dsn(probe)) as conn, conn.cursor() as c:
+            c.execute(f"DROP ROLE IF EXISTS {name}")
+        conn.close()

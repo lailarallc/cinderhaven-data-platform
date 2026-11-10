@@ -67,6 +67,27 @@ BEGIN
     END LOOP;
 END $$;
 
+-- The dbt schemas belong to the dbt role (path 5): Dagster's own login, a
+-- member of cinderhaven_dbt, must be able to replace every model in them.
+-- dbt's +grants and on-run-end hook keep the readers' grants after each build.
+DO $$
+DECLARE s text; t record;
+BEGIN
+    FOREACH s IN ARRAY ARRAY['public_staging', 'public_intermediate', 'public_marts'] LOOP
+        IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = s) THEN
+            EXECUTE format('ALTER SCHEMA %I OWNER TO cinderhaven_dbt', s);
+            FOR t IN SELECT c.relname, c.relkind FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+                     WHERE n.nspname = s AND c.relkind IN ('r', 'p', 'v', 'm') LOOP
+                EXECUTE format('ALTER %s %I.%I OWNER TO cinderhaven_dbt',
+                               CASE t.relkind WHEN 'v' THEN 'VIEW' WHEN 'm' THEN 'MATERIALIZED VIEW'
+                                              ELSE 'TABLE' END, s, t.relname);
+            END LOOP;
+            EXECUTE format('GRANT USAGE ON SCHEMA %I TO cinderhaven_reader, cinderhaven_validator', s);
+            EXECUTE format('GRANT SELECT ON ALL TABLES IN SCHEMA %I TO cinderhaven_reader, cinderhaven_validator', s);
+        END IF;
+    END LOOP;
+END $$;
+
 -- truth_populated(): one boolean, false where truth does not exist. It lives in
 -- public, not truth: truth is dropped on every rebuild and the reader has no
 -- USAGE on it, so a guard that probed truth directly would fail on permission.
