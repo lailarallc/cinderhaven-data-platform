@@ -14,6 +14,12 @@ runs after a backup, and it prints every change before it makes one.
     python scripts/apply_truth_roles.py --apply [--dagster-login NAME] [--reader-login NAME]
                                                                         # asks for APPLY, then one transaction
 
+--rotate LOGIN (repeatable) gives cinderhaven_dagster or cinderhaven_ci_reader
+a new password, the same way, and changes nothing else; any other role is
+refused (owner, 2026-11-10, after both first passwords went unkept).
+
+    python scripts/apply_truth_roles.py --rotate cinderhaven_dagster --rotate cinderhaven_ci_reader [--apply]
+
 --reader-login creates a NEW non-superuser login, a member of cinderhaven_reader,
 the same way, for the platform's own read paths (verify-production-figures.yml,
 dump_flyio.sh). Where its password is kept is the owner's ruling.
@@ -122,7 +128,48 @@ def check_new_login(cur, login: str) -> None:
 
 #: Where each new login's password goes, printed beside it (owner, 2026-11-09).
 PLACE = {"cinderhaven_dbt": "Place it in ~/.dbt/profiles.yml (user and password of Dagster's cinderhaven target) now.",
-         "cinderhaven_reader": "Place it where the owner's ruling keeps the platform's workflow reader credential, now."}
+         "cinderhaven_reader": "Place it in the platform repo's POSTGRES_PASSWORD Actions secret "
+                               "(lailarallc/cinderhaven-data-platform) now."}
+
+#: The only logins --rotate touches (owner, 2026-11-10), each with the role it must still be in.
+ROTATABLE = {"cinderhaven_dagster": "cinderhaven_dbt", "cinderhaven_ci_reader": "cinderhaven_reader"}
+
+
+def rotate(conn, names: list[str], apply: bool) -> int:
+    """Give each named login a new generated password; change nothing else."""
+    for n in names:
+        if n not in ROTATABLE:
+            raise SystemExit(f"--rotate {n}: refused. Only {', '.join(ROTATABLE)} can be rotated.")
+    with conn.cursor() as cur:
+        for n in names:
+            cur.execute("SELECT rolsuper, rolcanlogin, pg_has_role(%s, %s, 'MEMBER') FROM pg_roles "
+                        "WHERE rolname = %s", (n, ROTATABLE[n], n))
+            row = cur.fetchone()
+            if row is None:
+                raise SystemExit(f"--rotate {n}: no such login here; it is created with --dagster-login/--reader-login")
+            if row != (False, True, True):
+                raise SystemExit(f"--rotate {n}: refused; expected a non-superuser login in {ROTATABLE[n]}, "
+                                 f"found superuser={row[0]} login={row[1]} member={row[2]}")
+    print(f"\n{len(names)} change(s):")
+    for n in names:
+        print(f"  ALTER ROLE {n} PASSWORD (new, generated at apply, shown once; nothing else changes)")
+    if not apply:
+        print("\nDry run: nothing changed. Re-run with --apply to make these changes.")
+        return 0
+    if input("\nType APPLY to make these changes in one transaction: ").strip() != "APPLY":
+        print("Not confirmed: nothing changed.")
+        return 1
+    passwords = {n: secrets.token_urlsafe(32) for n in names}
+    with conn.cursor() as cur:
+        for n in names:
+            cur.execute(sql.SQL("ALTER ROLE {} PASSWORD {}").format(sql.Identifier(n),
+                                                                    sql.Literal(scram_verifier(passwords[n]))))
+    conn.commit()
+    print("Applied and committed. The old passwords no longer work.")
+    for n in names:
+        print(f"\nLogin {n} ({ROTATABLE[n]}): its password follows, shown ONCE and stored nowhere.\n"
+              f"{PLACE[ROTATABLE[n]]}\n\n    {passwords[n]}\n")
+    return 0
 
 
 def main(argv: list[str]) -> int:
@@ -130,7 +177,11 @@ def main(argv: list[str]) -> int:
     p.add_argument("--apply", action="store_true", help="make the changes (asks for confirmation)")
     p.add_argument("--dagster-login", help="create Dagster's own login, a member of cinderhaven_dbt")
     p.add_argument("--reader-login", help="create a workflow reader login, a member of cinderhaven_reader")
+    p.add_argument("--rotate", action="append", metavar="LOGIN",
+                   help=f"new password for an existing login, repeatable; only {', '.join(ROTATABLE)}")
     args = p.parse_args(argv)
+    if args.rotate and (args.dagster_login or args.reader_login):
+        raise SystemExit("--rotate runs alone: it changes passwords and nothing else")
     logins = [(n, r) for n, r in ((args.dagster_login, "cinderhaven_dbt"),
                                   (args.reader_login, "cinderhaven_reader")) if n]
     if len({n for n, _ in logins}) != len(logins):
@@ -140,7 +191,8 @@ def main(argv: list[str]) -> int:
     if not dsn:
         print("Set DATABASE_URL to the administrator DSN from the platform's secret location.", file=sys.stderr)
         return 2
-    print(BACKUP_REMINDER)
+    if not args.rotate:
+        print(BACKUP_REMINDER)
     try:
         prod_guard.check(dsn)
     except prod_guard.ProdDatabaseError as e:
@@ -153,6 +205,9 @@ def main(argv: list[str]) -> int:
             cur.execute("SELECT current_user, current_database(), inet_server_port()")
             user, db, port = cur.fetchone()
             print(f"Target: database {db}, port {port}, as {user}")
+        if args.rotate:
+            return rotate(conn, list(dict.fromkeys(args.rotate)), args.apply)
+        with conn.cursor() as cur:
             for login, _ in logins:
                 check_new_login(cur, login)
             changes = change_list(cur, logins)
