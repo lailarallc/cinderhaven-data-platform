@@ -100,15 +100,19 @@ jobs:
       - name: "Egress path 1: the dump runs as a reader, names its schemas, ships no truth"
         run: |
           PGUSER=ci_generator PGPASSWORD="$GEN_PW" psql -v ON_ERROR_STOP=1 -q -f tests/fixtures/egress/probe_truth_row.sql
-          export SKIP_PROXY=1 DUMP_HOST=localhost DUMP_PORT=5432 DUMP_USER=ci_reader PGPASSWORD="$READ_PW"
+          export SKIP_PROXY=1 DUMP_HOST=localhost DUMP_PORT=5432 DUMP_USER=ci_reader PGUSER=ci_reader PGPASSWORD="$READ_PW"
           DUMP_FILE=/tmp/dump.sql bash scripts/dump_flyio.sh
           grep -q "CREATE TABLE raw.stores" /tmp/dump.sql
           python -c "from quarantine.text_scan import assert_no_truth_text; assert_no_truth_text('/tmp/dump.sql')"
           if grep -Eiq '^CREATE SCHEMA (IF NOT EXISTS )?"?truth"?;' /tmp/dump.sql; then echo "::error::dump creates truth"; exit 1; fi
-          if DUMP_SCHEMAS="raw truth" DUMP_FILE=/tmp/dump_truth.sql bash scripts/dump_flyio.sh; then
+          # Listed, truth is still excluded: the script ships none of it.
+          DUMP_SCHEMAS="raw truth" DUMP_FILE=/tmp/dump_truth.sql bash scripts/dump_flyio.sh
+          python -c "from quarantine.text_scan import assert_no_truth_text; assert_no_truth_text('/tmp/dump_truth.sql')"
+          # With the exclusion gone, the role still holds: a reader cannot dump truth.
+          if pg_dump --schema=truth --no-owner --no-privileges -f /tmp/bare.sql; then
             echo "::error::a reader dumped truth"; exit 1
           fi
-          echo "naming truth in the schema list fails on permission, as it must"
+          echo "a reader's dump of truth fails on permission, as it must"
 
       - name: "Egress path 1: init-db.sh refuses a truth dump; a clean dump restores with no truth"
         env:
