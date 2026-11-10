@@ -2,7 +2,7 @@
 # Restore the Cinderhaven Data Platform dump into the local Postgres.
 # Runs automatically on first `docker compose up` via the entrypoint.
 
-DUMP_FILE="/data/cinderhaven_dump.sql"
+DUMP_FILE="${DUMP_FILE:-/data/cinderhaven_dump.sql}"
 
 if [ ! -f "$DUMP_FILE" ]; then
     echo "==================================================="
@@ -13,6 +13,13 @@ if [ ! -f "$DUMP_FILE" ]; then
     echo "  docker compose down && docker compose up"
     echo "==================================================="
     exit 0
+fi
+
+# Refuse a dump that creates the truth schema (plan U4, egress path 1). The dump
+# strips GRANTs, so on the restore side exclusion is the only control.
+if grep -Eiq '^CREATE SCHEMA (IF NOT EXISTS )?"?truth"?;' "$DUMP_FILE"; then
+    echo "REFUSED: $DUMP_FILE creates the truth schema. Re-dump with scripts/dump_flyio.sh." >&2
+    exit 1
 fi
 
 echo "Restoring Cinderhaven data from $DUMP_FILE ..."

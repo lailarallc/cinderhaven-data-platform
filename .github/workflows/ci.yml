@@ -42,7 +42,7 @@ jobs:
 
       - name: Generate this run's test logins
         run: |
-          for v in GEN_PW DBT_PW; do
+          for v in GEN_PW DBT_PW READ_PW; do
             pw=$(openssl rand -hex 20); echo "::add-mask::$pw"; echo "$v=$pw" >> "$GITHUB_ENV"
           done
 
@@ -54,6 +54,7 @@ jobs:
           psql -v ON_ERROR_STOP=1 -q -f sql/truth_roles.sql
           psql -v ON_ERROR_STOP=1 -q -c "CREATE ROLE ci_generator LOGIN PASSWORD '$GEN_PW' IN ROLE cinderhaven_generator"
           psql -v ON_ERROR_STOP=1 -q -c "CREATE ROLE ci_dbt LOGIN PASSWORD '$DBT_PW' IN ROLE cinderhaven_dbt"
+          psql -v ON_ERROR_STOP=1 -q -c "CREATE ROLE ci_reader LOGIN PASSWORD '$READ_PW' IN ROLE cinderhaven_reader"
 
       - name: Apply the schema DDL as the generator
         env:
@@ -95,6 +96,31 @@ jobs:
             fi
             echo "$planted: caught"
           done
+
+      - name: "Egress path 1: the dump runs as a reader, names its schemas, ships no truth"
+        run: |
+          PGUSER=ci_generator PGPASSWORD="$GEN_PW" psql -v ON_ERROR_STOP=1 -q -f tests/fixtures/egress/probe_truth_row.sql
+          export SKIP_PROXY=1 DUMP_HOST=localhost DUMP_PORT=5432 DUMP_USER=ci_reader PGPASSWORD="$READ_PW"
+          DUMP_FILE=/tmp/dump.sql bash scripts/dump_flyio.sh
+          grep -q "CREATE TABLE raw.stores" /tmp/dump.sql
+          python -c "from quarantine.text_scan import assert_no_truth_text; assert_no_truth_text('/tmp/dump.sql')"
+          if grep -Eiq '^CREATE SCHEMA (IF NOT EXISTS )?"?truth"?;' /tmp/dump.sql; then echo "::error::dump creates truth"; exit 1; fi
+          if DUMP_SCHEMAS="raw truth" DUMP_FILE=/tmp/dump_truth.sql bash scripts/dump_flyio.sh; then
+            echo "::error::a reader dumped truth"; exit 1
+          fi
+          echo "naming truth in the schema list fails on permission, as it must"
+
+      - name: "Egress path 1: init-db.sh refuses a truth dump; a clean dump restores with no truth"
+        env:
+          PGUSER: ci_admin
+          PGPASSWORD: ci-throwaway-${{ github.run_id }}
+        run: |
+          echo 'CREATE SCHEMA truth;' > /tmp/bad.sql
+          if DUMP_FILE=/tmp/bad.sql bash scripts/init-db.sh; then echo "::error::init-db.sh restored a truth dump"; exit 1; fi
+          createdb restore_probe
+          psql -v ON_ERROR_STOP=1 -q -d restore_probe -f /tmp/dump.sql > /dev/null
+          test "$(psql -tA -d restore_probe -c "SELECT count(*) FROM pg_namespace WHERE nspname = 'truth'")" = "0"
+          echo "clean dump restored; no truth schema"
 
       - name: Database tier with no world (roles, apply script)
         env:
