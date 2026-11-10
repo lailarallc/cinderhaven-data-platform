@@ -135,7 +135,7 @@ jobs:
           HARNESS_PG_DB: cinderhaven
           HARNESS_PG_USER: ci_admin
           HARNESS_PG_PASSWORD: ci-throwaway-${{ github.run_id }}
-        run: python -m pytest -m db tests/test_truth_roles.py tests/test_apply_truth_roles.py
+        run: python -m pytest -m db tests/test_truth_roles.py tests/test_apply_truth_roles.py tests/test_consumer_credentials.py
 
   python-check:
     runs-on: ubuntu-latest
