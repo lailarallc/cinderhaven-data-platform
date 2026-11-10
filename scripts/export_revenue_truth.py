@@ -389,7 +389,15 @@ def _add_totals(rows: list[dict], revenue_key: str = "revenue") -> list[dict]:
 # Main export
 # ---------------------------------------------------------------------------
 
+#: Egress path 2 (plan U4): the schemas this export reads, explicitly. It checks
+#: its own source against them before connecting, so a query that strays
+#: outside fails here instead of exporting.
+EXPORT_SCHEMAS = {"raw", "public_staging", "public_marts"}
+
+
 def export_all():
+    from check_export_allowlist import assert_allowlisted
+    assert_allowlisted(Path(__file__), EXPORT_SCHEMAS)
     conn = get_conn()
     cur = conn.cursor()
 
