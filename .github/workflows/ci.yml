@@ -122,7 +122,9 @@ jobs:
           echo 'CREATE SCHEMA truth;' > /tmp/bad.sql
           if DUMP_FILE=/tmp/bad.sql bash scripts/init-db.sh; then echo "::error::init-db.sh restored a truth dump"; exit 1; fi
           createdb restore_probe
-          psql -v ON_ERROR_STOP=1 -q -d restore_probe -f /tmp/dump.sql > /dev/null
+          # The runner's pg_dump (17) writes SET transaction_timeout, which the 16 server rejects.
+          sed '/transaction_timeout/d' /tmp/dump.sql > /tmp/dump16.sql
+          psql -v ON_ERROR_STOP=1 -q -d restore_probe -f /tmp/dump16.sql > /dev/null
           test "$(psql -tA -d restore_probe -c "SELECT count(*) FROM pg_namespace WHERE nspname = 'truth'")" = "0"
           echo "clean dump restored; no truth schema"
 
