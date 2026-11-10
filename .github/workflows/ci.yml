@@ -7,8 +7,29 @@ on:
     branches: [main]
 
 jobs:
-  dbt-validate:
+  # Plan U4: the truth quarantine's database tier, on a throwaway service
+  # container that holds no truth rows. Roles as the bootstrap superuser (the
+  # one administrator connection CI keeps), DDL as a generator login, dbt as a
+  # dbt-role login through the committed profile, then the lineage checks on
+  # the real project and on a copy with violating models planted.
+  dbt-quarantine:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: cinderhaven
+          POSTGRES_USER: ci_admin
+          POSTGRES_PASSWORD: ci-throwaway-${{ github.run_id }}
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ci_admin" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: "5432"
+      PGDATABASE: cinderhaven
+      CINDERHAVEN_PG_HOST: localhost
+      CINDERHAVEN_PG_PORT: "5432"
     steps:
       - uses: actions/checkout@v4
 
@@ -16,30 +37,73 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Install dbt
-        run: pip install dbt-core dbt-postgres
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-      - name: Configure dbt profile
+      - name: Generate this run's test logins
         run: |
-          mkdir -p ~/.dbt
-          cat > ~/.dbt/profiles.yml << 'EOF'
-          cinderhaven:
-            target: ci
-            outputs:
-              ci:
-                type: postgres
-                host: localhost
-                port: 5432
-                user: ci
-                password: ci
-                dbname: ci
-                schema: public
-                threads: 1
-          EOF
+          for v in GEN_PW DBT_PW; do
+            pw=$(openssl rand -hex 20); echo "::add-mask::$pw"; echo "$v=$pw" >> "$GITHUB_ENV"
+          done
 
-      - name: Validate project structure
+      - name: Apply the roles as the bootstrap superuser
+        env:
+          PGUSER: ci_admin
+          PGPASSWORD: ci-throwaway-${{ github.run_id }}
+        run: |
+          psql -v ON_ERROR_STOP=1 -q -f sql/truth_roles.sql
+          psql -v ON_ERROR_STOP=1 -q -c "CREATE ROLE ci_generator LOGIN PASSWORD '$GEN_PW' IN ROLE cinderhaven_generator"
+          psql -v ON_ERROR_STOP=1 -q -c "CREATE ROLE ci_dbt LOGIN PASSWORD '$DBT_PW' IN ROLE cinderhaven_dbt"
+
+      - name: Apply the schema DDL as the generator
+        env:
+          PGUSER: ci_generator
+        run: |
+          export PGPASSWORD="$GEN_PW"
+          for f in sql/raw_schema.sql sql/costing_schema.sql sql/truth_schema.sql; do
+            psql -v ON_ERROR_STOP=1 -q -f "$f"
+          done
+          DATABASE_URL="host=localhost port=5432 dbname=cinderhaven user=ci_generator password=$GEN_PW" \
+            python -c "import sys; sys.path.insert(0, 'generation'); import os, psycopg2, seed_void_patterns as v
+          c = psycopg2.connect(os.environ['DATABASE_URL']); v.seed_addresses(c.cursor()); c.commit()"
+
+      - name: dbt compile and run as the dbt role, through the committed profile
         working-directory: cinderhaven
-        run: dbt parse
+        env:
+          CINDERHAVEN_PG_USER: ci_dbt
+        run: |
+          export CINDERHAVEN_PG_PASSWORD="$DBT_PW"
+          dbt run --profiles-dir ../orchestration
+          dbt compile --profiles-dir ../orchestration
+
+      - name: Lineage walk and compiled-SQL scan on the real project
+        run: python quarantine/dbt_lineage.py cinderhaven/target
+
+      - name: The same checks fail on a copy with a truth bypass and a literal planted
+        env:
+          CINDERHAVEN_PG_USER: ci_dbt
+        run: |
+          export CINDERHAVEN_PG_PASSWORD="$DBT_PW"
+          cp -r cinderhaven /tmp/planted && rm -rf /tmp/planted/target
+          for planted in mart_innocuous_bypass mart_literal_truth; do
+            rm -rf /tmp/run && cp -r /tmp/planted /tmp/run
+            cp tests/fixtures/dbt_lineage/sources_truth.yml /tmp/run/models/staging/sources_truth.yml
+            cp "tests/fixtures/dbt_lineage/$planted.sql" /tmp/run/models/marts/
+            (cd /tmp/run && dbt compile --profiles-dir "$GITHUB_WORKSPACE/orchestration" -q)
+            if python quarantine/dbt_lineage.py /tmp/run/target; then
+              echo "::error::dbt_lineage passed with $planted planted"; exit 1
+            fi
+            echo "$planted: caught"
+          done
+
+      - name: Database tier with no world (roles, apply script)
+        env:
+          HARNESS_PG_HOST: localhost
+          HARNESS_PG_PORT: "5432"
+          HARNESS_PG_DB: cinderhaven
+          HARNESS_PG_USER: ci_admin
+          HARNESS_PG_PASSWORD: ci-throwaway-${{ github.run_id }}
+        run: python -m pytest -m db tests/test_truth_roles.py tests/test_apply_truth_roles.py
 
   python-check:
     runs-on: ubuntu-latest
