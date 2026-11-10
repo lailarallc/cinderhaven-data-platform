@@ -91,6 +91,7 @@ def test_the_reader_reads_the_dbt_models(cur):
 
 
 def test_truth_populated_is_a_boolean_and_false_on_an_empty_truth(cur):
+    cur.execute("TRUNCATE " + ", ".join(f"truth.{t}" for t in TRUTH_TABLES))  # rolled back after
     _as(cur, "cinderhaven_reader", "SELECT public.truth_populated()")
     assert cur.fetchone()[0] is False
 
