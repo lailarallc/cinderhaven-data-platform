@@ -128,3 +128,21 @@ def test_dagsters_login_is_created_once_shown_once_and_works(probe):
         with psycopg2.connect(harness.dsn(probe)) as conn, conn.cursor() as c:
             c.execute(f"DROP ROLE IF EXISTS {name}")
         conn.close()
+
+
+def test_a_workflow_reader_login_is_created_in_the_reader_role(probe):
+    name = "workflow_reader_probe"
+    r = _run(probe, "--apply", "--reader-login", name, stdin="APPLY\n")
+    try:
+        assert r.returncode == 0, r.stderr
+        assert f"Login {name} (cinderhaven_reader)" in r.stdout
+        with psycopg2.connect(harness.dsn(probe)) as conn, conn.cursor() as c:
+            c.execute("SELECT rolsuper, rolcanlogin, pg_has_role(%s, 'cinderhaven_reader', 'MEMBER'), "
+                      "pg_has_role(%s, 'cinderhaven_dbt', 'MEMBER') FROM pg_roles WHERE rolname = %s",
+                      (name, name, name))
+            assert c.fetchone() == (False, True, True, False)
+        conn.close()
+    finally:
+        with psycopg2.connect(harness.dsn(probe)) as conn, conn.cursor() as c:
+            c.execute(f"DROP ROLE IF EXISTS {name}")
+        conn.close()

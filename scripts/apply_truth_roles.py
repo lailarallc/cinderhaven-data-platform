@@ -10,7 +10,13 @@ runs after a backup, and it prints every change before it makes one.
     #    (production through a fly proxy also needs ALLOW_PROD_DB=1)
     python scripts/apply_truth_roles.py                                 # dry run: prints the changes, makes none
     python scripts/apply_truth_roles.py --dagster-login NAME            # dry run, plus Dagster's new login
-    python scripts/apply_truth_roles.py --apply [--dagster-login NAME]  # asks for APPLY, then one transaction
+    python scripts/apply_truth_roles.py --reader-login NAME             # dry run, plus a workflow reader login
+    python scripts/apply_truth_roles.py --apply [--dagster-login NAME] [--reader-login NAME]
+                                                                        # asks for APPLY, then one transaction
+
+--reader-login creates a NEW non-superuser login, a member of cinderhaven_reader,
+the same way, for the platform's own read paths (verify-production-figures.yml,
+dump_flyio.sh). Where its password is kept is the owner's ruling.
 
 --dagster-login creates a NEW non-superuser login, a member of cinderhaven_dbt
 (path 5). Its password is generated at apply time and printed ONCE, after the
@@ -73,8 +79,8 @@ def _relations(cur, schema: str, owner_to: str, out: list[str]) -> None:
         out.append(f"ALTER {KIND[kind]} {schema}.{name} OWNER: {owner} -> {owner_to}")
 
 
-def change_list(cur, dagster_login: str | None) -> list[str]:
-    """Every change sql/truth_roles.sql (and --dagster-login) would make here, read from the catalog."""
+def change_list(cur, logins: list[tuple[str, str]]) -> list[str]:
+    """Every change sql/truth_roles.sql (and each new login) would make here, read from the catalog."""
     out: list[str] = []
     cur.execute("SELECT rolname FROM pg_roles WHERE rolname = ANY(%s)", (list(ROLES),))
     have = {r for (r,) in cur.fetchall()}
@@ -101,24 +107,34 @@ def change_list(cur, dagster_login: str | None) -> list[str]:
                        "TO cinderhaven_reader, cinderhaven_validator")
     out.append("CREATE OR REPLACE FUNCTION public.truth_populated() (SECURITY DEFINER, owner "
                "cinderhaven_generator; EXECUTE to reader, validator, generator)")
-    if dagster_login:
-        out.append(f"CREATE ROLE {dagster_login} LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE IN ROLE cinderhaven_dbt "
+    for login, role in logins:
+        out.append(f"CREATE ROLE {login} LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE IN ROLE {role} "
                    "(password generated at apply, shown once)")
     return out
 
 
-def check_dagster_login(cur, login: str) -> None:
+def check_new_login(cur, login: str) -> None:
     cur.execute("SELECT 1 FROM pg_roles WHERE rolname = %s", (login,))
     if cur.fetchone():
-        raise SystemExit(f"--dagster-login {login}: a role by that name exists. This script creates Dagster's login; "
+        raise SystemExit(f"{login}: a role by that name exists. This script creates new logins; "
                          "it never takes over or resets an existing one.")
+
+
+#: Where each new login's password goes, printed beside it (owner, 2026-11-09).
+PLACE = {"cinderhaven_dbt": "Place it in ~/.dbt/profiles.yml (user and password of Dagster's cinderhaven target) now.",
+         "cinderhaven_reader": "Place it where the owner's ruling keeps the platform's workflow reader credential, now."}
 
 
 def main(argv: list[str]) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--apply", action="store_true", help="make the changes (asks for confirmation)")
     p.add_argument("--dagster-login", help="create Dagster's own login, a member of cinderhaven_dbt")
+    p.add_argument("--reader-login", help="create a workflow reader login, a member of cinderhaven_reader")
     args = p.parse_args(argv)
+    logins = [(n, r) for n, r in ((args.dagster_login, "cinderhaven_dbt"),
+                                  (args.reader_login, "cinderhaven_reader")) if n]
+    if len({n for n, _ in logins}) != len(logins):
+        raise SystemExit("--dagster-login and --reader-login must name different logins")
 
     dsn = os.environ.get("DATABASE_URL")
     if not dsn:
@@ -137,9 +153,9 @@ def main(argv: list[str]) -> int:
             cur.execute("SELECT current_user, current_database(), inet_server_port()")
             user, db, port = cur.fetchone()
             print(f"Target: database {db}, port {port}, as {user}")
-            if args.dagster_login:
-                check_dagster_login(cur, args.dagster_login)
-            changes = change_list(cur, args.dagster_login)
+            for login, _ in logins:
+                check_new_login(cur, login)
+            changes = change_list(cur, logins)
         print(f"\n{len(changes)} change(s):")
         for c in changes:
             print(f"  {c}")
@@ -149,20 +165,19 @@ def main(argv: list[str]) -> int:
         if input("\nType APPLY to make these changes in one transaction: ").strip() != "APPLY":
             print("Not confirmed: nothing changed.")
             return 1
-        password = None
+        passwords = {}
         with conn.cursor() as cur:
             cur.execute(ROLES_SQL.read_text())
-            if args.dagster_login:
-                password = secrets.token_urlsafe(32)
-                cur.execute(sql.SQL("CREATE ROLE {} LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE PASSWORD {} "
-                                    "IN ROLE cinderhaven_dbt").format(sql.Identifier(args.dagster_login),
-                                                                      sql.Literal(scram_verifier(password))))
+            for login, role in logins:
+                passwords[login] = secrets.token_urlsafe(32)
+                cur.execute(sql.SQL("CREATE ROLE {} LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE PASSWORD {} IN ROLE {}")
+                            .format(sql.Identifier(login), sql.Literal(scram_verifier(passwords[login])),
+                                    sql.Identifier(role)))
         conn.commit()
         print("Applied and committed.")
-        if password:
-            print(f"\nDagster login {args.dagster_login}: its password follows, shown ONCE and stored nowhere.\n"
-                  "Place it in ~/.dbt/profiles.yml (user and password of Dagster's cinderhaven target) now.\n\n"
-                  f"    {password}\n")
+        for login, role in logins:
+            print(f"\nLogin {login} ({role}): its password follows, shown ONCE and stored nowhere.\n"
+                  f"{PLACE[role]}\n\n    {passwords[login]}\n")
         return 0
     finally:
         conn.close()
