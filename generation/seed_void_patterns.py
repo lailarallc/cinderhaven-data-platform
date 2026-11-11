@@ -39,7 +39,9 @@ from datetime import date, timedelta
 
 import psycopg2
 
-from seed_config import DATABASE_URL, WINDOW_END, init_rng
+from seed_config import (
+    DATABASE_URL, VOID_CLUSTER_SKUS, VOID_CURATED_SKUS, VOID_NEVER_SCATTER_ASSIGNMENTS, WINDOW_END, init_rng,
+)
 
 # ── FROZEN void-pattern constants (cinderhaven-data-v2 addendum) ──
 VOID_SEED = 700
@@ -48,10 +50,7 @@ ADDRESS_SEED = 710
 # Never-scanned cluster: the botched mod reset.
 CLUSTER_RETAILER = "RET-KROGER"
 CLUSTER_REGION = "Southeast"
-# Artisan Sauces spring line extension — star SKUs, deliberately NOT
-# in any curated delist-risk/borderline list for this retailer, so
-# the Velocity Decision Tool's stories stay untouched.
-CLUSTER_SKUS = ["CHP-AS-001", "CHP-AS-002", "CHP-AS-006"]
+CLUSTER_SKUS = VOID_CLUSTER_SKUS
 MOD_RESET_AUTH_DATE = date(2025, 6, 30)
 
 # Never-scanned SCATTER — isolated new-item setup failures at the five
@@ -65,13 +64,7 @@ MOD_RESET_AUTH_DATE = date(2025, 6, 30)
 NEVER_SCATTER_SEED = 720
 NEVER_SCATTER_MIN_STORES = 1
 NEVER_SCATTER_MAX_STORES = 3
-NEVER_SCATTER_ASSIGNMENTS = [
-    ("RET-WALMART",    "CHP-DG-007", date(2025, 10, 24)),
-    ("RET-COSTCO",     "CHP-SB-001", date(2025, 11,  7)),
-    ("RET-WHOLEFOODS", "CHP-DG-002", date(2025, 10, 31)),
-    ("RET-SPROUTS",    "CHP-SB-006", date(2025, 11,  7)),
-    ("RET-REGIONAL",   "CHP-DG-010", date(2025, 10, 24)),
-]
+NEVER_SCATTER_ASSIGNMENTS = VOID_NEVER_SCATTER_ASSIGNMENTS
 
 # Went-dark scatter — realistic background voids at every banner. Real
 # CPG brands carry ~1-3% of item-store combos dark at any time, skewed
@@ -84,17 +77,7 @@ WENT_DARK_MIN_PER_RETAILER = 12    # floor so small banners aren't ~zero
 WENT_DARK_MIN_WEEKS = 6            # dark at least this many weeks by WINDOW_END
 WENT_DARK_MAX_WEEKS = 40           # varied staleness
 # Never touch SKUs whose velocity patterns other tools curate.
-CURATED_SKUS = {
-    # seed_scan_data.DELIST_RISK_SKUS + BORDERLINE_SKUS, flattened.
-    "CHP-SC-008", "CHP-PS-007", "CHP-AS-009", "CHP-SC-010",
-    "CHP-AS-003", "CHP-PS-006", "CHP-SC-005",
-    "CHP-PS-001", "CHP-AS-010", "CHP-SC-003", "CHP-AS-005",
-    "CHP-AS-006", "CHP-PS-004", "CHP-SC-007",
-    "CHP-SC-002", "CHP-PS-008", "CHP-AS-004", "CHP-SC-009",
-    "CHP-PS-010", "CHP-AS-007", "CHP-SC-006",
-    "CHP-AS-002", "CHP-SC-004", "CHP-PS-009",
-    "CHP-AS-008", "CHP-SC-001", "CHP-PS-003",
-} | set(CLUSTER_SKUS)
+CURATED_SKUS = VOID_CURATED_SKUS
 
 # Deletion guard: abort if any retailer loses more than this share of
 # its trailing-52-week scan revenue (locked canonical tolerance is 2%).

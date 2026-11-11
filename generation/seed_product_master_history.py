@@ -24,25 +24,14 @@ from datetime import date
 # Allow running from project root
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 
-from seed_config import DATABASE_URL, WINDOW_START
+from seed_config import DATABASE_URL, PRODUCT_MASTER_HISTORY_SKUS, WINDOW_START
 
 import psycopg2
 
 SEED = 42
 SNAPSHOT_END = date(2026, 2, 1)
 
-ALL_SKUS = [
-    "CHP-AS-001", "CHP-AS-002", "CHP-AS-003", "CHP-AS-004", "CHP-AS-005",
-    "CHP-AS-006", "CHP-AS-007", "CHP-AS-008", "CHP-AS-009", "CHP-AS-010",
-    "CHP-DG-001", "CHP-DG-002", "CHP-DG-003", "CHP-DG-004", "CHP-DG-005",
-    "CHP-DG-006", "CHP-DG-007", "CHP-DG-008", "CHP-DG-009", "CHP-DG-010",
-    "CHP-PS-001", "CHP-PS-002", "CHP-PS-003", "CHP-PS-004", "CHP-PS-005",
-    "CHP-PS-006", "CHP-PS-007", "CHP-PS-008", "CHP-PS-009", "CHP-PS-010",
-    "CHP-SB-001", "CHP-SB-002", "CHP-SB-003", "CHP-SB-004", "CHP-SB-005",
-    "CHP-SB-006", "CHP-SB-007", "CHP-SB-008", "CHP-SB-009", "CHP-SB-010",
-    "CHP-SC-001", "CHP-SC-002", "CHP-SC-003", "CHP-SC-004", "CHP-SC-005",
-    "CHP-SC-006", "CHP-SC-007", "CHP-SC-008", "CHP-SC-009", "CHP-SC-010",
-]
+ALL_SKUS = PRODUCT_MASTER_HISTORY_SKUS  # seed_config, this path's order
 
 
 def months_range(start: date, end: date):

@@ -30,29 +30,8 @@ from seed_config import (
     WINDOW_START, WINDOW_END, init_rng,
     SKU_ARCHETYPES, ARCHETYPE_VELOCITY_MULT,
     get_sku_seasonal,
+    DELIST_RISK_SKUS, BORDERLINE_SKUS,
 )
-
-# Map each retailer to 3-5 SKUs that will underperform at that retailer.
-# Different SKUs struggle at different retailers — realistic pattern.
-DELIST_RISK_SKUS = {
-    "RET-WALMART": ["CHP-SC-008", "CHP-PS-007", "CHP-AS-009", "CHP-SC-010"],
-    "RET-COSTCO": ["CHP-AS-003", "CHP-PS-006", "CHP-SC-005"],
-    "RET-WHOLEFOODS": ["CHP-PS-001", "CHP-AS-010", "CHP-SC-003", "CHP-AS-005"],
-    "RET-SPROUTS": ["CHP-AS-006", "CHP-PS-004", "CHP-SC-007"],
-    "RET-KROGER": ["CHP-SC-002", "CHP-PS-008", "CHP-AS-004", "CHP-SC-009"],
-    "RET-REGIONAL": ["CHP-PS-010", "CHP-AS-007", "CHP-SC-006"],
-}
-
-# 1-2 SKUs per retailer in the warning zone: above threshold but declining.
-# These started healthy and are losing velocity — early warning signal.
-BORDERLINE_SKUS = {
-    "RET-WALMART": ["CHP-AS-002", "CHP-SC-004"],
-    "RET-COSTCO": ["CHP-PS-009", "CHP-SC-007"],
-    "RET-WHOLEFOODS": ["CHP-SC-002", "CHP-AS-008"],
-    "RET-SPROUTS": ["CHP-SC-001", "CHP-PS-003"],
-    "RET-KROGER": ["CHP-AS-005", "CHP-SC-001"],
-    "RET-REGIONAL": ["CHP-PS-001", "CHP-SC-009"],
-}
 
 
 def get_week_endings(start: date, end: date) -> list[date]:

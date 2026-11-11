@@ -124,6 +124,59 @@ for line, products in PRODUCT_LINES.items():
             "cogs_per_unit": cogs,
         })
 
+# -- SKU sets the other paths key on (plan U2: one catalog) --
+# Moved here verbatim from seed_scan_data.py and seed_void_patterns.py; no
+# value changed (origin-R1 re-keys them in U9). Each path keeps its own
+# iteration order: these are read in the order written.
+
+# Map each retailer to 3-5 SKUs that will underperform at that retailer.
+# Different SKUs struggle at different retailers — realistic pattern.
+DELIST_RISK_SKUS = {
+    "RET-WALMART": ["CHP-SC-008", "CHP-PS-007", "CHP-AS-009", "CHP-SC-010"],
+    "RET-COSTCO": ["CHP-AS-003", "CHP-PS-006", "CHP-SC-005"],
+    "RET-WHOLEFOODS": ["CHP-PS-001", "CHP-AS-010", "CHP-SC-003", "CHP-AS-005"],
+    "RET-SPROUTS": ["CHP-AS-006", "CHP-PS-004", "CHP-SC-007"],
+    "RET-KROGER": ["CHP-SC-002", "CHP-PS-008", "CHP-AS-004", "CHP-SC-009"],
+    "RET-REGIONAL": ["CHP-PS-010", "CHP-AS-007", "CHP-SC-006"],
+}
+
+# 1-2 SKUs per retailer in the warning zone: above threshold but declining.
+# These started healthy and are losing velocity — early warning signal.
+BORDERLINE_SKUS = {
+    "RET-WALMART": ["CHP-AS-002", "CHP-SC-004"],
+    "RET-COSTCO": ["CHP-PS-009", "CHP-SC-007"],
+    "RET-WHOLEFOODS": ["CHP-SC-002", "CHP-AS-008"],
+    "RET-SPROUTS": ["CHP-SC-001", "CHP-PS-003"],
+    "RET-KROGER": ["CHP-AS-005", "CHP-SC-001"],
+    "RET-REGIONAL": ["CHP-PS-001", "CHP-SC-009"],
+}
+
+# The void seeder's never-scanned cluster (seed_void_patterns.py).
+# Artisan Sauces spring line extension — star SKUs, deliberately NOT
+# in any curated delist-risk/borderline list for this retailer, so
+# the Velocity Decision Tool's stories stay untouched.
+VOID_CLUSTER_SKUS = ["CHP-AS-001", "CHP-AS-002", "CHP-AS-006"]
+
+# The void seeder's never-scanned scatter: (retailer, sku, auth date).
+VOID_NEVER_SCATTER_ASSIGNMENTS = [
+    ("RET-WALMART",    "CHP-DG-007", date(2025, 10, 24)),
+    ("RET-COSTCO",     "CHP-SB-001", date(2025, 11,  7)),
+    ("RET-WHOLEFOODS", "CHP-DG-002", date(2025, 10, 31)),
+    ("RET-SPROUTS",    "CHP-SB-006", date(2025, 11,  7)),
+    ("RET-REGIONAL",   "CHP-DG-010", date(2025, 10, 24)),
+]
+
+# SKUs whose velocity other tools curate; the void seeder never darkens them.
+# Derived: the two risk lists flattened, plus the cluster.
+VOID_CURATED_SKUS = ({s for skus in DELIST_RISK_SKUS.values() for s in skus}
+                     | {s for skus in BORDERLINE_SKUS.values() for s in skus}
+                     | set(VOID_CLUSTER_SKUS))
+
+# seed_product_master_history.py draws per SKU in code order (AS, DG, PS,
+# SB, SC); ALL_SKUS runs in catalog order (AS, PS, SC, DG, SB). Derived
+# from the catalog, in that path's order.
+PRODUCT_MASTER_HISTORY_SKUS = sorted(p["sku"] for p in ALL_SKUS)
+
 # -- Retailer store counts and volume tiers --
 
 RETAILER_STORE_COUNTS = {
