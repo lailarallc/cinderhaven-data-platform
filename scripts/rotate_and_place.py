@@ -1,25 +1,26 @@
-"""Rotate cinderhaven_dagster and cinderhaven_ci_reader, and put each new password
-where it is read. The owner runs this through scripts/rotate_and_place.ps1, which
-opens and closes the Fly proxy; no session runs it (DECISIONS#u4-custody-shape).
+"""Apply the roles (first time) or rotate the two logins, and put both passwords where
+they are read. The owner runs this through scripts/rotate_and_place.ps1, which opens
+and closes the Fly proxy; no session runs it (DECISIONS#u4-custody-shape).
 
 In one run:
   1. reads the admin credential from the platform .env, inside this process only;
-  2. prints production's current state (roles, logins, schema owners): which
-     steps of the apply have happened;
-  3. stops if the two logins do not exist (then the apply itself never ran);
-  4. shows the dry run and asks for APPLY;
-  5. rotates both logins (server receives SCRAM verifiers only);
+  2. prints production's current state (roles, logins, schema owners);
+  3. if the two logins do not exist (the apply has never run): backs the database
+     up with pg_dump and checks the file reads back, before anything else; stops if not;
+  4. prints the full plan (every role, ownership transfer and grant on a first
+     apply; the two rotations otherwise) and asks for APPLY;
+  5. applies sql/truth_roles.sql and creates both logins, or rotates them
+     (server receives SCRAM verifiers only);
   6. backs up ~/.dbt/profiles.yml and writes cinderhaven_dagster and its password
      into the cinderhaven profile;
   7. sets the POSTGRES_PASSWORD Actions secret of lailarallc/cinderhaven-data-platform
      with `gh secret set`, the password on stdin;
   8. logs in as each login with its new password (Dagster's read back from the
-     profile it was written to) and prints PASS/FAIL;
-  9. dispatches verify-production-figures.yml, the workflow that reads the
-     secret, and prints its PASS/FAIL.
+     profile) and dispatches verify-production-figures.yml; prints PASS/FAIL.
 
 No password or DSN is ever printed. The repo-level POSTGRES_PASSWORD secret is
-updated in place, not created (owner, 2026-11-09: no new secret).
+updated in place, not created (owner, 2026-11-09: no new secret). copack and
+voidfinder keep their owners (owner, 2026-11-11).
 """
 from __future__ import annotations
 
@@ -51,13 +52,32 @@ def dsn(host: str, port: int, db: str, user: str, password: str) -> str:
     return f"host={host} port={port} dbname={db} user={user} password={password}"
 
 
-def admin_dsn(env_file: Path, port: int) -> tuple[str, str]:
+def admin_creds(env_file: Path) -> dict[str, str]:
     vals = dotenv_values(env_file)
-    password = vals.get("POSTGRES_PASSWORD")
-    if not password:
+    if not vals.get("POSTGRES_PASSWORD"):
         raise SystemExit(f"{env_file}: no POSTGRES_PASSWORD (the admin credential); nothing changed")
-    db = vals.get("POSTGRES_DB") or "cinderhaven"
-    return dsn("localhost", port, db, vals.get("POSTGRES_USER") or "postgres", password), db
+    return {"user": vals.get("POSTGRES_USER") or "postgres", "password": vals["POSTGRES_PASSWORD"],
+            "db": vals.get("POSTGRES_DB") or "cinderhaven"}
+
+
+def backup(creds: dict[str, str], port: int, out: Path, docker: list[str]) -> tuple[bool, str]:
+    """pg_dump (custom format) through the proxy, from the postgres:17 image (no pg_dump on this
+    machine), then check the file reads back with pg_restore --list. The password goes to the
+    container through the environment, never on a command line."""
+    env = dict(os.environ, PGPASSWORD=creds["password"])
+    with out.open("wb") as f:
+        r = subprocess.run([*docker, "run", "--rm", "-e", "PGPASSWORD", "postgres:17-alpine", "pg_dump", "-Fc",
+                            "-h", "host.docker.internal", "-p", str(port), "-U", creds["user"], "-d", creds["db"]],
+                           stdout=f, stderr=subprocess.PIPE, env=env)
+    if r.returncode != 0 or out.stat().st_size == 0:
+        return False, f"pg_dump failed: {r.stderr.decode(errors='replace').strip().splitlines()[-1:] or 'empty'}"
+    with out.open("rb") as f:
+        check = subprocess.run([*docker, "run", "--rm", "-i", "postgres:17-alpine", "pg_restore", "--list"],
+                               stdin=f, capture_output=True)
+    entries = check.stdout.decode(errors="replace").count("TABLE DATA")
+    if check.returncode != 0 or entries == 0:
+        return False, "the backup did not read back with pg_restore --list"
+    return True, f"{out.name}, {out.stat().st_size / 1e6:.1f} MB, {entries} tables' data, reads back"
 
 
 def state(conn) -> dict:
@@ -166,10 +186,14 @@ def main(argv: list[str]) -> int:
     p.add_argument("--profiles", type=Path, default=Path.home() / ".dbt" / "profiles.yml")
     p.add_argument("--gh", default="gh", help=argparse.SUPPRESS)  # tests pass a fake
     p.add_argument("--no-dispatch", action="store_true", help=argparse.SUPPRESS)
+    p.add_argument("--docker", default="docker", help=argparse.SUPPRESS)
+    p.add_argument("--backup-dir", type=Path, default=ROOT, help=argparse.SUPPRESS)
     args = p.parse_args(argv)
     gh = args.gh.split("|")
 
-    admin, db = admin_dsn(args.env_file, args.port)
+    creds = admin_creds(args.env_file)
+    db = creds["db"]
+    admin = dsn("localhost", args.port, db, creds["user"], creds["password"])
     try:
         prod_guard.check(admin)
     except prod_guard.ProdDatabaseError as e:
@@ -180,26 +204,48 @@ def main(argv: list[str]) -> int:
         s = state(conn)
         print_state(s)
         missing = [l for l in (DAGSTER, READER) if l not in s["logins"]]
-        if missing:
-            print(f"\nSTOP: {', '.join(missing)} not on this host, so the apply (apply_truth_roles.py --apply) has "
-                  "not run here. This script only rotates. Nothing changed.")
+        if len(missing) == 1:
+            print(f"\nSTOP: only {missing[0]} is missing; this script handles both logins or neither. "
+                  "Nothing changed.")
             return 1
-        atr.check_rotatable(conn, [DAGSTER, READER])
+        first_apply = bool(missing)
+        if first_apply:
+            # The backup comes first, before the plan or the prompt: it only reads, and
+            # nothing else runs unless it reads back (owner, 2026-11-11).
+            out = args.backup_dir / f"backup-prod-{datetime.now().strftime('%Y%m%d-%H%M%S')}.dump"
+            print(f"\nBacking up the database to {out.name} (a few minutes) ...", flush=True)
+            ok, detail = backup(creds, args.port, out, args.docker.split("|"))
+            if not ok:
+                print(f"STOP: backup failed: {detail}. Nothing changed.")
+                return 1
+            print(f"Backup: {detail}")
         print("\nThis run will:")
-        print(f"  1. give {DAGSTER} and {READER} new passwords (old ones stop working)")
+        if first_apply:
+            with conn.cursor() as cur:
+                changes = atr.change_list(cur, [(DAGSTER, "cinderhaven_dbt"), (READER, "cinderhaven_reader")])
+            print("  1. apply the roles for the first time (sql/truth_roles.sql), in one transaction:")
+            for c in changes:
+                print(f"       {c}")
+        else:
+            atr.check_rotatable(conn, [DAGSTER, READER])
+            print(f"  1. give {DAGSTER} and {READER} new passwords (old ones stop working)")
         print(f"  2. back up {args.profiles} and set the cinderhaven profile's user to {DAGSTER} and its password")
         print(f"  3. set the {SECRET} Actions secret of {REPO} to {READER}'s password")
         print("  4. log in as each, then run the verify workflow")
         if input("\nType APPLY to do this: ").strip() != "APPLY":
             print("Not confirmed: nothing changed.")
             return 1
-        passwords = atr.rotate_passwords(conn, [DAGSTER, READER])
+        if first_apply:
+            passwords = atr.apply_roles(conn, [(DAGSTER, "cinderhaven_dbt"), (READER, "cinderhaven_reader")])
+            print("Applied the roles and created both logins.")
+        else:
+            passwords = atr.rotate_passwords(conn, [DAGSTER, READER])
+            print("Rotated both logins.")
     finally:
         conn.close()
-    print("Rotated both logins.")
 
-    backup = write_profile(args.profiles, DAGSTER, passwords[DAGSTER])
-    print(f"Wrote {DAGSTER} into {args.profiles} (backup: {backup.name}).")
+    profile_backup = write_profile(args.profiles, DAGSTER, passwords[DAGSTER])
+    print(f"Wrote {DAGSTER} into {args.profiles} (backup: {profile_backup.name}).")
     secret_ok = set_secret(gh, passwords[READER])
     print(f"{'Set' if secret_ok else 'FAILED to set'} the {SECRET} secret.")
 

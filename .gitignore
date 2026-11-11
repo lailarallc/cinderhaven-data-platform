@@ -49,3 +49,6 @@ secrets.*
 # Test harness: generated local test credentials (U3)
 tests/harness.env
 tests/harness_dbt/.user.yml
+
+# Production backups taken by scripts/rotate_and_place.py
+backup-*.dump

@@ -12,11 +12,31 @@ $repo = Split-Path -Parent $PSScriptRoot
 Set-Location $repo
 $port = 15432
 
-foreach ($tool in 'flyctl', 'gh', 'python') {
+foreach ($tool in 'flyctl', 'gh', 'python', 'docker') {
     if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {
         Write-Host "Missing $tool on PATH. Nothing changed." -ForegroundColor Red
         exit 1
     }
+}
+
+# The backup runs pg_dump in a container, so Docker must be up. Docker Desktop on
+# this machine crash-loops on stale socket files; the recorded fix is to rename
+# the two socket folders aside and start it once (never a factory reset).
+docker info *> $null
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Docker is not running; starting Docker Desktop (up to 3 minutes) ..."
+    Get-Process *docker* -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+    foreach ($p in "$env:LOCALAPPDATA\Docker\run", "$env:LOCALAPPDATA\docker-secrets-engine") {
+        if (Test-Path $p) { Rename-Item $p ((Split-Path $p -Leaf) + ".stale-$stamp") }
+    }
+    Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+    for ($i = 0; $i -lt 60; $i++) {
+        Start-Sleep -Seconds 3
+        docker info *> $null
+        if ($LASTEXITCODE -eq 0) { break }
+    }
+    if ($LASTEXITCODE -ne 0) { Write-Host "Docker did not start. Nothing changed." -ForegroundColor Red; exit 1 }
 }
 
 Write-Host "Opening the Fly proxy to cinderhaven-db on port $port ..."

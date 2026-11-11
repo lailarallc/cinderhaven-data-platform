@@ -346,6 +346,80 @@ cogs_per_unit else quantity * case_pack_qty * cogs_per_unit end`.
 
 ---
 
+### 2026-11-11 — An owner's production action was recorded done on the owner's word, unchecked
+
+**Attempted:** U4's production apply (`scripts/apply_truth_roles.py --apply`)
+is the owner's to run. On 2026-11-10 the message "apply done" arrived in
+chat, and the session recorded it as fact without reading production: U4's
+status in the spec plan ("The owner applied `sql/truth_roles.sql` to
+production on 2026-11-10", spec `d684a92`), a comment in
+`verify-production-figures.yml` ("since the owner's apply on 2026-11-10"), a
+comment in Dagster's `assets.py`, the commit message of `6a2acbb`, and the
+session's reports. It then shipped the two superuser checks that depend on
+the apply.
+
+**Why it didn't work:** The apply had never run. Two dispatches of
+verify-production-figures failed on `password authentication failed for
+user "cinderhaven_ci_reader"` (runs 42878682480, 42894133549), which
+Postgres also returns for a login that does not exist, so neither failure
+settled it. A read of production on 2026-11-11 (`rotate_and_place.py`'s
+state print) showed 0 of 4 group roles and neither login. The secret
+(`POSTGRES_PASSWORD`, last updated 2026-07-13) and `~/.dbt/profiles.yml`
+(`user: postgres`, last modified 2026-07-13) had also never changed, and
+both were readable from metadata before the checks shipped.
+
+**What we tried instead:** The records are restated with a dated correction
+(spec plan U4 status, DECISIONS#u4-custody-shape, spec HANDOFF, this
+repo's HANDOFF, the two code comments). The apply is now part of
+`scripts/rotate_and_place.ps1`, which reads production's state first and
+prints it, so the record can come from that print.
+
+**Rule (scoped to the surface, not this repro):** An owner's production
+action is recorded done, and anything that depends on it lands, only after
+a read of production shows it. The surfaces that record it: plan unit
+status lines, DECISIONS entries, HANDOFF entries, code and workflow
+comments, commit messages, and session reports. The reads that count: the
+catalog (`pg_roles` for roles and logins, `pg_namespace` and `pg_class` for
+owners, `has_*_privilege` for grants), `gh secret list` for a secret's
+update time, and the file itself for a local config (its `user:` line and
+modification time, never the password). The owner's word, relayed or
+typed, schedules the read; it is not the read.
+
+**Status:** Resolved (records corrected; the apply is still to run)
+
+**Tags:** owner action, production, verification, apply_truth_roles, U4, custody
+
+---
+
+### 2026-11-11 — A check that refuses a superuser shipped before the login it requires existed
+
+**Attempted:** Dagster's `assert_scoped_login` and the superuser check in
+`verify-production-figures.yml` landed in `6a2acbb` (2026-11-10), after the
+unverified "apply done" (entry above). The ordering rule was "login first,
+check second"; the login did not exist.
+
+**Why it didn't work:** Both checks refuse what production still has.
+`verify-production-figures` failed closed on both dispatches. Dagster's
+check would have refused every build since 2026-11-10, because `~/.dbt`
+still names `postgres`, a superuser. It caused no outage only because
+nothing runs Dagster's schedule on this machine: no daemon, no scheduled
+task, no `DAGSTER_HOME`, and no dbt invocation through `~/.dbt` since
+`6a2acbb` (every "Refusing to build" line in `cinderhaven/logs/dbt.log` is
+the harness's own test login). The "daily build" has not been a running
+thing; the last builds through `~/.dbt` are manual ones in logs rotated on
+Jul 6 and Nov 9.
+
+**What we tried instead:** The checks stay (they fail closed, which is
+their job); the apply that they wait on runs through
+`rotate_and_place.ps1`. Whether Dagster's schedule should run at all is a
+separate question for the owner.
+
+**Status:** Open until the apply runs and both checks pass in production
+
+**Tags:** Dagster, ordering, login first, superuser check, near-miss
+
+---
+
 ### 2026-06-03 — dbt --select without + prefix misses upstream dependencies
 
 **Attempted:** `dbt run --select dim_products fct_chargebacks dim_stores fct_scan_data fct_promotions dim_retailer_requirements` to materialize new/modified mart models.

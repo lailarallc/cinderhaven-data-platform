@@ -9,6 +9,43 @@ For things that didn't work, see FAILURES.md.
 
 ---
 
+## 2026-11-11 — U3 DONE, U4 built; the production apply has NOT run (correction)
+
+**Started from:** the spec repo's regen plan (U3, then U4); this file's last
+entry was 2026-07-29.
+
+**Did:**
+- U3 (f8ed8cc): the harness. `harness-db` on 127.0.0.1:55432 with a generated
+  local test set (`tests/harness.env`, gitignored); `tests/harness.py rebuild`
+  (274 s); multi-seed runner; three repeats of run seed 0 hash identical (50
+  tables). The 30-seed run is U2's.
+- U4 (9c8be2c..a9bee52): seeders moved to `generation/` (value-neutral);
+  `truth` schema and four roles; the quarantine gate, text scan and dbt
+  lineage checks; CI `dbt-quarantine`; egress paths 1, 2, 4 (owner-run), 3,
+  7, 8; the refresh delivers the gate; `apply_truth_roles.py` with
+  `--dagster-login`, `--reader-login`, `--rotate`; the two superuser checks
+  (6a2acbb).
+- 2026-11-11: `scripts/rotate_and_place.ps1` (+ `.py`), the owner's one step:
+  production state print, pg_dump backup verified readable first, full plan,
+  APPLY, roles + both logins, `~/.dbt` and `POSTGRES_PASSWORD` placed, login
+  tests, PASS/FAIL. `copack` and `voidfinder` keep their owners (owner).
+
+**CORRECTION (2026-11-11):** U4's status recorded the production apply as
+done on 2026-11-10 on the owner's relayed word. It had not run: production
+shows 0 of 4 group roles and neither login (the script's state print,
+2026-11-11). See FAILURES.md 2026-11-11 (two entries).
+
+**State:** main green. Production unchanged. The superuser checks fail
+closed until the apply runs. Dagster's schedule does not run on this
+machine (no daemon), so its check has refused nothing.
+
+**Next:** the owner runs, from this folder in PowerShell:
+`powershell -ExecutionPolicy Bypass -File scriptsotate_and_place.ps1`.
+Then: re-dispatch verify-production-figures; mark U4 DONE only on a read of
+production; U2 next.
+
+---
+
 ## 2026-07-29 — Phase 1: canonical verified against Postgres, both contradictions resolved, pre-Phase-2 baseline recorded
 
 **Started from:** Two-phase instruction from user. Phase 1 (measure,

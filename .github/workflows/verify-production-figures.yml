@@ -33,7 +33,8 @@ jobs:
       PGHOST: localhost
       PGPORT: "5432"
       # The platform's workflow reader (DECISIONS#u4-custody-shape): POSTGRES_PASSWORD holds its
-      # password, not the superuser's, since the owner's apply on 2026-11-10.
+      # password once the owner runs scripts/rotate_and_place.ps1 (the apply had NOT run on
+      # 2026-11-10 as first recorded; corrected 2026-11-11, FAILURES.md). Until then this fails closed.
       PGUSER: cinderhaven_ci_reader
       PGDATABASE: cinderhaven
       PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }}

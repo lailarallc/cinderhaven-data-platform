@@ -41,21 +41,26 @@ BEGIN
                    current_database());
 END $$;
 
--- On a host whose schemas predate the roles (production until U12), hand each
--- generated schema and its tables to the generator and grant on what exists.
+-- On a host whose schemas predate the roles (production until U12), hand raw
+-- and costing and their tables to the generator and grant on what exists.
+-- copack and voidfinder are written by other repos' logins (production's copack
+-- is owned by flypgadmin, 2026-11-11), and writer repos keep writing their own
+-- tables (owner, 2026-11-11): their owners stay, and they get read grants only.
 -- Elsewhere the grants travel with each schema's own DDL.
 DO $$
 DECLARE s text; t record;
 BEGIN
     FOREACH s IN ARRAY ARRAY['raw', 'costing', 'copack', 'voidfinder'] LOOP
         IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = s) THEN
-            EXECUTE format('ALTER SCHEMA %I OWNER TO cinderhaven_generator', s);
-            FOR t IN SELECT c.relname, c.relkind FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
-                     WHERE n.nspname = s AND c.relkind IN ('r', 'p', 'v', 'm') LOOP
-                EXECUTE format('ALTER %s %I.%I OWNER TO cinderhaven_generator',
-                               CASE t.relkind WHEN 'v' THEN 'VIEW' WHEN 'm' THEN 'MATERIALIZED VIEW'
-                                              ELSE 'TABLE' END, s, t.relname);
-            END LOOP;
+            IF s IN ('raw', 'costing') THEN
+                EXECUTE format('ALTER SCHEMA %I OWNER TO cinderhaven_generator', s);
+                FOR t IN SELECT c.relname, c.relkind FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+                         WHERE n.nspname = s AND c.relkind IN ('r', 'p', 'v', 'm') LOOP
+                    EXECUTE format('ALTER %s %I.%I OWNER TO cinderhaven_generator',
+                                   CASE t.relkind WHEN 'v' THEN 'VIEW' WHEN 'm' THEN 'MATERIALIZED VIEW'
+                                                  ELSE 'TABLE' END, s, t.relname);
+                END LOOP;
+            END IF;
             EXECUTE format('GRANT USAGE ON SCHEMA %I TO cinderhaven_reader, cinderhaven_validator', s);
             EXECUTE format('GRANT SELECT ON ALL TABLES IN SCHEMA %I TO cinderhaven_reader, cinderhaven_validator', s);
             EXECUTE format('GRANT SELECT ON ALL SEQUENCES IN SCHEMA %I TO cinderhaven_reader', s);

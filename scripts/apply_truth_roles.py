@@ -54,6 +54,8 @@ ROLES_SQL = ROOT / "sql" / "truth_roles.sql"
 ROLES = ("cinderhaven_generator", "cinderhaven_dbt", "cinderhaven_reader", "cinderhaven_validator")
 SCHEMAS = ("raw", "costing", "copack", "voidfinder")
 DBT_SCHEMAS = ("public_staging", "public_intermediate", "public_marts")
+#: Written by other repos' logins; their owners stay, read grants only (owner, 2026-11-11).
+WRITER_SCHEMAS = ("copack", "voidfinder")
 KIND = {"r": "TABLE", "p": "TABLE", "v": "VIEW", "m": "MATERIALIZED VIEW"}
 BACKUP_REMINDER = ("BACKUP: this transfers ownership of existing schemas. Confirm a backup of this database was "
                    "taken before running with --apply.")
@@ -100,9 +102,17 @@ def change_list(cur, logins: list[tuple[str, str]]) -> list[str]:
     out.append(f"GRANT CONNECT, CREATE ON DATABASE {db} TO cinderhaven_generator, cinderhaven_dbt")
     out.append(f"GRANT CONNECT ON DATABASE {db} TO cinderhaven_reader, cinderhaven_validator")
     for s in SCHEMAS:
-        _relations(cur, s, "cinderhaven_generator", out)
-        if out[-1].startswith("-- schema"):
-            continue
+        if s in WRITER_SCHEMAS:
+            cur.execute("SELECT pg_get_userbyid(nspowner) FROM pg_namespace WHERE nspname = %s", (s,))
+            row = cur.fetchone()
+            if row is None:
+                out.append(f"-- schema {s}: absent here")
+                continue
+            out.append(f"-- schema {s}: owner stays {row[0]} (written by another repo; read grants only)")
+        else:
+            _relations(cur, s, "cinderhaven_generator", out)
+            if out[-1].startswith("-- schema"):
+                continue
         readers = "cinderhaven_reader, cinderhaven_validator" + ("" if s == "voidfinder" else ", cinderhaven_dbt")
         out.append(f"GRANT USAGE ON SCHEMA {s}, SELECT ON ALL TABLES IN SCHEMA {s} TO {readers}")
         out.append(f"GRANT SELECT ON ALL SEQUENCES IN SCHEMA {s} TO cinderhaven_reader")
@@ -133,6 +143,24 @@ PLACE = {"cinderhaven_dbt": "Place it in ~/.dbt/profiles.yml (user and password 
 
 #: The only logins --rotate touches (owner, 2026-11-10), each with the role it must still be in.
 ROTATABLE = {"cinderhaven_dagster": "cinderhaven_dbt", "cinderhaven_ci_reader": "cinderhaven_reader"}
+
+
+def apply_roles(conn, logins: list[tuple[str, str]]) -> dict[str, str]:
+    """Run sql/truth_roles.sql and create each new login, in one transaction; return the
+    new passwords. Prints nothing."""
+    with conn.cursor() as cur:
+        for login, _ in logins:
+            check_new_login(cur, login)
+    passwords = {}
+    with conn.cursor() as cur:
+        cur.execute(ROLES_SQL.read_text())
+        for login, role in logins:
+            passwords[login] = secrets.token_urlsafe(32)
+            cur.execute(sql.SQL("CREATE ROLE {} LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE PASSWORD {} IN ROLE {}")
+                        .format(sql.Identifier(login), sql.Literal(scram_verifier(passwords[login])),
+                                sql.Identifier(role)))
+    conn.commit()
+    return passwords
 
 
 def check_rotatable(conn, names: list[str]) -> None:
@@ -232,15 +260,7 @@ def main(argv: list[str]) -> int:
         if input("\nType APPLY to make these changes in one transaction: ").strip() != "APPLY":
             print("Not confirmed: nothing changed.")
             return 1
-        passwords = {}
-        with conn.cursor() as cur:
-            cur.execute(ROLES_SQL.read_text())
-            for login, role in logins:
-                passwords[login] = secrets.token_urlsafe(32)
-                cur.execute(sql.SQL("CREATE ROLE {} LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE PASSWORD {} IN ROLE {}")
-                            .format(sql.Identifier(login), sql.Literal(scram_verifier(passwords[login])),
-                                    sql.Identifier(role)))
-        conn.commit()
+        passwords = apply_roles(conn, logins)
         print("Applied and committed.")
         for login, role in logins:
             print(f"\nLogin {login} ({role}): its password follows, shown ONCE and stored nowhere.\n"
