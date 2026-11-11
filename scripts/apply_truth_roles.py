@@ -135,8 +135,8 @@ PLACE = {"cinderhaven_dbt": "Place it in ~/.dbt/profiles.yml (user and password 
 ROTATABLE = {"cinderhaven_dagster": "cinderhaven_dbt", "cinderhaven_ci_reader": "cinderhaven_reader"}
 
 
-def rotate(conn, names: list[str], apply: bool) -> int:
-    """Give each named login a new generated password; change nothing else."""
+def check_rotatable(conn, names: list[str]) -> None:
+    """Raise SystemExit unless every name is a rotatable, existing, non-superuser login still in its role."""
     for n in names:
         if n not in ROTATABLE:
             raise SystemExit(f"--rotate {n}: refused. Only {', '.join(ROTATABLE)} can be rotated.")
@@ -150,6 +150,23 @@ def rotate(conn, names: list[str], apply: bool) -> int:
             if row != (False, True, True):
                 raise SystemExit(f"--rotate {n}: refused; expected a non-superuser login in {ROTATABLE[n]}, "
                                  f"found superuser={row[0]} login={row[1]} member={row[2]}")
+
+
+def rotate_passwords(conn, names: list[str]) -> dict[str, str]:
+    """ALTER each login's password to a new generated one, commit, and return them. Prints nothing."""
+    check_rotatable(conn, names)
+    passwords = {n: secrets.token_urlsafe(32) for n in names}
+    with conn.cursor() as cur:
+        for n in names:
+            cur.execute(sql.SQL("ALTER ROLE {} PASSWORD {}").format(sql.Identifier(n),
+                                                                    sql.Literal(scram_verifier(passwords[n]))))
+    conn.commit()
+    return passwords
+
+
+def rotate(conn, names: list[str], apply: bool) -> int:
+    """Give each named login a new generated password; change nothing else."""
+    check_rotatable(conn, names)
     print(f"\n{len(names)} change(s):")
     for n in names:
         print(f"  ALTER ROLE {n} PASSWORD (new, generated at apply, shown once; nothing else changes)")
@@ -159,12 +176,7 @@ def rotate(conn, names: list[str], apply: bool) -> int:
     if input("\nType APPLY to make these changes in one transaction: ").strip() != "APPLY":
         print("Not confirmed: nothing changed.")
         return 1
-    passwords = {n: secrets.token_urlsafe(32) for n in names}
-    with conn.cursor() as cur:
-        for n in names:
-            cur.execute(sql.SQL("ALTER ROLE {} PASSWORD {}").format(sql.Identifier(n),
-                                                                    sql.Literal(scram_verifier(passwords[n]))))
-    conn.commit()
+    passwords = rotate_passwords(conn, names)
     print("Applied and committed. The old passwords no longer work.")
     for n in names:
         print(f"\nLogin {n} ({ROTATABLE[n]}): its password follows, shown ONCE and stored nowhere.\n"
