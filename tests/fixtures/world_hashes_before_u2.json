@@ -1,0 +1,227 @@
+{
+ "platform": "f6d3826",
+ "production_demand_forecast": "9daa292",
+ "python": "3.13.14",
+ "tables": {
+  "copack.co_packers": {
+   "hash": "a0f63b760d79bad57accfc9c300d4bae",
+   "rows": 1
+  },
+  "copack.production_lines": {
+   "hash": "663b1407950fd1a4f8aad264935e314d",
+   "rows": 2
+  },
+  "copack.production_schedule": {
+   "hash": "967726c14c4c3523686fa2218a55bee3",
+   "rows": 16
+  },
+  "copack.sku_inventory": {
+   "hash": "614fcbf05162fba6fa00bf3f0bd76f08",
+   "rows": 50
+  },
+  "copack.sku_production_config": {
+   "hash": "3ad910cfd7adf89b93f2e52b9ef8d5eb",
+   "rows": 50
+  },
+  "costing.dim_inventory_lots": {
+   "hash": "8f6b41cc24aef54d45214ee27977a7db",
+   "rows": 288
+  },
+  "costing.dim_suppliers": {
+   "hash": "56215f1c197ecb089ae99863542aade0",
+   "rows": 7
+  },
+  "costing.fct_inventory_snapshot": {
+   "hash": "cd55a629269953f32492aeec87687e22",
+   "rows": 7800
+  },
+  "costing.fct_lot_balances": {
+   "hash": "d26d7bf90739644a1d561e8445598a52",
+   "rows": 8075
+  },
+  "costing.fct_lot_shipments": {
+   "hash": "d72791dea905789f538c882069272ec7",
+   "rows": 4440
+  },
+  "costing.fct_product_costs": {
+   "hash": "4a298ff59c73038d816248547021dcdb",
+   "rows": 1850
+  },
+  "costing.fct_production_runs": {
+   "hash": "20152ebb2ea603a46b401a473b7b70e8",
+   "rows": 294
+  },
+  "costing.fct_supplier_invoices": {
+   "hash": "929fd7a96e7779d83d70a455df3e6bee",
+   "rows": 294
+  },
+  "raw.distribution_log": {
+   "hash": "95e91071ddbf07838c8513fc114d7395",
+   "rows": 9992
+  },
+  "raw.distributor_chargebacks": {
+   "hash": "1d85346fed701b80170b3f55f8f23f3c",
+   "rows": 484
+  },
+  "raw.distributor_deductions": {
+   "hash": "b3f974cd1ded6e0b71a3851879c7d797",
+   "rows": 1970
+  },
+  "raw.distributor_disputes": {
+   "hash": "976037644f74a5e66fa6127d34ee51e6",
+   "rows": 764
+  },
+  "raw.distributor_order_lines": {
+   "hash": "a0955fa7ac343814258e6e8273c80075",
+   "rows": 47957
+  },
+  "raw.distributor_orders": {
+   "hash": "52916f7ac798e689df19a4fecf46ee0f",
+   "rows": 9042
+  },
+  "raw.distributor_remittances": {
+   "hash": "bb8923f9798f4a556a0aa1696f7c02c4",
+   "rows": 111
+  },
+  "raw.distributor_shipment_lines": {
+   "hash": "abb10de21cd2fba275e2a06ea0fce017",
+   "rows": 47957
+  },
+  "raw.distributor_shipments": {
+   "hash": "284896105051268fec38cfa5c2b292c3",
+   "rows": 9042
+  },
+  "raw.distributors": {
+   "hash": "515640ba7895f93fd3f29705d516f61d",
+   "rows": 3
+  },
+  "raw.price_history": {
+   "hash": "866cc049226be567e9d92e975024d987",
+   "rows": 407
+  },
+  "raw.product_master": {
+   "hash": "7ad42b6bd964be8ce052375113519e8e",
+   "rows": 50
+  },
+  "raw.product_master_history": {
+   "hash": "c6e30060d52b8de9be614fb0c7379ba5",
+   "rows": 1900
+  },
+  "raw.promotions": {
+   "hash": "29ff83a181242763f3a2a3442577053b",
+   "rows": 123
+  },
+  "raw.retailer_chargebacks": {
+   "hash": "814e264b6bb02165ac5b6aa1678c330a",
+   "rows": 2873
+  },
+  "raw.retailer_deduction_codes": {
+   "hash": "ae63e1c826891517d25451fee53718f5",
+   "rows": 102
+  },
+  "raw.retailer_deductions": {
+   "hash": "49b61cb252c9ccc6a29bf98662c3db97",
+   "rows": 14947
+  },
+  "raw.retailer_dispute_evidence": {
+   "hash": "f7692551639679e795f1b5dc396a99ca",
+   "rows": 22912
+  },
+  "raw.retailer_disputes": {
+   "hash": "7831e35eacac98bced713ce5bd6c2405",
+   "rows": 5247
+  },
+  "raw.retailer_edi_requirements": {
+   "hash": "01bbaa6d997451a3ea910f8b0aba1517",
+   "rows": 49
+  },
+  "raw.retailer_order_lines": {
+   "hash": "c6ab33f41a124961d7b2cb82af0eb2e4",
+   "rows": 189039
+  },
+  "raw.retailer_orders": {
+   "hash": "cd7854af8df5d8946cd9cf92fbb5c4c8",
+   "rows": 46760
+  },
+  "raw.retailer_pack_records": {
+   "hash": "92401ab4ce59219f7163c378937aa5f4",
+   "rows": 46760
+  },
+  "raw.retailer_post_audit_claims": {
+   "hash": "57d35a8c74f37c0e80986d50beb142d5",
+   "rows": 222
+  },
+  "raw.retailer_receipt_lines": {
+   "hash": "6a77d06eff0eb329b23bcd973f6d617d",
+   "rows": 189039
+  },
+  "raw.retailer_remittances": {
+   "hash": "b4973f26b4e26cd23552d0b18eb19d1f",
+   "rows": 222
+  },
+  "raw.retailer_requirements": {
+   "hash": "3683b7cf83cfcb7c75772b5a10e24c12",
+   "rows": 66
+  },
+  "raw.retailer_rules": {
+   "hash": "eb0bb6b9d971115f4af3b7a7abbbe83e",
+   "rows": 54
+  },
+  "raw.retailer_shipment_lines": {
+   "hash": "9d32ead14d0b929dfe0cd96970cb6db2",
+   "rows": 189039
+  },
+  "raw.retailer_shipments": {
+   "hash": "b16549759463fc35602c3a055ce3ea19",
+   "rows": 46760
+  },
+  "raw.retailers": {
+   "hash": "b99c9c82d29c7a90bea3d0e332e77ea9",
+   "rows": 6
+  },
+  "raw.scan_data": {
+   "hash": "6a7a0c3b5ad749587dfc3128dce95127",
+   "rows": 1323569
+  },
+  "raw.shopify_chargebacks": {
+   "hash": "011f997d704133ac9bb39d67a830ef2e",
+   "rows": 71
+  },
+  "raw.shopify_order_lines": {
+   "hash": "16b7e86fdf594894a49730c16d220026",
+   "rows": 35478
+  },
+  "raw.shopify_orders": {
+   "hash": "74acc8d768f7f2fc378cd72df61bc5ed",
+   "rows": 18497
+  },
+  "raw.shopify_payouts": {
+   "hash": "1b4086ac62309cae3d65d66168c4671e",
+   "rows": 90
+  },
+  "raw.shopify_refunds": {
+   "hash": "2be0aec7dfa6279ef45a184407882cda",
+   "rows": 820
+  },
+  "raw.shopify_transactions": {
+   "hash": "53038f0ebd3be7d7c5451a492d0d6eb8",
+   "rows": 18497
+  },
+  "raw.sku_costs": {
+   "hash": "01f4fc8201a45583b67881b024a03aaa",
+   "rows": 50
+  },
+  "raw.sku_distributors": {
+   "hash": "5364eba0dc61b30c55effee67d8ebea8",
+   "rows": 91
+  },
+  "raw.stores": {
+   "hash": "e5c97797c21a37873605cb530b7be469",
+   "rows": 640
+  },
+  "voidfinder.store_addresses": {
+   "hash": "ad25917c45dcf95587c57f91e5fd12cd",
+   "rows": 640
+  }
+ }
+}

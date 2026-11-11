@@ -8,6 +8,7 @@ fly tunnel.
     python tests/harness.py seed      # today's platform paths, in today's order
     python tests/harness.py build     # dbt build (all models and tests)
     python tests/harness.py rebuild   # seed + build, each step timed
+    python tests/harness.py characterize  # U2: seed + copack's own seeder, then sql/world_hashes.sql
     python tests/harness.py test      # fast tier: no database connection
     python tests/harness.py test-db   # database tier: needs the harness instance
 
@@ -114,6 +115,45 @@ def run_seed(run_seed: int = 0) -> list:
     return timings
 
 
+#: production-demand-forecast's copack seeder, run as-is for U2's characterization (it writes copack today).
+COPACK_SEEDER = Path(os.environ.get("COPACK_SEEDER") or
+                     ROOT.parent.parent / "published" / "production-demand-forecast" / "db" / "seed_copack.py")
+
+
+def world_hashes(vals: dict[str, str]) -> list[tuple[str, int, str]]:
+    import psycopg2
+    with psycopg2.connect(dsn(vals), connect_timeout=5) as conn, conn.cursor() as cur:
+        cur.execute((ROOT / "sql" / "world_hashes.sql").read_text())
+        rows = cur.fetchall()
+    conn.close()
+    return rows
+
+
+def characterize() -> list:
+    """U2's characterization: today's world, today's paths in today's order, then
+    production-demand-forecast's seed_copack.py; then sql/world_hashes.sql to
+    output/harness/world-hashes-<platform sha>.json."""
+    import json
+    import platform
+    if not COPACK_SEEDER.exists():
+        raise HarnessError(f"{COPACK_SEEDER} not found; set COPACK_SEEDER")
+    vals = harness_values()
+    timings = run_seed()
+    _run("seed_copack.py (production-demand-forecast)", [sys.executable, str(COPACK_SEEDER)], vals,
+         COPACK_SEEDER.parent.parent, timings)
+    sha = lambda d: subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=d,  # noqa: E731
+                                   capture_output=True, text=True).stdout.strip()
+    rows = world_hashes(vals)
+    out = {"platform": sha(ROOT), "production_demand_forecast": sha(COPACK_SEEDER.parent),
+           "python": platform.python_version(),
+           "tables": {t: {"rows": n, "hash": h} for t, n, h in rows}}
+    path = ROOT / "output" / "harness" / f"world-hashes-{out['platform']}.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(out, indent=1, sort_keys=True) + "\n")
+    print(f"\n{len(rows)} tables hashed -> {path.relative_to(ROOT)}")
+    return timings
+
+
 def apply_roles(vals: dict[str, str]) -> None:
     """Apply sql/truth_roles.sql as the harness instance's administrator (its
     bootstrap superuser): the one administrator connection the plan keeps."""
@@ -148,6 +188,8 @@ def main(argv: list[str]) -> int:
             _report(run_build())
         elif cmd == "rebuild":
             _report(run_seed() + run_build())
+        elif cmd == "characterize":
+            _report(characterize())
         elif cmd == "test":
             return subprocess.run([sys.executable, "-m", "pytest", "-m", "not db", "tests"], cwd=ROOT).returncode
         elif cmd == "test-db":
