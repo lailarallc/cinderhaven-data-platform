@@ -9,6 +9,25 @@ For things that didn't work, see FAILURES.md.
 
 ---
 
+## 2026-11-11 (later) — U4 DONE: the production apply ran, read back
+
+**Did:**
+- `158eadd`: the dbt schemas keep their owner; `cinderhaven_dbt` gets USAGE (grant option) and CREATE; only
+  relations named by `cinderhaven/models` transfer. Harness tests: a foreign relation in each dbt schema keeps
+  its owner; a dbt login rebuilds its models and cannot drop a foreign one.
+- The owner ran `scripts/rotate_and_place.ps1`: backup `backup-prod-20261111-125608.dump` (38.5 MB, reads
+  back), APPLY, `~/.dbt` and `POSTGRES_PASSWORD` placed, PASS for both logins.
+- verify-production-figures now prints roles and owners from the catalog. Run 43073841707: login check f/t/f,
+  every query as `cinderhaven_ci_reader`. Run 43075578696: verify-production-figures run 43075578696 (as `cinderhaven_ci_reader`, a catalog read): the four group roles present and NOLOGIN; `cinderhaven_dagster` (non-superuser, login, in `cinderhaven_dbt`) and `cinderhaven_ci_reader` (non-superuser, login, in `cinderhaven_reader`); `raw` and `costing` and their 49 tables owned by `cinderhaven_generator`; `copack` still `flypgadmin`'s and `voidfinder` still `postgres`'s; the three dbt schemas still `postgres`'s, with 87 model relations owned by `cinderhaven_dbt` (41 staging, 14 intermediate, 32 marts) and the twelve dimension-weight-integrity relations still `postgres`'s.
+
+**State:** U4 DONE, recorded on a read of production (FAILURES.md 2026-11-11 rule). The entry below is the
+corrected record of 2026-11-10's non-apply. Seen in the read, not acted on: `cinderhaven_demand_forecast` is a SUPERUSER login and owns three of `copack`'s nine relations (`flypgadmin` five, `postgres` one). Writer logins are U12's. Dagster's check has not run against production: no
+schedule runs, and its prod_guard refuses a tunnel on 5432.
+
+**Next:** U2's first step is its characterization, off the shared host: on the harness, build today's world with today's paths in today's order (`tests/harness.py seed`, then production-demand-forecast's `db/seed_copack.py`) and record row counts and an order-independent hash per table with a new `sql/world_hashes.sql` (raw, costing, copack's seeded tables, voidfinder; never truth).
+
+---
+
 ## 2026-11-11 — U3 DONE, U4 built; the production apply has NOT run (correction)
 
 **Started from:** the spec repo's regen plan (U3, then U4); this file's last
