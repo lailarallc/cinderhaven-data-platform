@@ -1,9 +1,11 @@
 """Apply sql/truth_roles.sql to a host whose schemas predate the roles (production).
 
 The owner runs this; no session does (DECISIONS#u4-custody-shape, 2026-11-09).
-It transfers ownership of raw, costing, copack and voidfinder to
-cinderhaven_generator, and of the three dbt schemas to cinderhaven_dbt, so it
-runs after a backup, and it prints every change before it makes one.
+It transfers ownership of raw and costing to cinderhaven_generator, and of the
+relations this project's dbt builds (cinderhaven/models) to cinderhaven_dbt;
+copack, voidfinder, the dbt schemas themselves and every relation another repo
+writes keep their owners (owner, 2026-11-11). It runs after a backup, and it
+prints every change before it makes one.
 
     # 1. take a backup first
     # 2. set DATABASE_URL to the administrator DSN from the platform's secret location
@@ -31,7 +33,8 @@ credential already lives. The script never writes it anywhere, and the server
 receives only a SCRAM-SHA-256 verifier computed here, so no statement log can
 hold the plaintext.
 
-The DSN is never printed. The SQL applied is sql/truth_roles.sql, unchanged.
+The DSN is never printed. The SQL applied is sql/truth_roles.sql, unchanged, then
+the dbt-model transfers, in the same transaction.
 """
 from __future__ import annotations
 
@@ -51,6 +54,7 @@ import prod_guard
 
 ROOT = Path(__file__).resolve().parent.parent
 ROLES_SQL = ROOT / "sql" / "truth_roles.sql"
+MODELS = ROOT / "cinderhaven" / "models"
 ROLES = ("cinderhaven_generator", "cinderhaven_dbt", "cinderhaven_reader", "cinderhaven_validator")
 SCHEMAS = ("raw", "costing", "copack", "voidfinder")
 DBT_SCHEMAS = ("public_staging", "public_intermediate", "public_marts")
@@ -87,6 +91,30 @@ def _relations(cur, schema: str, owner_to: str, out: list[str]) -> None:
         out.append(f"ALTER {KIND[kind]} {schema}.{name} OWNER: {owner} -> {owner_to}")
 
 
+def dbt_models() -> dict[str, set[str]]:
+    """The relations this project's dbt builds, per dbt schema, from cinderhaven/models/<layer>/**/*.sql
+    (dbt_project.yml puts each layer in public_<layer>; no model sets an alias or schema)."""
+    return {f"public_{layer}": {p.stem for p in (MODELS / layer).rglob("*.sql")}
+            for layer in ("staging", "intermediate", "marts")}
+
+
+def _dbt_relations(cur, schema: str) -> list[tuple[str, str, str]]:
+    cur.execute("SELECT c.relname, c.relkind, pg_get_userbyid(c.relowner) FROM pg_class c "
+                "JOIN pg_namespace n ON n.oid = c.relnamespace "
+                "WHERE n.nspname = %s AND c.relkind IN ('r', 'p', 'v', 'm') ORDER BY 1", (schema,))
+    return cur.fetchall()
+
+
+def transfer_dbt_models(cur) -> None:
+    """Give cinderhaven_dbt the relations this project's dbt builds; leave every other one alone."""
+    models = dbt_models()
+    for s in DBT_SCHEMAS:
+        for name, kind, owner in _dbt_relations(cur, s):
+            if name in models[s] and owner != "cinderhaven_dbt":
+                cur.execute(sql.SQL("ALTER {} {}.{} OWNER TO cinderhaven_dbt").format(
+                    sql.SQL(KIND[kind]), sql.Identifier(s), sql.Identifier(name)))
+
+
 def change_list(cur, logins: list[tuple[str, str]]) -> list[str]:
     """Every change sql/truth_roles.sql (and each new login) would make here, read from the catalog."""
     out: list[str] = []
@@ -116,11 +144,24 @@ def change_list(cur, logins: list[tuple[str, str]]) -> list[str]:
         readers = "cinderhaven_reader, cinderhaven_validator" + ("" if s == "voidfinder" else ", cinderhaven_dbt")
         out.append(f"GRANT USAGE ON SCHEMA {s}, SELECT ON ALL TABLES IN SCHEMA {s} TO {readers}")
         out.append(f"GRANT SELECT ON ALL SEQUENCES IN SCHEMA {s} TO cinderhaven_reader")
+    models = dbt_models()
     for s in DBT_SCHEMAS:
-        _relations(cur, s, "cinderhaven_dbt", out)
-        if not out[-1].startswith("-- schema"):
-            out.append(f"GRANT USAGE ON SCHEMA {s}, SELECT ON ALL TABLES IN SCHEMA {s} "
-                       "TO cinderhaven_reader, cinderhaven_validator")
+        cur.execute("SELECT pg_get_userbyid(nspowner) FROM pg_namespace WHERE nspname = %s", (s,))
+        row = cur.fetchone()
+        if row is None:
+            out.append(f"-- schema {s}: absent here")
+            continue
+        out.append(f"-- schema {s}: owner stays {row[0]}")
+        out.append(f"GRANT USAGE (WITH GRANT OPTION), CREATE ON SCHEMA {s} TO cinderhaven_dbt")
+        for name, kind, owner in _dbt_relations(cur, s):
+            if name in models[s]:
+                if owner != "cinderhaven_dbt":
+                    out.append(f"ALTER {KIND[kind]} {s}.{name} OWNER: {owner} -> cinderhaven_dbt")
+            else:
+                out.append(f"-- {KIND[kind]} {s}.{name}: owner stays {owner} "
+                           "(not built by this project's dbt; read grants only)")
+        out.append(f"GRANT USAGE ON SCHEMA {s}, SELECT ON ALL TABLES IN SCHEMA {s} "
+                   "TO cinderhaven_reader, cinderhaven_validator")
     out.append("CREATE OR REPLACE FUNCTION public.truth_populated() (SECURITY DEFINER, owner "
                "cinderhaven_generator; EXECUTE to reader, validator, generator)")
     for login, role in logins:
@@ -154,6 +195,7 @@ def apply_roles(conn, logins: list[tuple[str, str]]) -> dict[str, str]:
     passwords = {}
     with conn.cursor() as cur:
         cur.execute(ROLES_SQL.read_text())
+        transfer_dbt_models(cur)
         for login, role in logins:
             passwords[login] = secrets.token_urlsafe(32)
             cur.execute(sql.SQL("CREATE ROLE {} LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE PASSWORD {} IN ROLE {}")

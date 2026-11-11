@@ -72,21 +72,21 @@ BEGIN
     END LOOP;
 END $$;
 
--- The dbt schemas belong to the dbt role (path 5): Dagster's own login, a
--- member of cinderhaven_dbt, must be able to replace every model in them.
+-- The dbt schemas keep their owner (path 5; owner, 2026-11-11): another repo
+-- (dimension-weight-integrity) writes its own relations into them until U12
+-- moves it to its own schema, and writer repos keep their own tables. The dbt
+-- role gets CREATE and USAGE (with grant option, for dbt's on-run-end grant).
+-- Only the relations this project's dbt builds change owner, and that list
+-- comes from cinderhaven/models, so scripts/apply_truth_roles.py makes those
+-- transfers in the same transaction; every other relation keeps its owner.
 -- dbt's +grants and on-run-end hook keep the readers' grants after each build.
 DO $$
-DECLARE s text; t record;
+DECLARE s text;
 BEGIN
     FOREACH s IN ARRAY ARRAY['public_staging', 'public_intermediate', 'public_marts'] LOOP
         IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = s) THEN
-            EXECUTE format('ALTER SCHEMA %I OWNER TO cinderhaven_dbt', s);
-            FOR t IN SELECT c.relname, c.relkind FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
-                     WHERE n.nspname = s AND c.relkind IN ('r', 'p', 'v', 'm') LOOP
-                EXECUTE format('ALTER %s %I.%I OWNER TO cinderhaven_dbt',
-                               CASE t.relkind WHEN 'v' THEN 'VIEW' WHEN 'm' THEN 'MATERIALIZED VIEW'
-                                              ELSE 'TABLE' END, s, t.relname);
-            END LOOP;
+            EXECUTE format('GRANT USAGE ON SCHEMA %I TO cinderhaven_dbt WITH GRANT OPTION', s);
+            EXECUTE format('GRANT CREATE ON SCHEMA %I TO cinderhaven_dbt', s);
             EXECUTE format('GRANT USAGE ON SCHEMA %I TO cinderhaven_reader, cinderhaven_validator', s);
             EXECUTE format('GRANT SELECT ON ALL TABLES IN SCHEMA %I TO cinderhaven_reader, cinderhaven_validator', s);
         END IF;

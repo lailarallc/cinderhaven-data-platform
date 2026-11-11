@@ -5,11 +5,13 @@ owned by the administrator. It is created and dropped by the test.
 """
 from __future__ import annotations
 
+import secrets
 import subprocess
 import sys
 from pathlib import Path
 
 import psycopg2
+import psycopg2.errors
 import pytest
 
 import harness
@@ -92,13 +94,95 @@ def test_an_existing_role_is_never_taken_over_as_dagsters_login(probe):
     assert r.returncode != 0 and "exists" in (r.stdout + r.stderr)
 
 
-def test_the_dbt_schemas_go_to_the_dbt_role(probe):
-    with psycopg2.connect(harness.dsn(probe)) as conn, conn.cursor() as c:
-        c.execute("CREATE SCHEMA public_marts; CREATE TABLE public_marts.fct_x (x int)")
+# ── the dbt schemas (owner, 2026-11-11): only this project's models change owner ──
+
+FOREIGN = "dwi_writer_probe"   # stands in for dimension-weight-integrity's login
+#: One model of this project's dbt per dbt schema (in cinderhaven/models), and one
+#: relation another repo writes there (names production holds on 2026-11-11).
+OURS = {"public_staging": ("VIEW", "stg_retailers"), "public_intermediate": ("VIEW", "int_all_orders"),
+        "public_marts": ("TABLE", "dim_products")}
+THEIRS = {"public_staging": "stg_wms_dimensions", "public_intermediate": "int_measurement_of_record",
+          "public_marts": "fct_dimension_cost"}
+
+
+def _rel_owner(vals, schema, name):
+    with psycopg2.connect(harness.dsn(vals)) as conn, conn.cursor() as c:
+        c.execute("SELECT pg_get_userbyid(c.relowner) FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace "
+                  "WHERE n.nspname = %s AND c.relname = %s", (schema, name))
+        owner = c.fetchone()[0]
     conn.close()
-    assert "ALTER SCHEMA public_marts OWNER" in _run(probe).stdout
+    return owner
+
+
+@pytest.fixture
+def dbt_schemas(probe):
+    """The three dbt schemas as production has them: owned by the admin, holding this project's
+    models (owned by the admin) and another repo's relations (owned by that repo's login)."""
+    with psycopg2.connect(harness.dsn(probe)) as conn, conn.cursor() as c:
+        c.execute(f"DROP ROLE IF EXISTS {FOREIGN}; CREATE ROLE {FOREIGN}")
+        for s, (kind, ours) in OURS.items():
+            c.execute(f"CREATE SCHEMA {s}")
+            c.execute(f"CREATE VIEW {s}.{ours} AS SELECT 1 AS x" if kind == "VIEW"
+                      else f"CREATE TABLE {s}.{ours} (x int)")
+            c.execute(f"CREATE TABLE {s}.{THEIRS[s]} (x int); ALTER TABLE {s}.{THEIRS[s]} OWNER TO {FOREIGN}")
+    conn.close()
+    yield probe
+    with psycopg2.connect(harness.dsn(probe)) as conn, conn.cursor() as c:
+        c.execute(f"DROP OWNED BY {FOREIGN}; DROP ROLE {FOREIGN}")
+    conn.close()
+
+
+def test_a_foreign_relation_in_each_dbt_schema_keeps_its_owner_through_the_apply(dbt_schemas):
+    probe, admin = dbt_schemas, dbt_schemas["HARNESS_PG_USER"]
+    dry = _run(probe).stdout
+    for s, (kind, ours) in OURS.items():
+        assert f"-- schema {s}: owner stays {admin}" in dry
+        assert f"ALTER {kind} {s}.{ours} OWNER: {admin} -> cinderhaven_dbt" in dry
+        assert f"-- TABLE {s}.{THEIRS[s]}: owner stays {FOREIGN}" in dry
+        assert f"{s}.{THEIRS[s]} OWNER" not in dry
+    r = _run(probe, "--apply", stdin="APPLY\n")
+    assert r.returncode == 0, r.stdout + r.stderr
+    for s, (_, ours) in OURS.items():
+        assert _owner(probe, s) == admin, f"schema {s} changed owner"
+        assert _rel_owner(probe, s, THEIRS[s]) == FOREIGN, f"{s}.{THEIRS[s]} changed owner"
+        assert _rel_owner(probe, s, ours) == "cinderhaven_dbt", f"{s}.{ours} did not go to the dbt role"
+        with psycopg2.connect(harness.dsn(probe)) as conn, conn.cursor() as c:
+            c.execute("SELECT has_table_privilege('cinderhaven_reader', %s, 'SELECT')", (f"{s}.{THEIRS[s]}",))
+            assert c.fetchone()[0], f"the reader cannot read {s}.{THEIRS[s]}"
+        conn.close()
+
+
+def test_a_dbt_login_rebuilds_its_models_and_cannot_touch_a_foreign_relation(dbt_schemas):
+    probe = dbt_schemas
     assert _run(probe, "--apply", stdin="APPLY\n").returncode == 0
-    assert _owner(probe, "public_marts") == "cinderhaven_dbt"
+    password = "probe-" + secrets.token_urlsafe(16)  # a throwaway harness login
+    with psycopg2.connect(harness.dsn(probe)) as conn, conn.cursor() as c:
+        c.execute("DROP ROLE IF EXISTS dbt_login_probe")
+        c.execute("CREATE ROLE dbt_login_probe LOGIN PASSWORD %s IN ROLE cinderhaven_dbt", (password,))
+    conn.close()
+    as_dbt = dict(probe, HARNESS_PG_USER="dbt_login_probe", HARNESS_PG_PASSWORD=password)
+    try:
+        with psycopg2.connect(harness.dsn(as_dbt)) as conn, conn.cursor() as c:
+            # What dbt does: a view replaced in place, a table swapped through a temp and a backup,
+            # a new model created, and the on-run-end schema grant.
+            c.execute("CREATE OR REPLACE VIEW public_staging.stg_retailers AS SELECT 1 AS x")
+            c.execute("CREATE TABLE public_marts.dim_products__dbt_tmp (x int);"
+                      "ALTER TABLE public_marts.dim_products RENAME TO dim_products__dbt_backup;"
+                      "ALTER TABLE public_marts.dim_products__dbt_tmp RENAME TO dim_products;"
+                      "DROP TABLE public_marts.dim_products__dbt_backup;"
+                      "CREATE TABLE public_marts.mart_new_probe (x int);"
+                      "GRANT SELECT ON public_marts.dim_products TO cinderhaven_reader;"
+                      "GRANT USAGE ON SCHEMA public_marts TO cinderhaven_reader, cinderhaven_validator")
+        conn.close()
+        with psycopg2.connect(harness.dsn(as_dbt)) as conn, conn.cursor() as c:
+            with pytest.raises(psycopg2.errors.InsufficientPrivilege):
+                c.execute("DROP TABLE public_marts.fct_dimension_cost")
+        conn.close()
+        assert _rel_owner(probe, "public_marts", "fct_dimension_cost") == FOREIGN
+    finally:
+        with psycopg2.connect(harness.dsn(probe)) as conn, conn.cursor() as c:
+            c.execute("DROP OWNED BY dbt_login_probe; DROP ROLE dbt_login_probe")
+        conn.close()
 
 
 def test_dagsters_login_is_created_once_shown_once_and_works(probe):
