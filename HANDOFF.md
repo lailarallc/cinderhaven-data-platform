@@ -40,7 +40,7 @@ closed until the apply runs. Dagster's schedule does not run on this
 machine (no daemon), so its check has refused nothing.
 
 **Next:** the owner runs, from this folder in PowerShell:
-`powershell -ExecutionPolicy Bypass -File scriptsotate_and_place.ps1`.
+`powershell -ExecutionPolicy Bypass -File scripts\rotate_and_place.ps1`.
 Then: re-dispatch verify-production-figures; mark U4 DONE only on a read of
 production; U2 next.
 
