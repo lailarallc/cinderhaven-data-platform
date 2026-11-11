@@ -59,6 +59,38 @@ jobs:
           done
           pg_isready -h localhost -p 5432
 
+      # Plan U4: the owner's apply is recorded done only on a read of production (FAILURES.md
+      # 2026-11-11). The catalog is readable by any login; this prints roles and owners, no data.
+      - name: "Roles and owners in production (plan U4, read-only catalog)"
+        run: |
+          psql -v ON_ERROR_STOP=1 -c "
+            SELECT r.rolname, r.rolsuper, r.rolcanlogin,
+                   coalesce(string_agg(g.rolname, ',' ORDER BY g.rolname), '') AS member_of
+            FROM pg_roles r LEFT JOIN pg_auth_members m ON m.member = r.oid
+            LEFT JOIN pg_roles g ON g.oid = m.roleid
+            WHERE r.rolname LIKE 'cinderhaven\_%' GROUP BY 1, 2, 3 ORDER BY 1"
+          psql -v ON_ERROR_STOP=1 -c "
+            SELECT nspname AS schema, pg_get_userbyid(nspowner) AS owner FROM pg_namespace
+            WHERE nspname IN ('raw','costing','copack','voidfinder','truth',
+                              'public_staging','public_intermediate','public_marts') ORDER BY 1"
+          psql -v ON_ERROR_STOP=1 -c "
+            SELECT n.nspname AS schema, pg_get_userbyid(c.relowner) AS relation_owner, count(*) AS relations
+            FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE n.nspname IN ('raw','costing','copack','voidfinder',
+                                'public_staging','public_intermediate','public_marts')
+              AND c.relkind IN ('r','p','v','m') GROUP BY 1, 2 ORDER BY 1, 2"
+          psql -v ON_ERROR_STOP=1 -c "
+            SELECT n.nspname || '.' || c.relname AS relation, pg_get_userbyid(c.relowner) AS owner
+            FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE (n.nspname, c.relname) IN (
+              ('public_staging','stg_gdsn_published'), ('public_staging','stg_netsuite_items'),
+              ('public_staging','stg_wms_dimensions'), ('public_staging','stg_shopify_products'),
+              ('public_intermediate','int_dim_and_billable'), ('public_intermediate','int_freight_class_by_system'),
+              ('public_intermediate','int_measurement_of_record'), ('public_intermediate','int_system_attribute_divergence'),
+              ('public_marts','fct_attribute_divergence'), ('public_marts','fct_dimension_cost'),
+              ('public_marts','fct_freight_class_by_system'), ('public_marts','fct_governed_product_master'))
+            ORDER BY 1"
+
       - name: "Refuse a superuser or a login with truth access (plan U4, path 5's pattern)"
         run: |
           read -r su reader truth < <(psql -tA -F ' ' -v ON_ERROR_STOP=1 -c "
