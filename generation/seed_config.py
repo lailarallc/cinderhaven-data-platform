@@ -177,6 +177,117 @@ VOID_CURATED_SKUS = ({s for skus in DELIST_RISK_SKUS.values() for s in skus}
 # from the catalog, in that path's order.
 PRODUCT_MASTER_HISTORY_SKUS = sorted(p["sku"] for p in ALL_SKUS)
 
+# -- copack (plan U2; ported from production-demand-forecast's db/seed_copack.py) --
+# Values unchanged. Production config is derived from the catalog by line; the
+# schedule and on-hand inventory are calibrated literals, moved here verbatim.
+# (line_id, lead_time_weeks, min_run_cases) by product-line code; Specialty
+# Condiments 001-005 share Line A with the sauces, 006-010 run on Line B.
+_COPACK_LINE_RULES = {
+    "AS": ("LINE-A", 10, 500),
+    "SC-A": ("LINE-A", 8, 300),
+    "SC-B": ("LINE-B", 8, 300),
+    "DG": ("LINE-B", 10, 350),
+    "PS": ("LINE-B", 12, 400),
+    "SB": ("LINE-B", 8, 300),
+}
+_COPACK_NOTES = {
+    "CHP-AS-001": "Top-selling sauce. February 2025 OOS event. Hero demo SKU.",
+    "CHP-SC-001": "Shares Line A with Artisan Sauces. Conflict demo SKU.",
+}
+
+
+def _copack_rule(sku: str) -> tuple:
+    code = sku[4:6]
+    if code == "SC":
+        code = "SC-A" if int(sku[-3:]) <= 5 else "SC-B"
+    return _COPACK_LINE_RULES[code]
+
+
+# (sku, line_id, lead_time_weeks, min_run_cases, notes), catalog order
+COPACK_SKU_PRODUCTION_CONFIG = [(p["sku"], *_copack_rule(p["sku"]), _COPACK_NOTES.get(p["sku"]))
+                                for p in ALL_SKUS]
+
+# Booked runs as of 2025-11-01; the 2026-02-07 cluster lands after those SKUs stock out.
+# (run_id, sku, line_id, scheduled_week, quantity_cases, status)
+COPACK_PRODUCTION_SCHEDULE = [
+    ('RUN-001', 'CHP-AS-002', 'LINE-A', '2025-11-15', 500, 'booked'),
+    ('RUN-002', 'CHP-AS-008', 'LINE-A', '2025-11-22', 500, 'booked'),
+    ('RUN-003', 'CHP-DG-001', 'LINE-B', '2025-11-29', 350, 'booked'),
+    ('RUN-004', 'CHP-DG-005', 'LINE-B', '2025-12-06', 350, 'booked'),
+    ('RUN-005', 'CHP-DG-008', 'LINE-B', '2025-12-13', 350, 'booked'),
+    ('RUN-006', 'CHP-PS-001', 'LINE-B', '2025-12-20', 400, 'booked'),
+    ('RUN-007', 'CHP-PS-005', 'LINE-B', '2025-12-27', 400, 'booked'),
+    ('RUN-008', 'CHP-PS-007', 'LINE-B', '2026-01-03', 400, 'booked'),
+    ('RUN-009', 'CHP-PS-010', 'LINE-B', '2025-11-15', 400, 'booked'),
+    ('RUN-010', 'CHP-SC-003', 'LINE-A', '2025-11-22', 300, 'booked'),
+    ('RUN-011', 'CHP-SC-006', 'LINE-B', '2025-11-29', 300, 'booked'),
+    ('RUN-012', 'CHP-SC-009', 'LINE-B', '2025-12-06', 300, 'booked'),
+    # Late runs — next co-packer slot lands after these SKUs stock out:
+    ('RUN-013', 'CHP-AS-001', 'LINE-A', '2026-02-07', 500, 'booked'),
+    ('RUN-014', 'CHP-SC-001', 'LINE-A', '2026-02-07', 300, 'booked'),
+    ('RUN-015', 'CHP-PS-004', 'LINE-B', '2026-02-07', 400, 'booked'),
+    ('RUN-016', 'CHP-DG-007', 'LINE-B', '2026-02-07', 350, 'booked'),
+]
+
+# On-hand cases as of 2025-11-01, calibrated against the OOS-corrected forecast.
+COPACK_SKU_INVENTORY = [
+    # --- Artisan Sauces ---
+    ('CHP-AS-001', "2025-11-01", 1604, 'stocks out ~week 5'),
+    ('CHP-AS-002', "2025-11-01", 4916, 'healthy'),
+    ('CHP-AS-003', "2025-11-01", 278, 'stocks out ~week 11'),
+    ('CHP-AS-004', "2025-11-01", 333, 'stocks out ~week 7'),
+    ('CHP-AS-005', "2025-11-01", 1006, 'stocks out ~week 12'),
+    ('CHP-AS-006', "2025-11-01", 8865, 'stocks out ~week 10'),
+    ('CHP-AS-007', "2025-11-01", 479, 'stocks out ~week 8'),
+    ('CHP-AS-008', "2025-11-01", 190, 'healthy'),
+    ('CHP-AS-009', "2025-11-01", 1421, 'stocks out ~week 11'),
+    ('CHP-AS-010', "2025-11-01", 184, 'stocks out ~week 6'),
+    # --- Specialty Condiments ---
+    ('CHP-SC-001', "2025-11-01", 3290, 'stocks out ~week 8'),
+    ('CHP-SC-002', "2025-11-01", 488, 'stocks out ~week 10'),
+    ('CHP-SC-003', "2025-11-01", 388, 'healthy'),
+    ('CHP-SC-004', "2025-11-01", 1346, 'stocks out ~week 11'),
+    ('CHP-SC-005', "2025-11-01", 275, 'stocks out ~week 9'),
+    ('CHP-SC-006', "2025-11-01", 159, 'healthy'),
+    ('CHP-SC-007', "2025-11-01", 213, 'stocks out ~week 10'),
+    ('CHP-SC-008', "2025-11-01", 1037, 'stocks out ~week 5'),
+    ('CHP-SC-009', "2025-11-01", 1083, 'healthy'),
+    ('CHP-SC-010', "2025-11-01", 568, 'stocks out ~week 11'),
+    # --- Dried Goods ---
+    ('CHP-DG-001', "2025-11-01", 1972, 'healthy'),
+    ('CHP-DG-002', "2025-11-01", 1303, 'stocks out ~week 10'),
+    ('CHP-DG-003', "2025-11-01", 420, 'stocks out ~week 9'),
+    ('CHP-DG-004', "2025-11-01", 295, 'stocks out ~week 12'),
+    ('CHP-DG-005', "2025-11-01", 734, 'healthy'),
+    ('CHP-DG-006', "2025-11-01", 80, 'stocks out ~week 11'),
+    ('CHP-DG-007', "2025-11-01", 1637, 'stocks out ~week 4'),
+    ('CHP-DG-008', "2025-11-01", 812, 'healthy'),
+    ('CHP-DG-009', "2025-11-01", 248, 'stocks out ~week 10'),
+    ('CHP-DG-010', "2025-11-01", 889, 'stocks out ~week 7'),
+    # --- Pantry Staples ---
+    ('CHP-PS-001', "2025-11-01", 729, 'healthy'),
+    ('CHP-PS-002', "2025-11-01", 8580, 'stocks out ~week 10'),
+    ('CHP-PS-003', "2025-11-01", 687, 'stocks out ~week 12'),
+    ('CHP-PS-004', "2025-11-01", 550, 'stocks out ~week 6'),
+    ('CHP-PS-005', "2025-11-01", 422, 'healthy'),
+    ('CHP-PS-006', "2025-11-01", 244, 'stocks out ~week 11'),
+    ('CHP-PS-007', "2025-11-01", 879, 'healthy'),
+    ('CHP-PS-008', "2025-11-01", 276, 'stocks out ~week 12'),
+    ('CHP-PS-009', "2025-11-01", 4316, 'stocks out ~week 8'),
+    ('CHP-PS-010', "2025-11-01", 1248, 'healthy'),
+    # --- Snack Bites ---
+    ('CHP-SB-001', "2025-11-01", 3563, 'healthy'),
+    ('CHP-SB-002', "2025-11-01", 492, 'stocks out ~week 9'),
+    ('CHP-SB-003', "2025-11-01", 1635, 'stocks out ~week 10'),
+    ('CHP-SB-004', "2025-11-01", 98, 'stocks out ~week 6'),
+    ('CHP-SB-005', "2025-11-01", 533, 'healthy'),
+    ('CHP-SB-006', "2025-11-01", 2405, 'stocks out ~week 8'),
+    ('CHP-SB-007', "2025-11-01", 289, 'stocks out ~week 11'),
+    ('CHP-SB-008', "2025-11-01", 581, 'stocks out ~week 7'),
+    ('CHP-SB-009', "2025-11-01", 84, 'healthy'),
+    ('CHP-SB-010', "2025-11-01", 690, 'stocks out ~week 10'),
+]
+
 # -- Retailer store counts and volume tiers --
 
 RETAILER_STORE_COUNTS = {

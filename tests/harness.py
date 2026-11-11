@@ -8,7 +8,7 @@ fly tunnel.
     python tests/harness.py seed      # today's platform paths, in today's order
     python tests/harness.py build     # dbt build (all models and tests)
     python tests/harness.py rebuild   # seed + build, each step timed
-    python tests/harness.py characterize  # U2: seed + copack's own seeder, then sql/world_hashes.sql
+    python tests/harness.py characterize  # U2: seed + generation/seed_copack.py, then sql/world_hashes.sql
     python tests/harness.py test      # fast tier: no database connection
     python tests/harness.py test-db   # database tier: needs the harness instance
 
@@ -115,9 +115,10 @@ def run_seed(run_seed: int = 0) -> list:
     return timings
 
 
-#: production-demand-forecast's copack seeder, run as-is for U2's characterization (it writes copack today).
-COPACK_SEEDER = Path(os.environ.get("COPACK_SEEDER") or
-                     ROOT.parent.parent / "published" / "production-demand-forecast" / "db" / "seed_copack.py")
+#: The copack seeder characterize runs: the platform's port (plan U2). The baseline,
+#: tests/fixtures/world_hashes_before_u2.json, was taken with production-demand-forecast's
+#: own db/seed_copack.py; set COPACK_SEEDER to that file to take it again.
+COPACK_SEEDER = Path(os.environ.get("COPACK_SEEDER") or ROOT / "generation" / "seed_copack.py")
 
 
 def world_hashes(vals: dict[str, str]) -> list[tuple[str, int, str]]:
@@ -131,7 +132,7 @@ def world_hashes(vals: dict[str, str]) -> list[tuple[str, int, str]]:
 
 def characterize() -> list:
     """U2's characterization: today's world, today's paths in today's order, then
-    production-demand-forecast's seed_copack.py; then sql/world_hashes.sql to
+    the copack seeder (COPACK_SEEDER); then sql/world_hashes.sql to
     output/harness/world-hashes-<platform sha>.json."""
     import json
     import platform
@@ -139,12 +140,12 @@ def characterize() -> list:
         raise HarnessError(f"{COPACK_SEEDER} not found; set COPACK_SEEDER")
     vals = harness_values()
     timings = run_seed()
-    _run("seed_copack.py (production-demand-forecast)", [sys.executable, str(COPACK_SEEDER)], vals,
-         COPACK_SEEDER.parent.parent, timings)
+    _run(f"copack: {COPACK_SEEDER.relative_to(COPACK_SEEDER.parent.parent.parent)}",
+         [sys.executable, str(COPACK_SEEDER)], vals, COPACK_SEEDER.parent.parent, timings)
     sha = lambda d: subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=d,  # noqa: E731
                                    capture_output=True, text=True).stdout.strip()
     rows = world_hashes(vals)
-    out = {"platform": sha(ROOT), "production_demand_forecast": sha(COPACK_SEEDER.parent),
+    out = {"platform": sha(ROOT), "copack_seeder": COPACK_SEEDER.relative_to(COPACK_SEEDER.parent.parent.parent).as_posix(), "copack_seeder_repo": sha(COPACK_SEEDER.parent),
            "python": platform.python_version(),
            "tables": {t: {"rows": n, "hash": h} for t, n, h in rows}}
     path = ROOT / "output" / "harness" / f"world-hashes-{out['platform']}.json"
