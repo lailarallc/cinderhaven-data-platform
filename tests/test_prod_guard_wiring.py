@@ -34,7 +34,8 @@ def test_the_vendored_prod_guard_copies_are_byte_identical():
 
 def test_every_seeder_lives_in_generation_and_none_in_scripts():
     assert not list((ROOT / "scripts").glob("seed_*.py")), "a seeder is back in scripts/"
-    assert len(list((ROOT / "generation").glob("seed_*.py"))) == 10
+    # U4 moved ten; U2 added seed_copack.py, ported from production-demand-forecast.
+    assert len(list((ROOT / "generation").glob("seed_*.py"))) == 11
 
 
 @pytest.fixture
