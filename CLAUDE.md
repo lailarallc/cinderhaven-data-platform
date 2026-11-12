@@ -83,6 +83,11 @@ FAILURES.md as relevant.
   it to the user first.
 - Do not refactor unrelated code unprompted.
 - Do not rename things unless asked.
+- A test command that gates a commit, a push or a recorded result runs
+  unpiped or under `set -o pipefail`, and the gate reads the test
+  runner's own exit code. Never `test | tail && git commit`: `tail`
+  exits 0. Trim output only in a separate command (FAILURES.md,
+  2026-11-11).
 
 ## Working with PLAN.md
 

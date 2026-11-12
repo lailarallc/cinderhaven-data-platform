@@ -420,6 +420,37 @@ separate question for the owner.
 
 ---
 
+### 2026-11-11 — A commit landed with a red test because the chain checked `tail`'s exit code
+
+**Attempted:** `1489a32` (U2, the copack port) was committed and pushed from
+one chain: `python tests/harness.py test | tail -1 && git add ... && git commit ...`.
+The harness returns pytest's exit code, but in a pipeline the shell reports
+the last command's, and `tail -1` exits 0.
+
+**Why it didn't work:** One fast test failed
+(`test_every_seeder_lives_in_generation_and_none_in_scripts` still expected
+10 seeders; the port makes 11). `tail` printed the failure line, the chain
+read 0, and the commit went out. CI for `1489a32` failed (run 43108437564).
+`dc5ac0c` fixed the count; CI for it passed (run 43108679806).
+
+**What we tried instead:** The fix was committed only after pytest's own
+exit code was read, unpiped.
+
+**Rule (scoped to the surface, not this repro):** A test command that gates
+anything runs unpiped, or under `set -o pipefail`, so its exit code is the
+test runner's. The surfaces: a commit or push chained after a test run, a
+background run whose exit line is the evidence, a harness `characterize` or
+`test` call, `pytest`, `dbt build`/`dbt test`, and any CI step that pipes
+test output (`| tee`, `| tail`, `| grep`). Output may be trimmed for
+reading only in a separate command, after the exit code has been read. Also
+in CLAUDE.md under "How to work the project".
+
+**Status:** Resolved
+
+**Tags:** exit code, pipefail, pipe, commit gate, U2, test tier
+
+---
+
 ### 2026-06-03 — dbt --select without + prefix misses upstream dependencies
 
 **Attempted:** `dbt run --select dim_products fct_chargebacks dim_stores fct_scan_data fct_promotions dim_retailer_requirements` to materialize new/modified mart models.
