@@ -1,26 +1,37 @@
-name: Deploy costing schema to production
+name: Rebuild production from DDL (seed_all.py)
 
-# Deploys the additive `costing` schema (cost side + balance sheet) to the
-# production Fly Postgres.
+# The contract (plan U2; rewritten from the 2026-06 costing-only deploy):
 #
-# DISPATCH ONLY. Never on push, never on schedule. This job executes DDL and a
-# generator against production, unlike canonical-drift.yml which is read-only.
+#   This job rebuilds production from DDL with generation/seed_all.py, ONCE,
+#   in U12, as part of the relock. It drops and recreates raw, costing,
+#   copack's five seeded tables, truth and the public_* schemas, then builds
+#   every dbt model. Production is a publication: the class-A consumers in
+#   the spec's CONSUMER-READ-MAP read it live.
 #
-# Safety properties:
-#   - A pre-flight guard refuses to run if `costing` already holds rows, unless
-#     force_recreate is explicitly set. costing_schema.sql opens with
-#     DROP SCHEMA IF EXISTS costing CASCADE, so this guard is the only thing
-#     standing between a re-run and silent data loss.
-#   - The nine protected tables are hashed before and after. Any delta fails
-#     the job loudly and immediately.
-#   - seed_all.py is NEVER invoked. It drops and recreates the raw schema.
-#   - The job does not merge, tag, or deploy anything else.
+#   Until U12 the first step refuses. U12 removes that step in the commit that
+#   dispatches the rebuild, so opening the job is one reviewed line, not an
+#   input anyone can tick. No step connects to anything before it
+#   (tests/test_generation_paths.py).
+#
+# DISPATCH ONLY. Never on push, never on schedule.
+#
+# Gates after the refusal:
+#   - Step 0, sql/drop_guard.sql: populated raw, costing, copack or truth
+#     refuses unless force_recreate; a relation the platform does not define,
+#     or a raw table whose columns differ from the pre-regen reference,
+#     refuses whatever force_recreate says, unless LEFTOVER names it.
+#   - Step 3: production's post-rebuild hashes must equal the off-host
+#     world's manifest (reference/offhost_world_manifest.json, committed in
+#     U12). The published world is the tested world.
+#
+# Production's logins for this job are U12's; PGUSER below is the pre-U12
+# shape and never runs while the refusal stands.
 
 on:
   workflow_dispatch:
     inputs:
       force_recreate:
-        description: "Drop and recreate `costing` even if it already holds rows (DESTRUCTIVE)"
+        description: "Drop populated raw/costing/copack/truth (DESTRUCTIVE). Overrides nothing else."
         type: boolean
         required: false
         default: false
@@ -29,9 +40,28 @@ concurrency:
   group: deploy-costing-production
   cancel-in-progress: false
 
+env:
+  # sql/raw_schema.sql at the last platform commit before U8's first DDL edit
+  # (plan U2). Production has not been rebuilt since, so its raw tables equal
+  # this reference. Named here, in a reviewed line, not as a dispatch input.
+  RAW_REFERENCE_COMMIT: 934785e
+  # Consumer-written relations U19 moves before the relock, comma-separated
+  # schema.relation. Empty until U12 fills it from the read map.
+  LEFTOVER: ""
+
 jobs:
-  deploy:
+  rebuild:
     runs-on: ubuntu-latest
+    services:
+      # A scratch instance, never production: the guard's reference columns
+      # and expected relations come from the DDL applied here, not a parser.
+      scratch:
+        image: postgres:16
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust  # throwaway, empty, reachable from this runner only
+        ports: ["55432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 5s --health-retries 20
     env:
       PGHOST: localhost
       PGPORT: "5432"
@@ -40,19 +70,59 @@ jobs:
       PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
 
     steps:
+      # ── THE PRE-RELOCK REFUSAL ────────────────────────────────────
+      # First step, ahead of the proxy and everything that connects.
+      # U12 deletes this step in the commit that dispatches the rebuild.
+      - name: "Refuse: production is rebuilt once, in U12"
+        run: |
+          echo "::error::Production is rebuilt from DDL once, in U12, with the relock. This step refuses every dispatch until U12 removes it in a reviewed commit."
+          exit 1
+
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Step 0 reads sql/raw_schema.sql at RAW_REFERENCE_COMMIT
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.13"  # one version for the baseline, the unified run and U12 (spec DECISIONS#u2-one-python)
 
       - name: Install deps
         run: |
-          pip install psycopg2-binary
+          pip install -r requirements.txt
           sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
 
-      - name: Install flyctl
-        uses: superfly/flyctl-actions/setup-flyctl@master
+      # ── STEP 0 — the drop guard ───────────────────────────────────
+      - name: "Step 0a: guard inputs from the DDL and dbt's manifest (scratch instance)"
+        env:
+          SCRATCH: host=localhost port=55432 user=postgres dbname=postgres
+          PGPASSWORD: ""  # production's is never offered to the scratch instance
+          # dbt parse reads the committed profile but connects to nothing.
+          CINDERHAVEN_PG_HOST: localhost
+          CINDERHAVEN_PG_PORT: "55432"
+          CINDERHAVEN_PG_USER: postgres
+          CINDERHAVEN_PG_PASSWORD: unused
+        run: |
+          set -euo pipefail
+          COLS="SELECT coalesce(json_object_agg(relname, cols), '{}') FROM (
+                  SELECT c.relname, json_agg(a.attname ORDER BY a.attnum) AS cols
+                  FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+                  JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum > 0 AND NOT a.attisdropped
+                  WHERE n.nspname = 'raw' AND c.relkind = 'r' GROUP BY c.relname) t"
+          git show "$RAW_REFERENCE_COMMIT:sql/raw_schema.sql" | psql "$SCRATCH" -q -v ON_ERROR_STOP=1
+          psql "$SCRATCH" -tAc "$COLS" > /tmp/raw_reference.json
+          psql "$SCRATCH" -q -v ON_ERROR_STOP=1 -f sql/raw_schema.sql
+          psql "$SCRATCH" -tAc "SELECT string_agg('raw.' || relname, ',') FROM pg_class c
+                                JOIN pg_namespace n ON n.oid = c.relnamespace
+                                WHERE n.nspname = 'raw' AND c.relkind = 'r'" > /tmp/expected_raw.txt
+          (cd cinderhaven && dbt parse --profiles-dir ../orchestration -q)
+          python -c "
+          import json
+          nodes = json.load(open('cinderhaven/target/manifest.json'))['nodes'].values()
+          print(','.join(sorted(f\"{n['schema']}.{n.get('alias') or n['name']}\" for n in nodes
+                if n['resource_type'] in ('model', 'seed', 'snapshot')
+                and n['config'].get('materialized') != 'ephemeral')))" > /tmp/expected_dbt.txt
+          echo "reference tables: $(python -c "import json; print(len(json.load(open('/tmp/raw_reference.json'))))")"
+          echo "expected: $(tr ',' '\n' < /tmp/expected_raw.txt | wc -l) raw, $(tr ',' '\n' < /tmp/expected_dbt.txt | wc -l) dbt"
 
       - name: Open proxy to production
         env:
@@ -65,157 +135,60 @@ jobs:
           done
           pg_isready -h localhost -p 5432
 
-      # ── STEP 0 — the guard ────────────────────────────────────────
-      # Turns the unanswerable "does costing already exist in production?"
-      # into a decision the job makes for itself, before anything destructive.
-      - name: "Step 0: pre-flight guard on costing"
+      - name: "Step 0b: sql/drop_guard.sql (zero rows = pass)"
         run: |
-          TABLES=$(psql -tAc "SELECT count(*) FROM information_schema.tables WHERE table_schema='costing';")
-          echo "costing tables present: $TABLES"
-
-          ROWS=$(psql -tAc "
-            SELECT COALESCE(SUM((xpath('/row/cnt/text()', x))[1]::text::bigint), 0)
-            FROM (
-              SELECT query_to_xml(
-                       format('SELECT count(*) AS cnt FROM %I.%I', table_schema, table_name),
-                       false, true, '') AS x
-              FROM information_schema.tables WHERE table_schema='costing'
-            ) t;")
-          echo "costing rows present: $ROWS"
-
-          if [ "$ROWS" -gt 0 ]; then
-            echo "--- existing costing contents ---"
-            psql -c "
-              SELECT table_name,
-                     (xpath('/row/cnt/text()',
-                       query_to_xml(format('SELECT count(*) AS cnt FROM %I.%I', table_schema, table_name),
-                       false, true, '')))[1]::text::bigint AS rows
-              FROM information_schema.tables WHERE table_schema='costing' ORDER BY table_name;"
-
-            if [ "${{ inputs.force_recreate }}" != "true" ]; then
-              echo "::error::costing already exists in production WITH ROWS ($ROWS). Refusing to drop it. Re-dispatch with force_recreate=true only if you intend to destroy and rebuild it."
-              exit 1
-            fi
-            echo "::warning::force_recreate=true — dropping and rebuilding a populated costing schema."
+          set -euo pipefail
+          {
+            echo '\o /dev/null'
+            printf "SELECT set_config('drop_guard.force_recreate', %s, false);\n" "'${{ inputs.force_recreate }}'"
+            printf "SELECT set_config('drop_guard.expected', %s, false);\n" "\$g\$$(cat /tmp/expected_raw.txt),$(cat /tmp/expected_dbt.txt)\$g\$"
+            printf "SELECT set_config('drop_guard.raw_reference', %s, false);\n" "\$g\$$(cat /tmp/raw_reference.json)\$g\$"
+            printf "SELECT set_config('drop_guard.leftover', %s, false);\n" "\$g\$${LEFTOVER}\$g\$"
+            echo '\o'
+          } > /tmp/guard_inputs.sql
+          # Unpiped: psql's own exit code gates the step (FAILURES.md, 2026-11-11).
+          psql -q -v ON_ERROR_STOP=1 -tA -f /tmp/guard_inputs.sql -f sql/drop_guard.sql > /tmp/guard_out.txt
+          grep -v '^$' /tmp/guard_out.txt > /tmp/refusals.txt || true
+          if [ -s /tmp/refusals.txt ]; then
+            echo "::error::The drop guard refused:"; cat /tmp/refusals.txt; exit 1
           fi
+          echo "Drop guard: no refusals."
 
-      # ── STEP 1 — production baseline ──────────────────────────────
-      - name: "Step 1: baseline hashes for the nine protected tables"
+      # ── STEP 1 — the dated record of the flat world ───────────────
+      - name: "Step 1: production's world hashes before the rebuild (a record, not an invariant)"
         run: |
-          cat > /tmp/hashes.sql <<'SQL'
-          SELECT 'fct_scan_data',             count(*), md5(string_agg(t::text,'|' ORDER BY t::text)) FROM public_marts.fct_scan_data t
-          UNION ALL SELECT 'fct_distribution',          count(*), md5(string_agg(t::text,'|' ORDER BY t::text)) FROM public_marts.fct_distribution t
-          UNION ALL SELECT 'fct_retailer_orders',       count(*), md5(string_agg(t::text,'|' ORDER BY t::text)) FROM public_marts.fct_retailer_orders t
-          UNION ALL SELECT 'fct_retailer_payments',     count(*), md5(string_agg(t::text,'|' ORDER BY t::text)) FROM public_marts.fct_retailer_payments t
-          UNION ALL SELECT 'fct_retailer_deductions',   count(*), md5(string_agg(t::text,'|' ORDER BY t::text)) FROM public_marts.fct_retailer_deductions t
-          UNION ALL SELECT 'fct_dtc_orders',            count(*), md5(string_agg(t::text,'|' ORDER BY t::text)) FROM public_marts.fct_dtc_orders t
-          UNION ALL SELECT 'raw.sku_costs',             count(*), md5(string_agg(t::text,'|' ORDER BY t::text)) FROM raw.sku_costs t
-          UNION ALL SELECT 'dim_products',              count(*), md5(string_agg(t::text,'|' ORDER BY t::text)) FROM public_marts.dim_products t
-          UNION ALL SELECT 'mart_channel_contribution', count(*), md5(string_agg(t::text,'|' ORDER BY t::text)) FROM public_marts.mart_channel_contribution t;
-          SQL
-          psql -tA -F'|' -f /tmp/hashes.sql | sed 's/ *$//' > /tmp/before.txt
-          echo "=== PRODUCTION BASELINE ==="
+          set -euo pipefail
+          psql -v ON_ERROR_STOP=1 -tA -F'|' -f sql/world_hashes.sql > /tmp/before.txt
+          echo "=== PRODUCTION BEFORE THE REBUILD ($(date -u +%F)) ==="
           cat /tmp/before.txt
 
-      # ── STEP 2 — DDL, then generator ──────────────────────────────
-      # NOTE: seed_costing.py applies costing_schema.sql itself, so the DDL is
-      # executed twice. It is idempotent (DROP IF EXISTS / CREATE), and running
-      # it explicitly first keeps the DDL visible in the job log.
-      # seed_all.py is NOT run here and must never be.
-      - name: "Step 2a: apply costing DDL"
-        run: psql -v ON_ERROR_STOP=1 -f sql/costing_schema.sql
-
-      - name: "Step 2b: run the generator"
+      # ── STEP 2 — the rebuild ──────────────────────────────────────
+      - name: "Step 2: generation/seed_all.py (DDL, generators, dbt build, verify_counts)"
         env:
           DATABASE_URL: postgresql://postgres:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/cinderhaven
-          ALLOW_PROD_DB: "1"  # this step writes production on purpose; see scripts/prod_guard.py
-        run: python generation/seed_costing.py
+          ALLOW_PROD_DB: "1"  # this step, and no other, writes production on purpose; see generation/prod_guard.py
+        run: python generation/seed_all.py
 
-      # ── STEP 3 — prove the hard rule held ─────────────────────────
-      - name: "Step 3: re-hash and fail on ANY delta"
+      # ── STEP 3 — the published world is the tested world ──────────
+      - name: "Step 3: post-rebuild hashes against the off-host manifest"
         run: |
-          psql -tA -F'|' -f /tmp/hashes.sql | sed 's/ *$//' > /tmp/after.txt
-          echo "=== PRODUCTION AFTER ==="
-          cat /tmp/after.txt
-          if diff -u /tmp/before.txt /tmp/after.txt; then
-            echo "*** IDENTICAL — all nine protected tables byte-for-byte unchanged ***"
-          else
-            echo "::error::PROTECTED TABLE CHANGED. Diff above shows which table and how. Deploy is unsafe; investigate before any further action."
-            exit 1
-          fi
+          set -euo pipefail
+          psql -v ON_ERROR_STOP=1 -tA -F'|' -f sql/world_hashes.sql > /tmp/after.txt
+          python -c "
+          import json, sys
+          want = {t['table']: (t['rows'], t['hash']) for t in json.load(open('reference/offhost_world_manifest.json'))['tables']}
+          got = {l.split('|')[0]: (int(l.split('|')[1]), l.split('|')[2]) for l in open('/tmp/after.txt').read().split()}
+          bad = sorted(t for t in want.keys() | got.keys() if want.get(t) != got.get(t))
+          for t in bad: print(f'{t}: production {got.get(t)}, off-host {want.get(t)}')
+          sys.exit(1 if bad else 0)"
+          echo "All $(wc -l < /tmp/after.txt) generated tables equal the off-host manifest."
 
-      # ── STEP 4 — acceptance + integrity ───────────────────────────
-      - name: "Step 4a: acceptance queries"
+      # ── STEP 4 — integrity ────────────────────────────────────────
+      - name: "Step 4: costing integrity suite (zero rows = pass)"
         run: |
-          psql <<'SQL'
-          \echo '=== Margin path and PPV (documented: 45.01 / 42.36 / 39.62, blended 42.31) ==='
-          WITH rev AS (
-            SELECT EXTRACT(YEAR FROM po_date)::int yr, SUM(total_value) v FROM public_staging.stg_retailer_orders GROUP BY 1
-            UNION ALL SELECT EXTRACT(YEAR FROM po_date)::int, SUM(total_value) FROM public_staging.stg_distributor_orders GROUP BY 1
-            UNION ALL SELECT EXTRACT(YEAR FROM created_at)::int, SUM(total) FROM public_staging.stg_shopify_orders GROUP BY 1
-          ), r AS (SELECT yr, SUM(v) v FROM rev GROUP BY 1 HAVING SUM(v) > 1000000),
-          c AS (SELECT EXTRACT(YEAR FROM cost_period)::int yr,
-                  SUM(units_basis*fully_loaded_cost_per_unit) act,
-                  SUM(units_basis*loaded_cost_at_standard) std,
-                  SUM(purchase_price_variance) ppv,
-                  SUM(units_basis*standard_cost_per_unit) sc
-                FROM costing.fct_product_costs GROUP BY 1)
-          SELECT r.yr,
-                 (100.0*(1-c.act/r.v))::numeric(6,2) AS margin_actual,
-                 (100.0*(1-c.std/r.v))::numeric(6,2) AS margin_standard,
-                 c.ppv::numeric(14,2) AS ppv,
-                 (100.0*c.ppv/c.sc)::numeric(6,2) AS ppv_pct
-          FROM r JOIN c USING (yr) ORDER BY 1;
-
-          \echo '=== Blended (documented: actual 42.31, standard 42.46) ==='
-          WITH tot AS (
-            SELECT (SELECT SUM(total_value) FROM public_staging.stg_retailer_orders)
-                 + (SELECT SUM(total_value) FROM public_staging.stg_distributor_orders)
-                 + (SELECT SUM(total) FROM public_staging.stg_shopify_orders) AS rev)
-          SELECT (100.0*(1-SUM(units_basis*fully_loaded_cost_per_unit)/(SELECT rev FROM tot)))::numeric(6,2) AS blended_actual,
-                 (100.0*(1-SUM(units_basis*loaded_cost_at_standard)/(SELECT rev FROM tot)))::numeric(6,2) AS blended_standard,
-                 SUM(purchase_price_variance)::numeric(14,2) AS net_ppv
-          FROM costing.fct_product_costs;
-
-          \echo '=== DIO (documented 127.3) / DPO (33.6) ==='
-          WITH inv AS (SELECT snapshot_date, SUM(value_at_actual) v FROM costing.fct_inventory_snapshot GROUP BY 1),
-               cg  AS (SELECT SUM(units_basis*fully_loaded_cost_per_unit)/3.0 a FROM costing.fct_product_costs)
-          SELECT (AVG(v)/(SELECT a FROM cg)*365)::numeric(8,1) AS dio FROM inv;
-          SELECT AVG(paid_date-invoice_date)::numeric(8,1) AS dpo FROM costing.fct_supplier_invoices;
-
-          \echo '=== Supplier invoices vs COGS (documented +1.89%) ==='
-          SELECT (100.0*((SELECT SUM(invoice_amount) FROM costing.fct_supplier_invoices)
-                - (SELECT SUM(units_basis*manufactured_cost_per_unit) FROM costing.fct_product_costs))
-                / (SELECT SUM(units_basis*manufactured_cost_per_unit) FROM costing.fct_product_costs))::numeric(6,2) AS recon_pct;
-
-          \echo '=== SKU margin spread: width >= 30 points, position inherited (documented 25.81-60.94, width 35.12) ==='
-          WITH s AS (SELECT sku, SUM(units_basis*fully_loaded_cost_per_unit) c, SUM(units_basis) u
-                     FROM costing.fct_product_costs GROUP BY 1)
-          SELECT MIN(100.0*(1-s.c/(s.u*d.wholesale_price)))::numeric(6,2) AS min_margin,
-                 MAX(100.0*(1-s.c/(s.u*d.wholesale_price)))::numeric(6,2) AS max_margin,
-                 (MAX(100.0*(1-s.c/(s.u*d.wholesale_price))) - MIN(100.0*(1-s.c/(s.u*d.wholesale_price))))::numeric(6,2) AS width
-          FROM s JOIN public_marts.dim_products d USING (sku) WHERE s.u > 0;
-
-          \echo '=== Row counts ==='
-          SELECT table_name,
-                 (xpath('/row/cnt/text()',
-                   query_to_xml(format('SELECT count(*) AS cnt FROM %I.%I', table_schema, table_name),
-                   false, true, '')))[1]::text::bigint AS rows
-          FROM information_schema.tables WHERE table_schema='costing' ORDER BY table_name;
-          SQL
-
-      - name: "Step 4b: integrity suite (zero rows = pass)"
-        run: |
+          set -euo pipefail
           psql -v ON_ERROR_STOP=1 -tA -f tests/test_costing_integrity.sql > /tmp/integrity.txt
           if [ -s /tmp/integrity.txt ]; then
             echo "::error::Integrity failures:"; cat /tmp/integrity.txt; exit 1
           fi
           echo "Integrity suite: no failing checks."
-
-      # ── STEP 5 — report only ──────────────────────────────────────
-      - name: "Step 5: report"
-        run: |
-          echo "Deploy complete. Protected tables unchanged; acceptance and integrity ran above."
-          echo "Compare the acceptance output against the documented figures and update"
-          echo "CINDERHAVEN_CANONICAL.md only if production differs. This job deliberately"
-          echo "does NOT merge PR #1, wire any tool to costing.*, or touch the live apps."

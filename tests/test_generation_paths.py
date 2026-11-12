@@ -46,3 +46,40 @@ def test_product_master_history_keeps_its_own_sku_order():
     assert lines == sorted(lines) and lines[0] == "AS" and lines[-1] == "SC", \
         f"expected AS, DG, PS, SB, SC order, got {list(dict.fromkeys(lines))}"
     assert len(order) == 50 == len(set(order))
+
+
+# -- deploy-costing.yml: the pre-relock refusal (plan U2) --------------------
+
+WORKFLOW = GEN.parent / ".github" / "workflows" / "deploy-costing.yml"
+
+
+def _steps():
+    import yaml
+    jobs = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))["jobs"]
+    assert list(jobs) == ["rebuild"], f"one job expected, found {list(jobs)}"
+    return jobs["rebuild"]["steps"]
+
+
+def test_deploy_costing_refuses_before_any_step_runs():
+    # The refusal is step one: no checkout, no proxy, no psql ahead of it.
+    first = _steps()[0]
+    assert "uses" not in first and first["run"].strip().endswith("exit 1"), first
+    assert "U12" in first["name"], first["name"]
+
+
+def test_deploy_costing_writes_production_only_through_seed_all_with_the_override_on_that_step():
+    steps = _steps()
+    overridden = [s["name"] for s in steps if "ALLOW_PROD_DB" in (s.get("env") or {})]
+    assert len(overridden) == 1 and "seed_all.py" in overridden[0], overridden
+    runs = "\n".join(s.get("run", "") for s in steps)
+    assert "seed_costing.py" not in runs and "costing_schema.sql" not in runs
+
+
+def test_deploy_costing_runs_the_drop_guard_before_the_rebuild_on_python_3_13():
+    steps = _steps()
+    names = [s.get("name", s.get("uses", "")) for s in steps]
+    guard = next(i for i, s in enumerate(steps) if "sql/drop_guard.sql" in s.get("run", ""))
+    rebuild = next(i for i, s in enumerate(steps) if "generation/seed_all.py" in s.get("run", ""))
+    assert guard < rebuild, names
+    pins = [s["with"]["python-version"] for s in steps if "setup-python" in s.get("uses", "")]
+    assert pins == ["3.13"], pins
