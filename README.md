@@ -101,10 +101,11 @@ docs/                       # architecture, walkthrough, data-gap assessment, db
 CINDERHAVEN_CANONICAL.md    # single source of truth for headline figures
 ```
 
-Note: the `copack` schema (co-packer S&OP tables) is owned by the
-[production-demand-forecast](https://github.com/MsShawnP/production-demand-forecast) project and
-survives platform reseeds — `seed_all.py` drops only the `raw` schema. Seed it from that repo
-with `python db/seed_copack.py`.
+Note: the `copack` schema's five co-packer tables are generated here, by `seed_all.py`
+(`generation/seed_copack.py`, `sql/copack_schema.sql`), from the one catalog. The schema itself
+and the forecast snapshot tables the
+[production-demand-forecast](https://github.com/MsShawnP/production-demand-forecast) project writes
+into it survive platform reseeds.
 
 Further reading: [Architecture](docs/architecture.md) · [Walkthrough](docs/walkthrough.md) · [Data gap assessment](docs/data-gap-assessment.md) · [dbt docs](docs/dbt-docs/index.html)
 

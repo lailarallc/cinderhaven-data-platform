@@ -1,7 +1,10 @@
 -- costing schema — additive cost side and balance sheet.
 --
--- ISOLATION: this schema survives seed_all.py, which drops only `raw` plus the
--- dbt schemas. Nothing here is ever dropped by a platform reseed.
+-- REBUILT WITH THE REST (plan U2): seed_all.py's DDL step applies this file
+-- with raw, truth and copack's tables, so every rebuild recreates `costing`
+-- empty and seed_costing.py refills it from the regenerated raw. The drop
+-- guard (sql/drop_guard.sql) refuses a populated `costing` unless
+-- force_recreate.
 --
 -- NO CROSS-SCHEMA FOREIGN KEYS. `DROP SCHEMA raw CASCADE` silently drops FK
 -- constraints that live in this schema while leaving the tables and their rows

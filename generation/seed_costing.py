@@ -1,8 +1,8 @@
 """Seed the additive cost side and balance sheet into the `costing` schema.
 
-ADDITIVE ONLY. Reads from `raw` and `public_staging`; writes only to `costing`.
-No existing table is modified, and `costing` survives seed_all.py's teardown of
-`raw`.
+Reads from `raw` and `public_staging`; writes only to `costing`. seed_all.py
+runs it (plan U2): its DDL step recreates `costing` empty with the rest, and it
+runs this after every raw generator and the dbt staging build.
 
 Every demand-dependent value is DERIVED from raw.scan_data at generation time:
 inventory build-ahead, production run timing, the ingredient scale effect,
@@ -12,8 +12,7 @@ change (seasonality, growth reshape) is a re-run, not a rewrite.
 Stable and hardcoded: freight rates by NMFC class, shelf life by product line,
 supplier payment terms, lot-to-store allocation policy.
 
-Usage:
-    DATABASE_URL=... python generation/seed_costing.py
+Usage: python generation/seed_all.py (it applies the costing DDL this reads).
 """
 from __future__ import annotations
 
@@ -437,10 +436,8 @@ def main():
     """)
     revenue_total = float(cur.fetchone()["rev"])
 
-    print("Executing costing DDL ...")
-    ddl = open(os.path.join(os.path.dirname(__file__), "..", "sql", "costing_schema.sql")).read()
-    cur.execute(ddl)
-
+    # sql/costing_schema.sql is applied by seed_all.py's DDL step (plan U2), so
+    # schema creation happens in one place; costing is empty here.
     print("Building suppliers ...")
     sup = build_suppliers(products)
     psycopg2.extras.execute_values(cur, """

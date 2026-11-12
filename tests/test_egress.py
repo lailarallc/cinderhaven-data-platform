@@ -51,8 +51,13 @@ def _prints_in(path: Path):
 def test_seed_all_reports_truth_as_a_boolean_through_truth_populated():
     src = (ROOT / "generation" / "seed_all.py").read_text(encoding="utf-8")
     assert "public.truth_populated()" in src
-    # verify_counts stays on raw: extending it to truth would print the injected-error count.
-    assert "WHERE schemaname = 'raw'" in src
+    # verify_counts counts raw, costing, voidfinder and copack's five (plan U2) and never
+    # truth: extending it to truth would print the injected-error count.
+    fn = next(n for n in ast.parse(src).body if isinstance(n, ast.FunctionDef) and n.name == "verify_counts")
+    body = ast.get_source_segment(src, fn)
+    assert "n.nspname IN ('raw', 'costing', 'voidfinder')" in body and "n.nspname = 'copack'" in body
+    assert "truth" not in body.replace("report_truth(conn)", "").replace("truth as a boolean only", ""), \
+        "verify_counts names truth outside its boolean report"
 
 
 def test_no_generation_print_formats_a_value_from_truth():

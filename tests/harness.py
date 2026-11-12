@@ -5,10 +5,10 @@ no `make`. Every step that connects runs scripts/prod_guard.py first, against
 the harness instance's host and port, so no step reaches production through a
 fly tunnel.
 
-    python tests/harness.py seed      # today's platform paths, in today's order
-    python tests/harness.py build     # dbt build (all models and tests)
-    python tests/harness.py rebuild   # seed + build, each step timed
-    python tests/harness.py characterize  # U2: seed + generation/seed_copack.py, then sql/world_hashes.sql
+    python tests/harness.py seed      # generation/seed_all.py, the one entry point (dbt build included)
+    python tests/harness.py build     # dbt build again (all models and tests)
+    python tests/harness.py rebuild   # seed; seed_all.py builds every model since U2
+    python tests/harness.py characterize  # U2: seed, then sql/world_hashes.sql
     python tests/harness.py test      # fast tier: no database connection
     python tests/harness.py test-db   # database tier: needs the harness instance
 
@@ -87,11 +87,12 @@ def _run(label: str, cmd: list[str], vals: dict[str, str], cwd: Path, timings: l
         raise HarnessError(f"{label} failed (exit {r.returncode})")
 
 
+# U2: seed_all.py is the only generation path. It runs the raw generators,
+# product master history, copack, a dbt staging build, costing and the full dbt
+# build; the baseline (tests/fixtures/world_hashes_before_u2.json) was taken from
+# the four separate pre-U2 steps plus production-demand-forecast's own copack seeder.
 SEED_STEPS = [
     ("seed_all.py", [sys.executable, "generation/seed_all.py"], ROOT),
-    ("dbt run: staging", dbt_cmd("run", "--select", "staging"), ROOT / "cinderhaven"),
-    ("seed_costing.py", [sys.executable, "generation/seed_costing.py"], ROOT),
-    ("seed_product_master_history.py", [sys.executable, "generation/seed_product_master_history.py"], ROOT),
 ]
 BUILD_STEPS = [("dbt build: all", dbt_cmd("build"), ROOT / "cinderhaven")]
 
@@ -115,12 +116,6 @@ def run_seed(run_seed: int = 0) -> list:
     return timings
 
 
-#: The copack seeder characterize runs: the platform's port (plan U2). The baseline,
-#: tests/fixtures/world_hashes_before_u2.json, was taken with production-demand-forecast's
-#: own db/seed_copack.py; set COPACK_SEEDER to that file to take it again.
-COPACK_SEEDER = Path(os.environ.get("COPACK_SEEDER") or ROOT / "generation" / "seed_copack.py")
-
-
 def world_hashes(vals: dict[str, str]) -> list[tuple[str, int, str]]:
     import psycopg2
     with psycopg2.connect(dsn(vals), connect_timeout=5) as conn, conn.cursor() as cur:
@@ -131,21 +126,16 @@ def world_hashes(vals: dict[str, str]) -> list[tuple[str, int, str]]:
 
 
 def characterize() -> list:
-    """U2's characterization: today's world, today's paths in today's order, then
-    the copack seeder (COPACK_SEEDER); then sql/world_hashes.sql to
-    output/harness/world-hashes-<platform sha>.json."""
+    """U2's characterization: the world seed_all.py builds, then sql/world_hashes.sql
+    to output/harness/world-hashes-<platform sha>.json."""
     import json
     import platform
-    if not COPACK_SEEDER.exists():
-        raise HarnessError(f"{COPACK_SEEDER} not found; set COPACK_SEEDER")
     vals = harness_values()
     timings = run_seed()
-    _run(f"copack: {COPACK_SEEDER.relative_to(COPACK_SEEDER.parent.parent.parent)}",
-         [sys.executable, str(COPACK_SEEDER)], vals, COPACK_SEEDER.parent.parent, timings)
     sha = lambda d: subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=d,  # noqa: E731
                                    capture_output=True, text=True).stdout.strip()
     rows = world_hashes(vals)
-    out = {"platform": sha(ROOT), "copack_seeder": COPACK_SEEDER.relative_to(COPACK_SEEDER.parent.parent.parent).as_posix(), "copack_seeder_repo": sha(COPACK_SEEDER.parent),
+    out = {"platform": sha(ROOT), "entry_point": "generation/seed_all.py",
            "python": platform.python_version(),
            "tables": {t: {"rows": n, "hash": h} for t, n, h in rows}}
     path = ROOT / "output" / "harness" / f"world-hashes-{out['platform']}.json"
@@ -188,7 +178,7 @@ def main(argv: list[str]) -> int:
         elif cmd == "build":
             _report(run_build())
         elif cmd == "rebuild":
-            _report(run_seed() + run_build())
+            _report(run_seed())
         elif cmd == "characterize":
             _report(characterize())
         elif cmd == "test":

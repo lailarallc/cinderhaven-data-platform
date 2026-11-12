@@ -4,23 +4,17 @@ Ported from production-demand-forecast's db/seed_copack.py: same rows, same
 columns. Draws nothing at random. The SKU-keyed rows come from seed_config.py
 (the one catalog); the co-packer and its two lines stay here.
 
-Applies sql/copack_schema.sql first, which drops and recreates only these five
-tables; that repo's forecast snapshot tables in copack are left alone.
-
-Usage:
-    python generation/seed_copack.py
+seed_all.py's DDL step applies sql/copack_schema.sql, which drops and recreates
+only these five tables (that repo's forecast snapshot tables in copack are left
+alone); this module inserts their rows and checks them. seed_all.py runs it.
 """
 from __future__ import annotations
-
-from pathlib import Path
 
 import psycopg2
 
 from seed_config import (
     COPACK_PRODUCTION_SCHEDULE, COPACK_SKU_INVENTORY, COPACK_SKU_PRODUCTION_CONFIG, DATABASE_URL,
 )
-
-SCHEMA_SQL = Path(__file__).resolve().parent.parent / "sql" / "copack_schema.sql"
 
 CO_PACKERS = [
     ("COPACK-001", "Midwest Production Partners, LLC", "Racine, WI",
@@ -51,7 +45,6 @@ INSERTS = [
 
 
 def seed(cur) -> None:
-    cur.execute(SCHEMA_SQL.read_text(encoding="utf-8"))
     for target, rows in INSERTS:
         n_cols = len(rows[0])
         cur.executemany(f"INSERT INTO {target} VALUES ({', '.join(['%s'] * n_cols)})", rows)

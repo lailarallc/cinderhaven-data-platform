@@ -20,9 +20,10 @@ skips, when the instance is unconfigured or unreachable.
    the platform `.env`.
 2. `docker compose --env-file tests/harness.env up -d harness-db` starts Postgres on `127.0.0.1:55432`, with no
    production dump mounted.
-3. `python tests/harness.py rebuild` rebuilds the world from DDL: `seed_all.py`, `dbt run` of staging,
-   `seed_costing.py`, `seed_product_master_history.py`, then a full `dbt build` (profile: `tests/harness_dbt/`).
-   Every step runs `scripts/prod_guard.py` against the harness host and port first.
+3. `python tests/harness.py rebuild` rebuilds the world from DDL through `seed_all.py` alone: DDL, the raw
+   generators, product master history, copack, a dbt staging build, `seed_costing.py`, then a full `dbt build`
+   (plan U2; dbt through `orchestration/profiles.yml` with the seeded instance's connection).
+   `scripts/prod_guard.py` checks the harness host and port first.
 
 The Makefile wraps each command (`make harness-db`, `make rebuild`, `make test`, `make test-db`, `make test-seeds`).
 

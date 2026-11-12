@@ -83,3 +83,30 @@ def test_deploy_costing_runs_the_drop_guard_before_the_rebuild_on_python_3_13():
     assert guard < rebuild, names
     pins = [s["with"]["python-version"] for s in steps if "setup-python" in s.get("uses", "")]
     assert pins == ["3.13"], pins
+
+
+# -- seed_all.py hands dbt the instance it seeded (plan U2) -------------------
+
+def _seed_all(monkeypatch):
+    import importlib
+    monkeypatch.setenv("DATABASE_URL", "host=localhost port=5999 dbname=world user=gen password=x")
+    for k in ("CINDERHAVEN_PG_HOST", "CINDERHAVEN_PG_PORT", "CINDERHAVEN_PG_DB", "CINDERHAVEN_PG_USER"):
+        monkeypatch.delenv(k, raising=False)
+    sys.path.insert(0, str(GEN))
+    for m in ("seed_config", "seed_all"):
+        sys.modules.pop(m, None)
+    return importlib.import_module("seed_all")
+
+
+def test_seed_all_gives_dbt_the_seeded_instance(monkeypatch):
+    env = _seed_all(monkeypatch).dbt_env()
+    assert (env["CINDERHAVEN_PG_HOST"], env["CINDERHAVEN_PG_PORT"], env["CINDERHAVEN_PG_DB"]) == \
+        ("localhost", "5999", "world")
+
+
+def test_seed_all_refuses_a_dbt_target_naming_another_instance(monkeypatch):
+    import pytest
+    seed_all = _seed_all(monkeypatch)
+    monkeypatch.setenv("CINDERHAVEN_PG_PORT", "5432")  # e.g. a fly tunnel left in the shell
+    with pytest.raises(seed_all.SeedError, match="CINDERHAVEN_PG_PORT"):
+        seed_all.dbt_env()
