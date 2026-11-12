@@ -901,9 +901,23 @@ DTC_REFUND_REASONS_NON_GLASS = [
 # ── END DTC COST LAYERS ──────────────────────────────────────────
 
 
+# ── RUN SEED (plan U2) ────────────────────────────────────────────
+# Every stream on the generation path is built by init_rng, which shifts its
+# constant by RUN_SEED * RUN_SEED_STRIDE. Run seed 0 is today's world, stream
+# for stream. Any other run seed moves every stream, and a shift by one amount
+# keeps distinct constants distinct. The stride sits far above every stream
+# constant (all < 1000), so no two run seeds share a stream. Streams that
+# collide at run seed 0 collide at every run seed until U9 re-streams them.
+RUN_SEED_STRIDE = 1_000_000
+_run_seed = os.environ.get("CINDERHAVEN_RUN_SEED", "0")
+if not _run_seed.isdigit():
+    raise ValueError(f"CINDERHAVEN_RUN_SEED must be a whole number >= 0, got {_run_seed!r}")
+RUN_SEED = int(_run_seed)
+
+
 def init_rng(seed: int = SEED) -> random.Random:
-    """Create a seeded RNG for deterministic generation."""
-    return random.Random(seed)
+    """Create a seeded RNG for deterministic generation: the stream constant, shifted by the run seed."""
+    return random.Random(seed + RUN_SEED * RUN_SEED_STRIDE)
 
 
 # ── DEFECT PROFILE (isolated RNG stream, seed=300) ────────────────

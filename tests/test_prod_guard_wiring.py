@@ -66,9 +66,10 @@ def test_seed_all_refuses_fly_tunnel_before_connecting(fly_tunnel):
 
 
 def test_seed_costing_refuses_fly_tunnel_before_connecting(fly_tunnel):
-    seed_costing = _fresh_import("seed_costing")
+    # Since U2 it imports seed_config (init_rng), whose import is the guard.
+    sys.modules.pop("seed_config", None)
     with pytest.raises(prod_guard.ProdDatabaseError):
-        seed_costing.main()
+        _fresh_import("seed_costing").main()
 
 
 def test_ingest_refuses_fly_tunnel_on_the_configured_port(fly_tunnel, monkeypatch):

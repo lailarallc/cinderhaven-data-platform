@@ -79,9 +79,16 @@ def test_the_guard_is_handed_the_harness_host_and_port(monkeypatch):
     assert seen[0][-1] == "127.0.0.1:55432" and seen[0][-2].endswith("prod_guard.py")
 
 
-def test_a_run_seed_other_than_zero_is_refused_until_u2():
-    with pytest.raises(harness.HarnessError, match="U2"):
-        harness.run_seed(1)
+def test_the_run_seed_reaches_seed_all_and_defaults_to_zero(monkeypatch):
+    monkeypatch.setenv("CINDERHAVEN_RUN_SEED", "7")  # a stray value in the shell
+    vals = {k: "v" for k in harness.KEYS}
+    assert harness.child_env(vals)["CINDERHAVEN_RUN_SEED"] == "0"
+    assert harness.child_env(vals, 3)["CINDERHAVEN_RUN_SEED"] == "3"
+
+
+def test_a_negative_run_seed_is_refused():
+    with pytest.raises(harness.HarnessError, match=">= 0"):
+        harness.run_seed(-1)
 
 
 # ── the multi-seed runner ───────────────────────────────────────────

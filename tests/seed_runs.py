@@ -160,9 +160,8 @@ def _platform_gates() -> list[Gate]:
 def _repeat_gate() -> Gate:
     """Hard gate for --repeat: every rebuild of run seed 0 hashes identical to the first.
 
-    Until U2 gives seed_all.py a run seed, N "seeds" can only be N rebuilds of
-    one world. That run is recorded as repeats, never as N seeds, and what it
-    proves is determinism: the baseline U2's characterization starts from.
+    N rebuilds of one run seed, recorded as repeats, never as N seeds: what it
+    proves is determinism. Since U2 the multi-seed run (--seeds) varies the world.
     """
     import psycopg2
     import harness
@@ -183,8 +182,7 @@ def _repeat_gate() -> Gate:
 def _platform_rebuild(seed: int) -> None:
     import harness
     t0 = time.time()
-    harness.run_seed(seed)
-    harness.run_build()
+    harness.run_seed(seed)  # seed_all.py builds every dbt model since U2
     print(f"seed {seed}: rebuilt in {time.time() - t0:.0f}s", flush=True)
 
 

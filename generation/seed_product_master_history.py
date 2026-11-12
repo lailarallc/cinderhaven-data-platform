@@ -24,7 +24,7 @@ from datetime import date
 # Allow running from project root
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 
-from seed_config import DATABASE_URL, PRODUCT_MASTER_HISTORY_SKUS, WINDOW_START
+from seed_config import DATABASE_URL, PRODUCT_MASTER_HISTORY_SKUS, WINDOW_START, init_rng
 
 import psycopg2
 
@@ -146,7 +146,7 @@ def load_rows(rows: list[tuple]) -> None:
 
 
 def main() -> None:
-    rng = random.Random(SEED)
+    rng = init_rng(SEED)
     profiles = build_sku_profiles(rng)
 
     # Print summary of which SKUs have issues
