@@ -9,6 +9,32 @@ For things that didn't work, see FAILURES.md.
 
 ---
 
+## 2026-11-11 (evening) — U2 in progress: seed_all.py is the one entry point
+
+**Did (each proven against `tests/fixtures/world_hashes_before_u2.json`, 55 tables, Python 3.13.14, 0 differing):**
+- `60a08db` characterization; `db3fb2c` the SKU lists into `seed_config.py`; `1489a32` + `dc5ac0c` copack
+  ported (`generation/seed_copack.py`, `sql/copack_schema.sql`, grants at the end).
+- `83c21e7` FAILURES + CLAUDE.md: `1489a32` went out with a red test because the gate read `tail`'s exit
+  code. Test gates run unpiped or under pipefail.
+- `44a0f4d` `sql/drop_guard.sql` + `tests/test_drop_guard.py` (13 fixture cases on the harness).
+- `2232264` `deploy-costing.yml`: first step refuses until U12; then drop guard, world-hash record,
+  `seed_all.py`, off-host manifest compare, integrity suite; Python 3.13. Step 0b dry-run on the harness
+  container; Step 0a (scratch service, `dbt parse`) has not run anywhere.
+- `208d9f9` `seed_all.py` runs DDL (raw, truth, costing, copack's five), the raw generators, product master
+  history, copack, dbt staging, costing, full dbt build (459/459), verify_counts. dbt gets the seeded
+  instance's connection; a mismatched `CINDERHAVEN_PG_*` refuses. Harness seed = `seed_all.py` alone.
+
+**State:** fast tier 116 passed, db tier 90 passed. Nothing touched production.
+
+**Next (rest of U2):** the run seed (run seed 0 = today's streams) and the two direct `random.Random` calls
+through `init_rng`; delete `scripts/ingest_sqlite_to_postgres.py` and `scripts/generate_shopify_orders.py`
+with the loader's prod_guard test; Makefile (`make seed` = `seed_all.py`) and `docs/architecture.md:11`;
+the remaining test scenarios (costing and copack orphans from the DDL's sku columns, history population,
+voidfinder one-per-store, copack snapshot and `edi_*` stand-ins left byte-identical, grant survival,
+partial-failure, two runs identical and a second seed different).
+
+---
+
 ## 2026-11-11 (later) — U4 DONE: the production apply ran, read back
 
 **Did:**
