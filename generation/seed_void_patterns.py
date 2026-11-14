@@ -270,6 +270,17 @@ def apply_went_dark(cur, cutoffs) -> dict:
     return deleted_by_retailer
 
 
+class DeletionGuardTripped(RuntimeError):
+    """The guard's refusal, with what tripped it, so a harness run can record it
+    as that run seed's result (plan U2, owner 2026-11-14). Behaviour unchanged:
+    it is still the RuntimeError that stops the run."""
+
+    def __init__(self, retailer_id: str, share: float, limit: float):
+        self.retailer_id, self.share, self.limit = retailer_id, share, limit
+        super().__init__(f"Deletion guard tripped: {retailer_id} would lose {share:.2%} of trailing-52w "
+                         f"revenue (limit {limit:.1%}). Shrink WENT_DARK_PAIRS or the week range.")
+
+
 def check_deletion_guard(cur, deleted_by_retailer):
     """Abort (raise) if any retailer's trailing-52w revenue drops more
     than MAX_RETAILER_REVENUE_DELETION."""
@@ -287,12 +298,7 @@ def check_deletion_guard(cur, deleted_by_retailer):
         print(f"  went-dark deletions {retailer_id}: ${deleted:,.0f} "
               f"({share:.2%} of trailing-52w)")
         if share > MAX_RETAILER_REVENUE_DELETION:
-            raise RuntimeError(
-                f"Deletion guard tripped: {retailer_id} would lose "
-                f"{share:.2%} of trailing-52w revenue "
-                f"(limit {MAX_RETAILER_REVENUE_DELETION:.0%}). "
-                f"Shrink WENT_DARK_PAIRS or the week range."
-            )
+            raise DeletionGuardTripped(retailer_id, share, MAX_RETAILER_REVENUE_DELETION)
 
 
 def seed_addresses(cur) -> int:

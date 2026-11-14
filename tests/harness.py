@@ -18,10 +18,12 @@ DATABASE_URL from the harness values and POSTGRES_PASSWORD is removed.
 """
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -35,6 +37,17 @@ KEYS = ("HARNESS_PG_HOST", "HARNESS_PG_PORT", "HARNESS_PG_DB", "HARNESS_PG_USER"
 
 class HarnessError(RuntimeError):
     pass
+
+
+class GuardTripped(HarnessError):
+    """seed_all.py stopped on a generator's guard (exit 3), with what tripped it."""
+
+    def __init__(self, label: str, detail: dict):
+        self.detail = detail
+        super().__init__(f"{label} stopped by a guard: {detail}")
+
+
+GUARD_TRIP_EXIT = 3  # generation/seed_all.py's
 
 
 def harness_values() -> dict[str, str]:
@@ -83,8 +96,14 @@ def _run(label: str, cmd: list[str], vals: dict[str, str], cwd: Path, timings: l
          run_seed: int = 0) -> None:
     print(f"\n== {label}", flush=True)
     t0 = time.time()
-    r = subprocess.run(cmd, cwd=cwd, env=child_env(vals, run_seed))
-    timings.append((label, time.time() - t0))
+    env = child_env(vals, run_seed)
+    with tempfile.TemporaryDirectory() as tmp:
+        report = Path(tmp) / "guard_trip.json"
+        env["CINDERHAVEN_GUARD_REPORT"] = str(report)
+        r = subprocess.run(cmd, cwd=cwd, env=env)
+        timings.append((label, time.time() - t0))
+        if r.returncode == GUARD_TRIP_EXIT and report.exists():
+            raise GuardTripped(label, json.loads(report.read_text()))
     if r.returncode != 0:
         raise HarnessError(f"{label} failed (exit {r.returncode})")
 

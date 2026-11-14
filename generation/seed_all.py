@@ -23,6 +23,7 @@ Usage:
 """
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import subprocess
@@ -209,7 +210,21 @@ def main():
     print(f"\nDone in {elapsed:.1f}s")
 
 
+#: Exit code for a run stopped by a generator's guard: the world was refused, not broken.
+GUARD_TRIP_EXIT = 3
+
 if __name__ == "__main__":
     # Ensure generation/ is on the path for imports
     sys.path.insert(0, str(Path(__file__).parent))
-    main()
+    from seed_void_patterns import DeletionGuardTripped
+    try:
+        main()
+    except DeletionGuardTripped as e:
+        # The run still stops. The harness passes CINDERHAVEN_GUARD_REPORT so a
+        # multi-seed run can record the trip as that seed's result (owner, 2026-11-14).
+        report = os.environ.get("CINDERHAVEN_GUARD_REPORT")
+        if report:
+            Path(report).write_text(json.dumps({"guard": "void_deletion", "retailer": e.retailer_id,
+                                                "loss": round(e.share, 6), "limit": e.limit}))
+        print(f"\n{e}", file=sys.stderr)
+        sys.exit(GUARD_TRIP_EXIT)

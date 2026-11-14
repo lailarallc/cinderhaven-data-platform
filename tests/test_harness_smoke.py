@@ -157,7 +157,7 @@ def test_a_seed_that_cannot_be_built_fails_the_run_loudly():
 def test_the_record_is_written_with_commit_seeds_and_verdicts(tmp_path):
     rec = seed_runs.run([0, 1, 2], lambda s: None, _stub_gates())
     data = json.loads(seed_runs.write_record(rec, tmp_path).read_text())
-    assert set(data) == {"commit", "mode", "seeds", "passed", "outcomes", "verdicts"}
+    assert set(data) == {"commit", "mode", "seeds", "passed", "outcomes", "verdicts", "not_built"}
     assert data["seeds"] == [0, 1, 2]
 
 
@@ -206,6 +206,76 @@ def test_the_multi_seed_run_refuses_uncommitted_run_inputs(monkeypatch):
     monkeypatch.setattr(seed_runs, "_dirty_inputs", lambda: ["generation/seed_config.py"])
     monkeypatch.setattr(seed_runs, "run", lambda *a, **k: pytest.fail("the run started"))
     assert seed_runs.main(["--seeds", "2"]) == 2
+
+
+# ── guard trips and the U2 run-seed verdict (owner, 2026-11-14) ─────
+
+TRIP = {"guard": "void_deletion", "retailer": "RET-REGIONAL", "loss": 0.0163, "limit": 0.015}
+
+
+def _tripping(trip_seed):
+    def rebuild(s):
+        if s == trip_seed:
+            raise seed_runs.SeedNotBuilt(TRIP)
+    return rebuild
+
+
+def _world(s):  # a distinct, repeatable world per seed
+    return {"raw.t": {"rows": 1, "hash": f"h{s}"}}
+
+
+def test_a_guard_trip_is_that_seeds_result_and_the_run_goes_on(tmp_path):
+    progress = tmp_path / "p.jsonl"
+    rec = seed_runs.run([0, 1, 2], _tripping(1), _stub_gates(), progress, _world)
+    assert rec.not_built == {1: TRIP}
+    assert [o["seed"] for o in rec.outcomes["hard"]] == [0, 2], "gates judge the built seeds"
+    assert sorted(rec.worlds) == [0, 2] and rec.repeat == {"repeat_of": 0, "world": _world(0)}
+    built = []
+    again = seed_runs.run([0, 1, 2], built.append, _stub_gates(), progress, _world)
+    assert built == [] and again.not_built == {1: TRIP}, "a resume reran a saved seed, trip or repeat"
+
+
+def test_repeat_mode_rebuilds_seed_zero_every_time():
+    built = []
+    rec = seed_runs.run([0, 0, 0], built.append, _stub_gates())
+    assert built == [0, 0, 0] and len(rec.outcomes["hard"]) == 3
+
+
+def test_the_u2_verdict_passes_deterministic_distinct_worlds_and_reports_trips_beside_it(tmp_path):
+    rec = seed_runs.run([0, 1, 2], _tripping(1), _stub_gates(), None, _world)
+    v = seed_runs.run_seed_machinery(rec, baseline=_world(0))
+    assert v["passed"] and v["built"] == [0, 2] and v["guard_trips"] == {"1": TRIP}
+
+
+def test_the_u2_verdict_fails_on_a_repeat_that_differs_twin_worlds_or_a_moved_seed_zero():
+    worlds = iter([_world(0), _world(1), _world(9)])  # the repeat of seed 0 comes back different
+    rec = seed_runs.run([0, 1], lambda s: None, _stub_gates(), None, lambda s: next(worlds))
+    assert not seed_runs.run_seed_machinery(rec, _world(0))["deterministic"]
+    rec = seed_runs.run([0, 1], lambda s: None, _stub_gates(), None, lambda s: _world(0))
+    assert not seed_runs.run_seed_machinery(rec, _world(0))["distinct"]
+    rec = seed_runs.run([0, 1], lambda s: None, _stub_gates(), None, _world)
+    assert not seed_runs.run_seed_machinery(rec, _world(5))["seed0_is_baseline"]
+
+
+def test_seed_all_exit_3_with_a_report_becomes_guard_tripped(monkeypatch):
+    def fake_run(cmd, cwd=None, env=None):
+        Path(env["CINDERHAVEN_GUARD_REPORT"]).write_text(json.dumps(TRIP))
+        return subprocess.CompletedProcess(cmd, harness.GUARD_TRIP_EXIT)
+    monkeypatch.setattr(harness.subprocess, "run", fake_run)
+    with pytest.raises(harness.GuardTripped) as e:
+        harness._run("seed_all.py", ["x"], {k: "v" for k in harness.KEYS}, ROOT, [], 9)
+    assert e.value.detail == TRIP
+
+
+def test_the_void_guard_message_prints_the_limit_it_enforces():
+    sys.path.insert(0, str(ROOT / "generation"))
+    src = (ROOT / "generation" / "seed_void_patterns.py").read_text(encoding="utf-8")
+    assert "MAX_RETAILER_REVENUE_DELETION = 0.015" in src
+    ns: dict = {}
+    cls_src = src[src.index("class DeletionGuardTripped"):src.index("def check_deletion_guard")]
+    exec(cls_src, ns)
+    msg = str(ns["DeletionGuardTripped"]("RET-REGIONAL", 0.0163, 0.015))
+    assert "(limit 1.5%)" in msg and "1.63%" in msg, msg
 
 
 def test_poisson_band_is_the_ruled_rule():
