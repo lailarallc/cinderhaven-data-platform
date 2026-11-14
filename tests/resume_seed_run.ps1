@@ -9,7 +9,10 @@
 # 4. Runs tests/seed_runs.py --seeds 30, which skips every seed already saved in
 #    output/seed_runs/progress-<commit>-30seeds.jsonl and judges from the saved results.
 # Exits with the run's own exit code (0 = every gate passed).
-$ErrorActionPreference = "Stop"
+# "Continue", not "Stop": in Windows PowerShell 5.1 a native command's stderr
+# (docker info while the engine is down; docker compose's progress lines) is a
+# terminating error under "Stop". Every step checks its own $LASTEXITCODE instead.
+$ErrorActionPreference = "Continue"
 Set-Location (Split-Path $PSScriptRoot -Parent)
 
 function Test-DockerEngine {
