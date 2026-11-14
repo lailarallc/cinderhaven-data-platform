@@ -278,6 +278,38 @@ def test_the_void_guard_message_prints_the_limit_it_enforces():
     assert "(limit 1.5%)" in msg and "1.63%" in msg, msg
 
 
+def _seed_all_with_build_results(monkeypatch, tmp_path, statuses):
+    import importlib
+    monkeypatch.setenv("DATABASE_URL", "host=localhost port=5999 dbname=w user=g password=x")
+    sys.path.insert(0, str(ROOT / "generation"))
+    for m in ("seed_config", "seed_all"):
+        sys.modules.pop(m, None)
+    seed_all = importlib.import_module("seed_all")
+    monkeypatch.setattr(seed_all, "DBT_PROJECT", tmp_path)
+    (tmp_path / "target").mkdir()
+
+    def failing_build(*args):
+        rows = [{"unique_id": f"node.{i}", "status": s} for i, s in enumerate(statuses)]
+        (tmp_path / "target" / "run_results.json").write_text(json.dumps({"results": rows}))
+        raise seed_all.SeedError("dbt build failed (exit 1)")
+    monkeypatch.setattr(seed_all, "run_dbt", failing_build)
+    return seed_all
+
+
+def test_a_dbt_build_whose_tests_fail_is_a_recorded_refusal(monkeypatch, tmp_path):
+    seed_all = _seed_all_with_build_results(monkeypatch, tmp_path, ["pass", "fail", "skipped"])
+    with pytest.raises(seed_all.DbtTestsFailed) as e:
+        seed_all.full_build()
+    assert e.value.tests == ["node.1"]
+
+
+def test_a_dbt_build_with_an_error_fails_loudly(monkeypatch, tmp_path):
+    seed_all = _seed_all_with_build_results(monkeypatch, tmp_path, ["fail", "error"])
+    with pytest.raises(seed_all.SeedError) as e:
+        seed_all.full_build()
+    assert not isinstance(e.value, seed_all.DbtTestsFailed)
+
+
 def test_poisson_band_is_the_ruled_rule():
     # U18 (2026-10-20): at 30 seeds a window mean of 7.84 holds within +/- 1.00.
     lo, hi = seed_runs.poisson_band(7.84, 30)

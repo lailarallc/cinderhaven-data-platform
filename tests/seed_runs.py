@@ -372,8 +372,10 @@ def main(argv: list[str]) -> int:
               f"(seed {m['repeat_of']} rebuilt); distinct: {m['distinct']}; seed 0 = U2 baseline: "
               f"{m['seed0_is_baseline']}")
     for s, d in sorted(rec.not_built.items()):
-        print(f"  guard trip (reported, not a U2 failure): seed {s}: {d.get('retailer')} "
-              f"{d.get('loss', 0):.2%} > limit {d.get('limit', 0):.1%}")
+        what = (f"{d['retailer']} {d['loss']:.2%} > limit {d['limit']:.1%}" if d.get("guard") == "void_deletion"
+                else f"dbt tests failed: {', '.join(d.get('tests', []))}" if d.get("guard") == "dbt_tests"
+                else str(d))
+        print(f"  guard trip (reported, not a U2 failure): seed {s}: {what}")
     return 0 if rec.passed else 1
 
 
