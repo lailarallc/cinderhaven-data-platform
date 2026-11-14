@@ -21,12 +21,21 @@ Each run writes output/seed_runs/<utc>.json (gitignored): commit, seeds, every
 outcome, every verdict. U12's relock reads it.
 
     python tests/seed_runs.py --seeds 30
+
+The multi-seed run is resumable: each seed's outcomes land in
+output/seed_runs/progress-<commit>-<n>seeds.jsonl as the seed finishes, and the
+same command after a shutdown skips the finished seeds. It refuses a tree whose
+generation inputs differ from the commit, so every saved seed is that commit's.
+After a shutdown, one line starts Docker, the harness database and the run:
+
+    powershell -ExecutionPolicy Bypass -File tests/resume_seed_run.ps1
 """
 from __future__ import annotations
 
 import argparse
 import json
 import math
+import os
 import subprocess
 import sys
 import time
@@ -92,22 +101,73 @@ def _commit() -> str:
     return r.stdout.strip() if r.returncode == 0 else "unknown"
 
 
-def run(seeds: list[int], rebuild: Callable[[int], None], gates: list[Gate]) -> RunRecord:
+def _load_progress(progress: Path, commit: str, gate_names: list[str]) -> dict[int, dict]:
+    """Finished seeds from a progress file: {seed: {gate: outcome}}. A header from
+    another commit or gate set refuses; a torn last line (power cut mid-write) is
+    dropped, and that seed reruns."""
+    done: dict[int, dict] = {}
+    lines = progress.read_text(encoding="utf-8").splitlines()
+    header = json.loads(lines[0])
+    if header["commit"] != commit or header["gates"] != gate_names:
+        raise ValueError(f"{progress.name} was written at commit {header['commit'][:12]} with gates "
+                         f"{header['gates']}; this run is {commit[:12]} with {gate_names}. Results from "
+                         "another tree are not mixed: move the file aside to start over")
+    for i, line in enumerate(lines[1:], start=2):
+        try:
+            entry = json.loads(line)
+        except json.JSONDecodeError:
+            if i == len(lines):
+                break  # torn final line
+            raise
+        done[entry["seed"]] = entry["outcomes"]
+    return done
+
+
+def run(seeds: list[int], rebuild: Callable[[int], None], gates: list[Gate],
+        progress: Optional[Path] = None) -> RunRecord:
     """Rebuild at each seed, record one outcome per gate per seed, then judge across seeds.
+
+    With `progress`, each seed's outcomes are appended to that file the moment the
+    seed finishes, a restart skips every seed already there, and the verdict is
+    judged from the saved outcomes. A seed cut off mid-rebuild has no line and
+    reruns from DDL.
 
     A rebuild that raises fails the run loudly: a seed that cannot be built is
     not a draw.
     """
     if not gates:
         raise ValueError("no gates: a run that judges nothing would pass vacuously")
-    rec = RunRecord(commit=_commit(), seeds=list(seeds), outcomes={g.name: [] for g in gates})
+    commit = _commit()
+    names = [g.name for g in gates]
+    rec = RunRecord(commit=commit, seeds=list(seeds), outcomes={n: [] for n in names})
+    done: dict[int, dict] = {}
+    if progress is not None:
+        if progress.exists():
+            done = _load_progress(progress, commit, names)
+            print(f"resuming {progress.name}: {len(done)} of {len(seeds)} seeds already finished", flush=True)
+        else:
+            progress.parent.mkdir(parents=True, exist_ok=True)
+            progress.write_text(json.dumps({"commit": commit, "seeds": list(seeds), "gates": names}) + "\n",
+                                encoding="utf-8")
     for seed in seeds:
+        if seed in done:
+            continue
         rebuild(seed)
+        outcomes = {}
         for g in gates:
             o = g.check(seed)
             if g.reads_truth and o.statistic is not None:
                 raise ValueError(f"gate {g.name} reads truth; its record may hold a boolean only")
-            rec.outcomes[g.name].append({"seed": seed, "passed": bool(o.passed), "statistic": o.statistic})
+            outcomes[g.name] = {"seed": seed, "passed": bool(o.passed), "statistic": o.statistic}
+        done[seed] = outcomes
+        if progress is not None:
+            with progress.open("a", encoding="utf-8") as f:
+                f.write(json.dumps({"seed": seed, "outcomes": outcomes}) + "\n")
+                f.flush()
+                os.fsync(f.fileno())
+    for seed in seeds:
+        for n in names:
+            rec.outcomes[n].append(done[seed][n])
     for g in gates:
         rec.verdicts[g.name] = judge(g, rec.outcomes[g.name])
     return rec
@@ -179,6 +239,18 @@ def _repeat_gate() -> Gate:
     return Gate("world_identical_to_first_rebuild", "hard", identical)
 
 
+#: What a rebuild and its gates read; uncommitted edits here would make saved
+#: seeds and later seeds come from different trees.
+RUN_INPUTS = ("generation", "sql", "cinderhaven", "orchestration", "tests/harness.py", "tests/seed_runs.py",
+              "tests/table_hashes.py", "tests/test_costing_integrity.sql")
+
+
+def _dirty_inputs() -> list[str]:
+    r = subprocess.run(["git", "status", "--porcelain", "--", *RUN_INPUTS], cwd=ROOT,
+                       capture_output=True, text=True)
+    return [line[3:] for line in r.stdout.splitlines() if line.strip()]
+
+
 def _platform_rebuild(seed: int) -> None:
     import harness
     t0 = time.time()
@@ -198,7 +270,13 @@ def main(argv: list[str]) -> int:
         rec = run([0] * args.repeat, _platform_rebuild, _platform_gates() + [_repeat_gate()])
         rec.mode = f"repeat: {args.repeat} rebuilds of run seed 0; not a multi-seed run"
     else:
-        rec = run(list(range(args.seeds)), _platform_rebuild, _platform_gates())
+        dirty = _dirty_inputs()
+        if dirty:
+            print("refusing: uncommitted changes in files the run reads, so its results would not be "
+                  f"the commit's: {', '.join(dirty)}", file=sys.stderr)
+            return 2
+        progress = OUT_DIR / f"progress-{_commit()[:12]}-{args.seeds}seeds.jsonl"
+        rec = run(list(range(args.seeds)), _platform_rebuild, _platform_gates(), progress)
     path = write_record(rec)
     print(f"record: {path}  ({rec.mode})")
     for name, v in rec.verdicts.items():

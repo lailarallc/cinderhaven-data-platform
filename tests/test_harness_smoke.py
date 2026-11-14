@@ -161,6 +161,53 @@ def test_the_record_is_written_with_commit_seeds_and_verdicts(tmp_path):
     assert data["seeds"] == [0, 1, 2]
 
 
+# ── resuming the multi-seed run (a shutdown mid-run) ────────────────
+
+def _interrupted(progress, seeds, stop_at):
+    """A run cut off while rebuilding `stop_at`, as a shutdown would."""
+    def rebuild(s):
+        if s == stop_at:
+            raise KeyboardInterrupt
+    with pytest.raises(KeyboardInterrupt):
+        seed_runs.run(seeds, rebuild, _stub_gates(hard_miss_seed=1), progress)
+
+
+def test_each_finished_seed_is_saved_and_a_restart_skips_it(tmp_path):
+    progress = tmp_path / "progress.jsonl"
+    _interrupted(progress, [0, 1, 2, 3], stop_at=2)
+    assert [json.loads(line)["seed"] for line in progress.read_text().splitlines()[1:]] == [0, 1]
+    built = []
+    rec = seed_runs.run([0, 1, 2, 3], built.append, _stub_gates(hard_miss_seed=1), progress)
+    assert built == [2, 3], "a restart rebuilt a seed that had already finished"
+    whole = seed_runs.run([0, 1, 2, 3], lambda s: None, _stub_gates(hard_miss_seed=1))
+    assert rec.outcomes == whole.outcomes and rec.verdicts == whole.verdicts  # judged from saved results
+    assert rec.verdicts["hard"]["failed_seeds"] == [1], "seed 1's saved failure was lost on resume"
+
+
+def test_a_torn_last_line_is_dropped_and_that_seed_reruns(tmp_path):
+    progress = tmp_path / "progress.jsonl"
+    _interrupted(progress, [0, 1, 2], stop_at=2)
+    text = progress.read_text()
+    progress.write_text(text[: len(text) - 10])  # power cut mid-write of seed 1's line
+    built = []
+    seed_runs.run([0, 1, 2], built.append, _stub_gates(), progress)
+    assert built == [1, 2]
+
+
+def test_a_progress_file_from_another_commit_refuses(tmp_path, monkeypatch):
+    progress = tmp_path / "progress.jsonl"
+    _interrupted(progress, [0, 1], stop_at=1)
+    monkeypatch.setattr(seed_runs, "_commit", lambda: "f" * 40)
+    with pytest.raises(ValueError, match="not mixed"):
+        seed_runs.run([0, 1], lambda s: None, _stub_gates(), progress)
+
+
+def test_the_multi_seed_run_refuses_uncommitted_run_inputs(monkeypatch):
+    monkeypatch.setattr(seed_runs, "_dirty_inputs", lambda: ["generation/seed_config.py"])
+    monkeypatch.setattr(seed_runs, "run", lambda *a, **k: pytest.fail("the run started"))
+    assert seed_runs.main(["--seeds", "2"]) == 2
+
+
 def test_poisson_band_is_the_ruled_rule():
     # U18 (2026-10-20): at 30 seeds a window mean of 7.84 holds within +/- 1.00.
     lo, hi = seed_runs.poisson_band(7.84, 30)
