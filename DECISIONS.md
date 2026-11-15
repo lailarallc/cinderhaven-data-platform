@@ -252,10 +252,17 @@ Each entry:
   - Only one constant is keyed. Single numbers match dozens of rows by
     coincidence (a 30 or a 0.9 is printed somewhere), so a key is written
     only where the row governs the constant and prints it.
-- **Open, owner:** the value a pre-window period takes (U18 partition row
-  1481, a ruling at U5's start). `seed_config.value_in_effect` refuses a
-  pre-window date until it is ruled; no keyed constant is dated today, so
-  nothing reaches it.
+- **Pre-window value (owner, 2026-11-15; U18 partition row 1481).** Not a
+  blanket y1 rule, three cases in order: (1) a row that registers a start
+  value (A1.01's $25M, A9.13's opening draw): that governs; (2) a row
+  constant across y1-y3: that constant; (3) a row that trends with no start
+  value: `seed_config.value_in_effect` raises `PreWindowUnruled` naming the
+  row and the reader, and the owner rules it at that first read. A key
+  table `start` must be a value its row prints (seeder-prints arm). No keyed
+  constant is dated today, so nothing reaches case 3 on the platform.
+  Group 11's case-3 reads are listed in spec DECISIONS#pre-window-value.
+- **Reviewed (owner, 2026-11-15):** the session calls above and vendoring the
+  spec gate are accepted.
 - **Scope:** `scripts/check_anchor_coverage.py`, `generation/seed_config.py`
   (`COVERAGE_KEYS`, `value_in_effect`), `generation/seed_all.py` (step 0),
   `tests/test_anchor_coverage.py`, `tests/test_import_ban.py`.

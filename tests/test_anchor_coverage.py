@@ -141,6 +141,15 @@ def test_an_owed_entry_whose_row_now_prints_the_value_fails_until_removed(base):
         "seed_config.EVIDENCE_OUTCOME_WEIGHTS: owed to U13, but A4.07 now prints every value: paid, remove the note"]
 
 
+def test_a_start_value_its_row_does_not_register_fails_naming_the_constant(base):
+    cfg = base["sources"]["seed_config"].replace('{"key": "A4.07"}', '{"key": "A4.07", "start": 0.4321}')
+    keys, consts = _keys_and_consts(base, dict(base["sources"], seed_config=cfg))
+    report = cov.Report()
+    cov.arm_prints(consts, keys, base["index"], base["ca"], report)
+    assert report.blocking["seeder prints"] == [
+        "seed_config.EVIDENCE_OUTCOME_WEIGHTS: its pre-window start 0.4321 is not a start value A4.07 registers"]
+
+
 def test_an_owed_entry_whose_row_does_not_print_the_value_passes(base):
     keys, consts = _keys_and_consts(base)
     assert keys["seed_config.SEASONALITY"]["row"] == "A7.19"
@@ -222,17 +231,39 @@ def test_a_dated_period_outside_its_rows_span_fails(base):
     assert report.blocking["effective dating"][0].startswith("seed_config.X: period from 2027-06-01")
 
 
+TRENDED = [("2023-01-01", 0.10), ("2024-01-01", 0.12), ("2025-01-01", 0.14)]
+PRE = date(2022, 6, 1)
+
+
+def _in_effect(periods, on, **kw):
+    import seed_config
+    return seed_config.value_in_effect(periods, on, row="A9.99", reader="seed_test.READER", **kw)
+
+
 def test_a_dated_constant_takes_each_periods_value_and_two_periods_differ():
-    import seed_config
-    periods = [("2023-01-01", 0.10), ("2024-07-01", 0.12)]
-    assert seed_config.value_in_effect(periods, date(2023, 3, 1)) == 0.10
-    assert seed_config.value_in_effect(periods, date(2025, 3, 1)) == 0.12
+    assert _in_effect(TRENDED, date(2023, 3, 1)) == 0.10
+    assert _in_effect(TRENDED, date(2025, 3, 1)) == 0.14
 
 
-def test_a_pre_window_date_is_refused_until_its_owner_ruling():
+def test_pre_window_case_1_a_registered_start_value_governs():
+    assert _in_effect(TRENDED, PRE, start=0.08) == 0.08
+
+
+def test_pre_window_case_2_a_row_constant_across_the_window_takes_that_constant():
+    assert _in_effect([("2023-01-01", 0.05), ("2024-01-01", 0.05), ("2025-01-01", 0.05)], PRE) == 0.05
+
+
+def test_pre_window_case_3_a_trended_row_with_no_start_refuses_naming_the_row_and_the_reader():
     import seed_config
-    with pytest.raises(NotImplementedError, match="owner ruling"):
-        seed_config.value_in_effect([("2023-01-01", 0.10)], date(2022, 12, 1))
+    with pytest.raises(seed_config.PreWindowUnruled) as e:
+        _in_effect(TRENDED, PRE)
+    assert "A9.99 trends" in str(e.value) and "seed_test.READER reads it on 2022-06-01" in str(e.value)
+
+
+def test_pre_window_never_falls_back_to_y1():
+    import seed_config
+    with pytest.raises(seed_config.PreWindowUnruled):
+        _in_effect(TRENDED, PRE)  # y1's 0.10 is never returned for a trended row
 
 
 # ── the reverse direction ───────────────────────────────────────────

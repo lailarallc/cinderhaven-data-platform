@@ -166,6 +166,8 @@ def arm_prints(consts: dict, keys: dict, index: dict, ca, report: Report) -> Non
             bad.extend(f"{c}: keyed to {rid}, which does not print {why}" for _p, why in missing)
         if "owed" in entry and not missing:
             bad.append(f"{c}: owed to {entry['owed']}, but {rid} now prints every value: paid, remove the note")
+        if "start" in entry and not ca._exact_scales(float(entry["start"]), ca._printed_figures(index[rid])[1]):
+            bad.append(f"{c}: its pre-window start {entry['start']} is not a start value {rid} registers")
     report.block("seeder prints", bad)
 
 

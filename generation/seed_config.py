@@ -1018,7 +1018,8 @@ def compute_defect_profile(seed: int = DEFECT_SEED) -> dict:
 #                                    and the entry fails once that row prints it
 #                                    (paid: remove the note)
 # A keyed entry may carry "periods": [(ISO start, value), ...] for a row dated
-# inside the window; the seeder reads it through value_in_effect(). None does.
+# inside the window, and "start": the start value its row registers; the seeder
+# reads it through value_in_effect(). None does today.
 # The gate reads this table from source; nothing here reads a file.
 COVERAGE_KEYS = {
     # ---- not figures ----
@@ -1153,16 +1154,28 @@ COVERAGE_KEYS = {
 }
 
 
-def value_in_effect(periods, on: date):
+class PreWindowUnruled(LookupError):
+    """A trended row with no registered start value, read before the window: the owner rules it at first read."""
+
+
+def value_in_effect(periods, on: date, *, row: str, reader: str, start=None):
     """A keyed constant's value on `on`, from its dated periods [(ISO start, value), ...] (plan U5).
 
-    The value in effect is the latest period starting on or before `on`. A date
-    before the first period is the pre-window case, which waits on its owner
-    ruling (U18's partition, row 1481, at U5's start): refused, not guessed."""
-    ordered = sorted((date.fromisoformat(start), value) for start, value in periods)
+    Inside the window: the latest period starting on or before `on`. Before it,
+    the owner's three cases (2026-11-15, U18 partition row 1481):
+      1. the row registers a start value (A1.01's $25M, A9.13's opening draw):
+         `start` governs;
+      2. the row is constant across y1-y3: that constant;
+      3. the row trends and registers no start: refused, naming the row and the
+         reader, and the owner rules it at that first read. Never y1 by default."""
+    ordered = sorted((date.fromisoformat(s), value) for s, value in periods)
     if not ordered:
-        raise ValueError("no periods")
-    if on < ordered[0][0]:
-        raise NotImplementedError("the value a pre-window period takes is an owner ruling not yet made "
-                                  "(plan U5, U18 partition row 1481)")
-    return [value for start, value in ordered if start <= on][-1]
+        raise ValueError(f"{row}: no periods")
+    if on >= ordered[0][0]:
+        return [value for s, value in ordered if s <= on][-1]
+    if start is not None:
+        return start
+    if len({repr(value) for _, value in ordered}) == 1:
+        return ordered[0][1]
+    raise PreWindowUnruled(f"{row} trends across the window and registers no start value; {reader} reads it on "
+                           f"{on}, before the window: the owner rules this read (plan U5, three cases)")
