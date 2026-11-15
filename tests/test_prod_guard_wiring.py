@@ -1,6 +1,6 @@
 """The prod guard sits in front of every write path to Postgres.
 
-The seed scripts (generation/), seed_costing.py, ingest_sqlite_to_postgres.py and the Dagster
+The seed scripts (generation/), seed_costing.py and the Dagster
 `dbt build` all default to localhost:5432 -- a `fly proxy` tunnel to production
 when one is open. These tests fake a flyctl listener and assert nothing connects.
 
@@ -16,7 +16,6 @@ import pathlib
 import pytest
 
 ROOT = pathlib.Path(__file__).parent.parent
-sys.path.insert(0, str(ROOT / "scripts"))  # ingest_sqlite_to_postgres.py
 sys.path.insert(0, str(ROOT / "generation"))  # the seeders (U4 moved them out of scripts/)
 sys.path.insert(0, str(ROOT / "orchestration"))
 
@@ -66,20 +65,28 @@ def test_seed_all_refuses_fly_tunnel_before_connecting(fly_tunnel):
 
 
 def test_seed_costing_refuses_fly_tunnel_before_connecting(fly_tunnel):
-    seed_costing = _fresh_import("seed_costing")
+    # Since U2 it imports seed_config (init_rng), whose import is the guard.
+    sys.modules.pop("seed_config", None)
     with pytest.raises(prod_guard.ProdDatabaseError):
-        seed_costing.main()
+        _fresh_import("seed_costing").main()
 
 
-def test_ingest_refuses_fly_tunnel_on_the_configured_port(fly_tunnel, monkeypatch):
-    ingest = _fresh_import("ingest_sqlite_to_postgres")
-    monkeypatch.setattr(ingest, "_load_env", lambda: None)  # don't read the real .env
-    monkeypatch.setenv("POSTGRES_PROXY_PORT", "15432")
-    seen = []
-    monkeypatch.setattr(prod_guard, "_listener", lambda port: seen.append(port) or "flyctl")
-    with pytest.raises(prod_guard.ProdDatabaseError):
-        ingest.get_pg_connection()
-    assert seen == [15432], f"guard checked ports {seen}, expected [15432]"
+def test_the_two_retired_write_paths_stay_deleted():
+    # U2: the SQLite loader overwrote raw with the legacy catalogue; the second DTC
+    # generator wrote the same SQLite. seed_all.py is the only generation path.
+    for gone in ("scripts/ingest_sqlite_to_postgres.py", "scripts/generate_shopify_orders.py"):
+        assert not (ROOT / gone).exists(), f"{gone} is back"
+
+
+def test_the_local_restore_writes_no_raw_table_of_its_own():
+    # U2 close list (owner, 2026-11-14): data/seeds/retailer_requirements.sql truncated
+    # and refilled raw.retailer_requirements after the restore, in a schema seed_all no
+    # longer builds. The dump is the world; init-db.sh runs no supplemental SQL.
+    assert not (ROOT / "data" / "seeds").exists(), "data/seeds is back"
+    init_db = (ROOT / "scripts" / "init-db.sh").read_text(encoding="utf-8")
+    assert "/data/seeds" not in init_db and "TRUNCATE" not in init_db.upper()
+    assert [line for line in init_db.splitlines() if "psql" in line and " -f " in line] == [
+        'psql -U postgres -d cinderhaven -f "$DUMP_FILE"']
 
 
 def _load_assets(monkeypatch, tmp_path):

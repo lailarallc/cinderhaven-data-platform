@@ -9,6 +9,48 @@ For things that didn't work, see FAILURES.md.
 
 ---
 
+## 2026-11-14 (later) — U2 DONE, merged to main
+
+**Did (each with the 55-table baseline unchanged):**
+- Costing integrity diagnosed: seeds 7 and 12 fail only the 2% invoices-vs-COGS band (+2.16%, +2.01%;
+  seed 0 +1.89%, +1.72% of it goods billed over COGS's units basis). Owner: to U7 as two checks, goods
+  billed = COGS + change in inventory at cost (exact; U7 proves it first) and fees against goods billed.
+- `bf0e51f` `tests/band_measures.py`: every band test's measured value saved per seed; the record carries
+  each key's observed range and out-of-band seeds (U7's list). No rerun.
+- `3ea4b99` `data/seeds/retailer_requirements.sql` and init-db.sh's supplemental loop removed: it
+  truncated the restored table, then failed on a retired schema.
+- `6ea4aab` `docs/architecture.md` rewritten to the platform as built.
+
+**State:** fast tier 141 passed. Nothing touched production.
+
+**Next:** U9 and U7 own the run-seed findings (spec DECISIONS#u2-guard-trips). The next multi-seed run
+fills U7's band list.
+
+---
+
+## 2026-11-14 — U2 code complete on branch `u2-rest` (not merged); 30-seed run done
+
+**Did (branch `u2-rest`, pushed; each step proven against the 55-table baseline, 0 differing):**
+- `d4bc209` run seed: `CINDERHAVEN_RUN_SEED` + `init_rng`; seed_costing and seed_product_master_history
+  through it. `248824d` SQLite loader, Shopify generator and the loader's test deleted.
+- `b786f63` + `5c230d4` resumable 30-seed run: per-seed results in `output/seed_runs/progress-*.jsonl`;
+  one line after a shutdown: `powershell -ExecutionPolicy Bypass -File tests/resume_seed_run.ps1`.
+- `54f163f` + `b1d840a` a guard trip or a dbt test failure (no model error) is that seed's recorded
+  result (owner, spec DECISIONS#u2-guard-trips). `1589c3f` Makefile + diagram. `fdcfd5f` scenario tests.
+
+**30-seed run at `b1d840a`:** `u2_run_seed` PASS: 26 of 30 built, deterministic, distinct, seed 0 = baseline.
+Trips: void guard at seeds 9 (RET-REGIONAL 1.63%), 18 (RET-REGIONAL 1.59%), 29 (RET-COSTCO 1.54%), limit 1.5%;
+`assert_dispute_recovery_rates_in_band` at seed 10. `costing_integrity` (hard gate) FAILED at seeds 7 and 12;
+the run does not save which check failed. Not patched; for the owner.
+
+**State:** fast tier 134 passed, db tier 112 passed. Nothing touched production; nothing merged.
+
+**Next:** owner rules on the costing_integrity failures and on merging `u2-rest` (+ spec `u2-guard-trips`).
+Flagged, untouched: `data/seeds/retailer_requirements.sql` refills `raw.retailer_requirements` outside
+seed_all; the rest of `docs/architecture.md` is stale.
+
+---
+
 ## 2026-11-11 (evening) — U2 in progress: seed_all.py is the one entry point
 
 **Did (each proven against `tests/fixtures/world_hashes_before_u2.json`, 55 tables, Python 3.13.14, 0 differing):**

@@ -23,6 +23,7 @@ Usage:
 """
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import subprocess
@@ -47,6 +48,33 @@ COPACK_TABLES = ("co_packers", "production_lines", "sku_production_config", "pro
 
 class SeedError(RuntimeError):
     pass
+
+
+class DbtTestsFailed(SeedError):
+    """The full dbt build built every model it could, and tests refused the world
+    (a band test missed at this run seed). Like a generator guard, it is that run
+    seed's result in a multi-seed run (owner, 2026-11-14); a model error is not."""
+
+    def __init__(self, tests: list[str]):
+        self.tests = tests
+        super().__init__(f"dbt build: {len(tests)} test(s) failed: {', '.join(tests)}")
+
+
+def full_build():
+    """`dbt build`; a failure where tests failed and nothing errored raises DbtTestsFailed."""
+    results = DBT_PROJECT / "target" / "run_results.json"
+    results.unlink(missing_ok=True)  # never read a previous build's results
+    try:
+        run_dbt("build")
+    except SeedError:
+        if not results.exists():
+            raise
+        rows = json.loads(results.read_text(encoding="utf-8"))["results"]
+        failed = sorted(r["unique_id"] for r in rows if r["status"] == "fail")
+        errored = [r for r in rows if r["status"] in ("error", "runtime error")]
+        if failed and not errored:
+            raise DbtTestsFailed(failed) from None
+        raise
 
 
 def execute_ddl(conn):
@@ -198,7 +226,7 @@ def main():
     run_generator("seed_costing")
 
     print("\nStep 11: Full dbt build...")
-    run_dbt("build")
+    full_build()
 
     print("\nStep 12: Verifying...")
     conn = psycopg2.connect(DATABASE_URL)
@@ -209,7 +237,25 @@ def main():
     print(f"\nDone in {elapsed:.1f}s")
 
 
+#: Exit code for a run stopped by a generator's guard: the world was refused, not broken.
+GUARD_TRIP_EXIT = 3
+
 if __name__ == "__main__":
     # Ensure generation/ is on the path for imports
     sys.path.insert(0, str(Path(__file__).parent))
-    main()
+    from seed_void_patterns import DeletionGuardTripped
+    try:
+        main()
+    except (DeletionGuardTripped, DbtTestsFailed) as e:
+        # The run still stops. The harness passes CINDERHAVEN_GUARD_REPORT so a
+        # multi-seed run can record the trip as that seed's result (owner, 2026-11-14).
+        if isinstance(e, DeletionGuardTripped):
+            detail = {"guard": "void_deletion", "retailer": e.retailer_id, "loss": round(e.share, 6),
+                      "limit": e.limit}
+        else:
+            detail = {"guard": "dbt_tests", "tests": e.tests}
+        report = os.environ.get("CINDERHAVEN_GUARD_REPORT")
+        if report:
+            Path(report).write_text(json.dumps(detail))
+        print(f"\n{e}", file=sys.stderr)
+        sys.exit(GUARD_TRIP_EXIT)

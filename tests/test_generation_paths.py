@@ -110,3 +110,68 @@ def test_seed_all_refuses_a_dbt_target_naming_another_instance(monkeypatch):
     monkeypatch.setenv("CINDERHAVEN_PG_PORT", "5432")  # e.g. a fly tunnel left in the shell
     with pytest.raises(seed_all.SeedError, match="CINDERHAVEN_PG_PORT"):
         seed_all.dbt_env()
+
+
+# -- the run seed (plan U2) ---------------------------------------------------
+
+def _seed_config(monkeypatch, run_seed: str):
+    import importlib
+    monkeypatch.setenv("DATABASE_URL", "host=localhost port=5999 dbname=world user=gen password=x")
+    monkeypatch.setenv("CINDERHAVEN_RUN_SEED", run_seed)
+    sys.path.insert(0, str(GEN))
+    sys.modules.pop("seed_config", None)
+    return importlib.import_module("seed_config")
+
+
+def test_no_generator_builds_a_random_stream_but_through_init_rng():
+    direct = []
+    for p in sorted(GEN.glob("*.py")):
+        for node in ast.walk(ast.parse(p.read_text(encoding="utf-8"))):
+            if (isinstance(node, ast.Call) and getattr(node.func, "attr", getattr(node.func, "id", None)) == "Random"
+                    and p.name != "seed_config.py"):
+                direct.append(f"{p.name}:{node.lineno}")
+    assert direct == [], f"random.Random built outside init_rng: {direct}"
+
+
+def test_run_seed_zero_reproduces_every_stream_constant(monkeypatch):
+    import random
+    c = _seed_config(monkeypatch, "0")
+    for n in (42, 100, 200, 300, 301, 302, 400, 401, 450, 500, 600, 700, 800):
+        assert c.init_rng(n).random() == random.Random(n).random(), n
+
+
+def test_another_run_seed_moves_every_stream_and_keeps_them_distinct(monkeypatch):
+    import random
+    constants = (42, 100, 200, 300, 301, 302, 400, 401, 450, 500, 600, 700, 800)
+    c = _seed_config(monkeypatch, "1")
+    firsts = [c.init_rng(n).random() for n in constants]
+    assert all(f != random.Random(n).random() for f, n in zip(firsts, constants))
+    assert len(set(firsts)) == len(constants)
+
+
+def test_a_malformed_run_seed_refuses(monkeypatch):
+    import pytest
+    with pytest.raises(ValueError, match="CINDERHAVEN_RUN_SEED"):
+        _seed_config(monkeypatch, "-1")
+
+
+def test_a_generator_failure_stops_the_run_before_any_later_step_reads_its_schema(monkeypatch):
+    import types
+    import pytest
+    seed_all = _seed_all(monkeypatch)
+    ran = []
+
+    def generator(name):
+        ran.append(name)
+        if name == "seed_scan_data":
+            raise RuntimeError("scan data failed partway")
+
+    monkeypatch.setattr(seed_all, "psycopg2", types.SimpleNamespace(connect=lambda *a, **k: types.SimpleNamespace(
+        close=lambda: None, autocommit=False)))
+    monkeypatch.setattr(seed_all, "execute_ddl", lambda conn: ran.append("ddl"))
+    monkeypatch.setattr(seed_all, "run_generator", generator)
+    monkeypatch.setattr(seed_all, "run_dbt", lambda *a: ran.append("dbt " + a[0]))
+    monkeypatch.setattr(seed_all, "verify_counts", lambda conn: ran.append("verify_counts"))
+    with pytest.raises(RuntimeError, match="partway"):
+        seed_all.main()
+    assert ran == ["ddl", "seed_shared", "seed_retailer", "seed_distributor", "seed_dtc", "seed_scan_data"], ran

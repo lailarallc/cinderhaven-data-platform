@@ -17,7 +17,6 @@ Usage: python generation/seed_all.py (it applies the costing DDL this reads).
 from __future__ import annotations
 
 import os
-import random
 import sys
 from collections import defaultdict
 from datetime import date, timedelta
@@ -26,6 +25,7 @@ import psycopg2
 import psycopg2.extras
 
 import prod_guard
+from seed_config import init_rng  # the run seed shifts this stream too (plan U2)
 
 # Isolated RNG stream — cannot cascade into trade/count generation.
 SEED = 800
@@ -420,7 +420,7 @@ def simulate(products, demand, shipped, stockout_weeks, slug_skus, rng):
 
 
 def main():
-    rng = random.Random(SEED)
+    rng = init_rng(SEED)
     prod_guard.check(DATABASE_URL)  # refuses a fly tunnel to production
     conn = psycopg2.connect(DATABASE_URL)
     conn.autocommit = False

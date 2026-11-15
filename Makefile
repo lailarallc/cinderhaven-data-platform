@@ -13,6 +13,8 @@ harness-env:
 harness-db: harness-env
 	docker compose --env-file tests/harness.env up -d harness-db
 
+# generation/seed_all.py alone (plan U2): DDL, every generator, copack, costing,
+# the full dbt build. CINDERHAVEN_RUN_SEED picks the world; 0 is today's.
 seed:
 	python tests/harness.py seed
 
@@ -33,7 +35,7 @@ test-db:
 test-acceptance:
 	python -m pytest tests/acceptance
 
-# Until U2 gives seed_all.py a run seed, only run seed 0 exists: --seeds N>1
-# is refused. The determinism proof is `python tests/seed_runs.py --repeat 3`.
+# Rebuilds through seed_all.py at run seeds 0..29 (U18's 30; about 2 hours).
+# The determinism proof is `python tests/seed_runs.py --repeat 3`.
 test-seeds:
 	python tests/seed_runs.py --seeds 30

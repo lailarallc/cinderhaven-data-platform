@@ -18,10 +18,12 @@ DATABASE_URL from the harness values and POSTGRES_PASSWORD is removed.
 """
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -35,6 +37,17 @@ KEYS = ("HARNESS_PG_HOST", "HARNESS_PG_PORT", "HARNESS_PG_DB", "HARNESS_PG_USER"
 
 class HarnessError(RuntimeError):
     pass
+
+
+class GuardTripped(HarnessError):
+    """seed_all.py stopped on a generator's guard (exit 3), with what tripped it."""
+
+    def __init__(self, label: str, detail: dict):
+        self.detail = detail
+        super().__init__(f"{label} stopped by a guard: {detail}")
+
+
+GUARD_TRIP_EXIT = 3  # generation/seed_all.py's
 
 
 def harness_values() -> dict[str, str]:
@@ -54,9 +67,10 @@ def dsn(vals: dict[str, str]) -> str:
             f"user={vals['HARNESS_PG_USER']} password={vals['HARNESS_PG_PASSWORD']}")
 
 
-def child_env(vals: dict[str, str]) -> dict[str, str]:
+def child_env(vals: dict[str, str], run_seed: int = 0) -> dict[str, str]:
     env = {k: v for k, v in os.environ.items() if k not in ("POSTGRES_PASSWORD", "ALLOW_PROD_DB", "PGPASSWORD")}
     env.update(vals)
+    env["CINDERHAVEN_RUN_SEED"] = str(run_seed)  # always set: a stray value in the shell never picks the world
     env["DATABASE_URL"] = dsn(vals)
     env["PYTHONUTF8"] = "1"
     env["PYTHONUNBUFFERED"] = "1"  # step logs land as they happen when redirected to a file
@@ -78,11 +92,18 @@ def dbt_cmd(*args: str) -> list[str]:
     return [*base, *args, "--profiles-dir", str(DBT_PROFILES)]
 
 
-def _run(label: str, cmd: list[str], vals: dict[str, str], cwd: Path, timings: list) -> None:
+def _run(label: str, cmd: list[str], vals: dict[str, str], cwd: Path, timings: list,
+         run_seed: int = 0) -> None:
     print(f"\n== {label}", flush=True)
     t0 = time.time()
-    r = subprocess.run(cmd, cwd=cwd, env=child_env(vals))
-    timings.append((label, time.time() - t0))
+    env = child_env(vals, run_seed)
+    with tempfile.TemporaryDirectory() as tmp:
+        report = Path(tmp) / "guard_trip.json"
+        env["CINDERHAVEN_GUARD_REPORT"] = str(report)
+        r = subprocess.run(cmd, cwd=cwd, env=env)
+        timings.append((label, time.time() - t0))
+        if r.returncode == GUARD_TRIP_EXIT and report.exists():
+            raise GuardTripped(label, json.loads(report.read_text()))
     if r.returncode != 0:
         raise HarnessError(f"{label} failed (exit {r.returncode})")
 
@@ -98,13 +119,10 @@ BUILD_STEPS = [("dbt build: all", dbt_cmd("build"), ROOT / "cinderhaven")]
 
 
 def run_seed(run_seed: int = 0) -> list:
-    """Rebuild the world at `run_seed`. Today's platform has one world: run seed 0.
-
-    U2 gives seed_all.py the run seed (plan U3). Until it lands, any other seed
-    would rebuild the same world under another label, so it is refused.
-    """
-    if run_seed != 0:
-        raise HarnessError(f"run seed {run_seed}: seed_all.py takes no run seed until U2; only run seed 0 exists")
+    """Rebuild the world at `run_seed` (plan U2: seed_all.py reads CINDERHAVEN_RUN_SEED).
+    Run seed 0 is today's world, the one the U2 baseline hashes."""
+    if not isinstance(run_seed, int) or run_seed < 0:
+        raise HarnessError(f"run seed {run_seed!r}: a whole number >= 0")
     vals = harness_values()
     guard(vals)
     timings: list = []
@@ -112,7 +130,7 @@ def run_seed(run_seed: int = 0) -> list:
     apply_roles(vals)
     timings.append(("sql/truth_roles.sql", time.time() - t0))
     for label, cmd, cwd in SEED_STEPS:
-        _run(label, cmd, vals, cwd, timings)
+        _run(f"{label} (run seed {run_seed})", cmd, vals, cwd, timings, run_seed)
     return timings
 
 
