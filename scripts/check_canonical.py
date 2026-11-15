@@ -164,10 +164,22 @@ def parse_canonical():
         )
         if m:
             shortship_dims[dim] = float(m.group(1).replace(',', ''))
-    if shortship_dims:
+    # All four or none: a sum over the rows that happened to parse checks nothing (plan U19).
+    if len(shortship_dims) == 4:
         expected["shortship_dims_sum"] = sum(shortship_dims.values())
 
     return expected
+
+
+#: Every row parse_canonical() reads is required (plan U19): a reworded row fails here instead of switching its
+#: check off while the script stays green.
+REQUIRED = (
+    "chargeback_count_total", "chargeback_count_retailer", "chargeback_count_distributor",
+    "trailing_52w_revenue", "all_in_annual", "trade_rate",
+    "structural_annual", "structural_rate", "op_waste_rate",
+    "otif_exposure_total", "otif_fines_annual", "otif_velocity_annual",
+    "shortship_total_3yr", "shortship_annual", "shortship_dims_sum",
+)
 
 
 def get_connection():
@@ -190,12 +202,7 @@ def approx(actual, expected, tolerance_pct):
 
 def run_checks():
     expected = parse_canonical()
-    required = [
-        "chargeback_count_total", "chargeback_count_retailer",
-        "chargeback_count_distributor", "trailing_52w_revenue",
-        "all_in_annual", "trade_rate",
-    ]
-    missing = [k for k in required if k not in expected]
+    missing = [k for k in REQUIRED if k not in expected]
     if missing:
         print(f"FAIL: Could not parse from CINDERHAVEN_CANONICAL.md: {missing}")
         return 1

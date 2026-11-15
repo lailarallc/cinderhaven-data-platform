@@ -306,3 +306,110 @@ UNION ALL SELECT 'window.tail_orders|'||GREATEST(
    (SELECT MAX(created_at::date) FROM raw.shopify_orders))||'||'
 UNION ALL SELECT 'window.tail_supplier_invoices|'||MAX(invoice_date)||'||' FROM costing.fct_supplier_invoices
 ORDER BY 1;
+
+-- ── PRODUCERS FOLDED IN BY U19 (2026-11-15) ─────────────────────────
+-- Each key below was in canonical_values.yml with no producer here. Folded
+-- in so verify_canonical.py compares every numeric key to the world.
+--   price_history.*    counts, as observed 2026-08-01.
+--   revenue.retail_scan.ttm_through_2025_12_27
+--                      week_ending > MAX(week_ending) - 365 days (53 buckets).
+--   trade.*            check_canonical.py's definitions: structural = each
+--                      contracted retailer's trailing-52-week scan revenue at
+--                      its average raw.sku_costs rate; operational waste =
+--                      every non-promo_billback deduction, retailer and
+--                      distributor, over the 36-month corpus, divided by 3
+--                      (stored under the label trailing_365d).
+--   fulfillment.*      otif-blind-spot's scoring (scripts/02_export_json.py):
+--                      periods by po_date; on time = delivery_date <=
+--                      requested_ship_date + the retailer's MABD days
+--                      (otif_config.py), else is_on_time; in full = units
+--                      received >= units ordered, received falling back to
+--                      shipped and ordered to the PO's total_units when the
+--                      line aggregate is missing or zero; each rate rounded
+--                      to four places, then x100.
+--   Not produced, and so failing verify_canonical.py until a producer is
+--   named: trade.all_in_total.trailing_36m (3 x the annual all-in gives
+--   10669827.87 against the yml's .88; no definition tried reproduces it) and
+--   revenue.defect_sku_ttm (PDHA's R validators define the 27-SKU set).
+WITH fp(period, d0, d1) AS (VALUES
+  ('cy2023',       DATE '2023-01-01', DATE '2023-12-31'),
+  ('cy2024',       DATE '2024-01-01', DATE '2024-12-31'),
+  ('cy2025',       DATE '2025-01-01', DATE '2025-12-31'),
+  ('trailing_12m', DATE '2025-01-01', DATE '2025-12-31'),
+  ('trailing_24m', DATE '2024-01-01', DATE '2025-12-31'),
+  ('trailing_36m', DATE '2023-01-01', DATE '2025-12-31'),
+  ('full_corpus',  DATE '1900-01-01', DATE '2999-12-31')
+),
+mabd(retailer_id, days) AS (VALUES
+  ('RET-WALMART', 3), ('RET-KROGER', 4), ('RET-COSTCO', 6), ('RET-WHOLEFOODS', 6), ('RET-SPROUTS', 5),
+  ('RET-REGIONAL', 8)
+),
+sl AS (SELECT shipment_id, SUM(units_ordered) uo, SUM(units_shipped) us
+       FROM public_marts.fct_retailer_shipment_lines GROUP BY 1),
+rl AS (SELECT shipment_id, SUM(units_received) ur FROM public_marts.fct_retailer_receipt_lines GROUP BY 1),
+ship AS (
+  SELECT s.retailer_id, o.po_date,
+         COALESCE(NULLIF(sl.uo, 0), NULLIF(o.total_units, 0), 0) AS uo,
+         COALESCE(sl.us, 0) AS us,
+         COALESCE(NULLIF(rl.ur, 0), COALESCE(sl.us, 0)) AS ur,
+         CASE WHEN s.requested_ship_date IS NOT NULL AND s.delivery_date IS NOT NULL
+              THEN s.delivery_date <= s.requested_ship_date + COALESCE(m.days, 5)
+              ELSE COALESCE(s.is_on_time, false) END AS on_time
+  FROM public_marts.fct_retailer_shipments s
+  JOIN public_marts.fct_retailer_orders o ON o.order_id = s.order_id
+  LEFT JOIN sl ON sl.shipment_id = s.shipment_id
+  LEFT JOIN rl ON rl.shipment_id = s.shipment_id
+  LEFT JOIN mabd m ON m.retailer_id = s.retailer_id
+),
+scored AS (SELECT *, (uo <= 0 OR ur >= uo) AS in_full FROM ship),
+f AS (
+  SELECT fp.period,
+         ROUND(SUM(sc.us)::numeric / NULLIF(SUM(sc.uo), 0), 4) AS fill,
+         ROUND(AVG((sc.on_time AND sc.in_full)::int) FILTER (WHERE sc.retailer_id = 'RET-WALMART'), 4) AS otif_wm,
+         ROUND(AVG(sc.on_time::int) FILTER (WHERE sc.retailer_id = 'RET-WALMART'), 4) AS ot_wm,
+         ROUND(AVG(sc.in_full::int) FILTER (WHERE sc.retailer_id = 'RET-WALMART'), 4) AS if_wm,
+         ROUND(AVG((sc.on_time AND sc.in_full)::int), 4) AS otif_all,
+         COUNT(*) FILTER (WHERE sc.retailer_id = 'RET-WALMART') AS n_wm,
+         COUNT(*) AS n_all
+  FROM fp JOIN scored sc ON sc.po_date BETWEEN fp.d0 AND fp.d1
+  GROUP BY fp.period
+),
+w AS (SELECT DISTINCT week_ending FROM raw.scan_data ORDER BY week_ending DESC LIMIT 52),
+rev52 AS (SELECT r.name, SUM(sd.dollars_sold) AS rev
+          FROM raw.scan_data sd JOIN raw.stores st ON st.store_id = sd.store_id
+          JOIN raw.retailers r ON r.retailer_id = st.retailer_id
+          WHERE sd.week_ending >= (SELECT MIN(week_ending) FROM w) GROUP BY r.name),
+rate AS (SELECT AVG(trade_spend_pct_walmart) wm, AVG(trade_spend_pct_costco) co, AVG(trade_spend_pct_whole_foods) wf,
+                AVG(trade_spend_pct_sprouts) sp, AVG(trade_spend_pct_kroger) kr, AVG(trade_spend_pct_regional) rg
+         FROM raw.sku_costs),
+tr AS (
+  SELECT (SELECT SUM(rev) FROM rev52) AS rev,
+         (SELECT SUM(rev52.rev * CASE rev52.name WHEN 'Walmart' THEN rate.wm WHEN 'Costco' THEN rate.co
+                 WHEN 'Whole Foods' THEN rate.wf WHEN 'Sprouts' THEN rate.sp WHEN 'Kroger' THEN rate.kr
+                 WHEN 'Regional Group' THEN rate.rg END) FROM rev52, rate) AS struct,
+         ((SELECT COALESCE(SUM(amount), 0) FROM raw.retailer_deductions WHERE deduction_type != 'promo_billback')
+        + (SELECT COALESCE(SUM(amount), 0) FROM raw.distributor_deductions WHERE deduction_type != 'promo_billback'))
+          / 3.0 AS waste
+)
+SELECT 'price_history.row_count|'||(SELECT COUNT(*) FROM raw.price_history)::text
+UNION ALL
+SELECT 'price_history.baseline.rows|'||(SELECT COUNT(*) FROM raw.price_history WHERE effective_date = DATE '2023-01-01')::text
+UNION ALL
+SELECT 'revenue.retail_scan.ttm_through_2025_12_27|'||(
+  SELECT SUM(dollars_sold) FROM raw.scan_data
+  WHERE week_ending > (SELECT MAX(week_ending) FROM raw.scan_data) - 365)::numeric(16,2)
+UNION ALL SELECT 'trade.structural_annual.trailing_52w|'||ROUND(struct, 2)::text FROM tr
+UNION ALL SELECT 'trade.op_waste_annual.trailing_365d|'||ROUND(waste, 2)::text FROM tr
+UNION ALL SELECT 'trade.all_in_annual.trailing_52w|'||ROUND(struct + waste, 2)::text FROM tr
+UNION ALL SELECT 'trade.structural_rate_pct.trailing_52w|'||ROUND(100 * struct / rev, 2)::text FROM tr
+UNION ALL SELECT 'trade.op_waste_rate_pct.trailing_52w|'||ROUND(100 * waste / rev, 2)::text FROM tr
+UNION ALL SELECT 'trade.all_in_rate_pct.trailing_52w|'||ROUND(100 * (struct + waste) / rev, 2)::text FROM tr
+UNION ALL SELECT 'fulfillment.fill_rate_internal_pct.'||period||'|'||(100 * fill)::numeric(6,2)::text FROM f
+UNION ALL SELECT 'fulfillment.otif_walmart_pct.'||period||'|'||(100 * otif_wm)::numeric(6,2)::text FROM f
+UNION ALL SELECT 'fulfillment.on_time_walmart_pct.'||period||'|'||(100 * ot_wm)::numeric(6,2)::text FROM f
+UNION ALL SELECT 'fulfillment.in_full_walmart_pct.'||period||'|'||(100 * if_wm)::numeric(6,2)::text FROM f
+UNION ALL SELECT 'fulfillment.otif_portfolio_pct.'||period||'|'||(100 * otif_all)::numeric(6,2)::text FROM f
+UNION ALL SELECT 'fulfillment.gap_walmart_pts.'||period||'|'||(100 * (fill - otif_wm))::numeric(6,2)::text FROM f
+UNION ALL SELECT 'fulfillment.shipments.walmart_full_corpus|'||n_wm::text FROM f WHERE period = 'full_corpus'
+UNION ALL SELECT 'fulfillment.shipments.all_retailers_full_corpus|'||n_all::text FROM f WHERE period = 'full_corpus'
+;

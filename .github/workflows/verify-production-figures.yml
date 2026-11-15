@@ -106,7 +106,7 @@ jobs:
       - name: "Canonical gather — every metric by basis and period"
         run: |
           echo "=== BEGIN CANONICAL GATHER ==="
-          psql -tA -v ON_ERROR_STOP=1 -f sql/canonical_gather.sql
+          psql -tA -v ON_ERROR_STOP=1 -f sql/canonical_gather.sql | tee "$RUNNER_TEMP/gather.txt"
           echo "=== END CANONICAL GATHER ==="
 
       - name: "The four figures, re-measured in production"
@@ -188,3 +188,10 @@ jobs:
                  (SELECT SUM(deduction_amount) FROM public_intermediate.int_retailer_payments)::numeric(14,2) AS int_deductions,
                  (SELECT SUM(chargeback_amount) FROM public_staging.stg_retailer_chargebacks)::numeric(14,2)  AS stg_chargebacks;
           SQL
+
+      # Plan U19: every documented figure in canonical_values.yml against this run's gather, at the yml's precision.
+      # Last, so every step above prints whatever this one finds. It reads the saved gather; it opens no connection.
+      - name: "Every documented figure against the gather (verify_canonical.py, plan U19)"
+        run: |
+          python3 -m pip install --quiet pyyaml
+          python3 scripts/verify_canonical.py --gather "$RUNNER_TEMP/gather.txt"
