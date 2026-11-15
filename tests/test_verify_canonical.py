@@ -25,7 +25,8 @@ revenue:
 supersedes:
   - {token: '$1.65M', reason: x}
 """
-GATHER = """universe.skus_total.all_time|50
+GATHER = """--- DATA WINDOWS ---
+universe.skus_total.all_time|50
 trade.all_in_rate_pct.trailing_52w|11.003291549683935
 revenue.retail_scan.cy2025|32323139.62
 window.scan_data|2023-01-07..2025-12-27
@@ -94,6 +95,11 @@ def test_half_up_at_the_yml_precision():
     assert vc.at_precision(Decimal("11.005"), Decimal("11.00")) == Decimal("11.01")
     assert vc.at_precision(Decimal("379558.775"), Decimal("379558.78")) == Decimal("379558.78")
     assert vc.at_precision(Decimal("49.4999"), Decimal(50)) == Decimal(49)
+
+
+def test_a_window_line_yields_its_row_count():
+    live = vc.parse_gather(["window.retailer_deductions|2023-01-23|2026-01-02|14947", "window.tail_orders|2026-01-02||"])
+    assert live == {"rows.retailer_deductions.all_time": Decimal(14947)}
 
 
 def test_extra_gather_keys_are_listed_not_failed(tmp_path, monkeypatch, capsys):

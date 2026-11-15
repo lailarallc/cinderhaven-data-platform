@@ -96,13 +96,16 @@ def parse_gather(lines) -> dict[str, Decimal]:
     bad = []
     for raw in lines:
         line = raw.strip()
-        if not line or line.startswith(("=", "#")):
-            continue
+        if not line or line.startswith(("=", "#")) or re.fullmatch(r"--- [A-Z ]+ ---", line):
+            continue  # blank, the workflow's BEGIN/END markers, the gather's own \echo section headers
         key, sep, val = line.partition("|")
         if not sep or not re.fullmatch(r"[\w.]+", key):
             bad.append(line)
             continue
-        if key.startswith("window."):  # data windows: dates, by design not figures
+        if key.startswith("window."):  # min|max|count: the count is the figure rows.<table>.all_time
+            count = val.split("|")[-1]
+            if count.isdigit():
+                out[f"rows.{key[len('window.'):]}.all_time"] = Decimal(count)
             continue
         try:
             out[key] = Decimal(val)

@@ -413,3 +413,31 @@ UNION ALL SELECT 'fulfillment.gap_walmart_pts.'||period||'|'||(100 * (fill - oti
 UNION ALL SELECT 'fulfillment.shipments.walmart_full_corpus|'||n_wm::text FROM f WHERE period = 'full_corpus'
 UNION ALL SELECT 'fulfillment.shipments.all_retailers_full_corpus|'||n_all::text FROM f WHERE period = 'full_corpus'
 ;
+
+-- ── CANON KEYS FOR TYPED FIGURES (U19, 2026-11-15) ──────────────────
+-- Figures consumers print that had no key: the all-time retailer
+-- deduction total and count (held only in a data_windows string), the
+-- cross-channel deduction backlog and count (int_all_deductions, as
+-- retailer-deduction-recovery prints them), and the payment lifecycle in
+-- cents per invoiced dollar (net / gross remitted x100; retailer,
+-- distributor, and the two combined). Each data_windows row count is also
+-- a figure: verify_canonical.py reads it from that table's window line as
+-- rows.<table>.all_time.
+SELECT 'deductions.retailer_total.all_time|'||(SELECT SUM(amount) FROM raw.retailer_deductions)::numeric(16,2)
+UNION ALL
+SELECT 'deductions.retailer_rows.all_time|'||(SELECT COUNT(*) FROM raw.retailer_deductions)::text
+UNION ALL
+SELECT 'deductions.cross_channel_total.all_time|'||(SELECT SUM(deduction_amount) FROM public_intermediate.int_all_deductions)::numeric(16,2)
+UNION ALL
+SELECT 'deductions.cross_channel_rows.all_time|'||(SELECT COUNT(*) FROM public_intermediate.int_all_deductions)::text
+UNION ALL
+SELECT 'lifecycle.retailer_cents_per_dollar.all_time|'||
+  (SELECT ROUND(100.0 * SUM(net_amount) / SUM(gross_amount), 2) FROM public_marts.fct_retailer_payments)::text
+UNION ALL
+SELECT 'lifecycle.distributor_cents_per_dollar.all_time|'||
+  (SELECT ROUND(100.0 * SUM(net_amount) / SUM(gross_amount), 2) FROM public_marts.fct_distributor_payments)::text
+UNION ALL
+SELECT 'lifecycle.wholesale_cents_per_dollar.all_time|'||(SELECT ROUND(100.0 *
+  ((SELECT SUM(net_amount) FROM public_marts.fct_retailer_payments) + (SELECT SUM(net_amount) FROM public_marts.fct_distributor_payments))
+  / ((SELECT SUM(gross_amount) FROM public_marts.fct_retailer_payments) + (SELECT SUM(gross_amount) FROM public_marts.fct_distributor_payments)), 2))::text
+;
