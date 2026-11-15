@@ -9,6 +9,25 @@ For things that didn't work, see FAILURES.md.
 
 ---
 
+## 2026-11-14 (later) — U2 DONE, merged to main
+
+**Did (each with the 55-table baseline unchanged):**
+- Costing integrity diagnosed: seeds 7 and 12 fail only the 2% invoices-vs-COGS band (+2.16%, +2.01%;
+  seed 0 +1.89%, +1.72% of it goods billed over COGS's units basis). Owner: to U7 as two checks, goods
+  billed = COGS + change in inventory at cost (exact; U7 proves it first) and fees against goods billed.
+- `bf0e51f` `tests/band_measures.py`: every band test's measured value saved per seed; the record carries
+  each key's observed range and out-of-band seeds (U7's list). No rerun.
+- `3ea4b99` `data/seeds/retailer_requirements.sql` and init-db.sh's supplemental loop removed: it
+  truncated the restored table, then failed on a retired schema.
+- `6ea4aab` `docs/architecture.md` rewritten to the platform as built.
+
+**State:** fast tier 141 passed. Nothing touched production.
+
+**Next:** U9 and U7 own the run-seed findings (spec DECISIONS#u2-guard-trips). The next multi-seed run
+fills U7's band list.
+
+---
+
 ## 2026-11-14 — U2 code complete on branch `u2-rest` (not merged); 30-seed run done
 
 **Did (branch `u2-rest`, pushed; each step proven against the 55-table baseline, 0 differing):**
