@@ -33,7 +33,8 @@ window.scan_data|2023-01-07..2025-12-27
 """
 
 
-def _run(tmp_path, monkeypatch, gather: str | None = GATHER, yml: str = YML, db_url: str | None = None) -> int:
+def _run(tmp_path, monkeypatch, gather: str | None = GATHER, yml: str = YML, db_url: str | None = None,
+         fleet=None) -> int:
     y = tmp_path / "canonical_values.yml"
     y.write_text(yml, encoding="utf-8")
     monkeypatch.setattr(vc, "CANONICAL_YAML", y)
@@ -46,7 +47,84 @@ def _run(tmp_path, monkeypatch, gather: str | None = GATHER, yml: str = YML, db_
     if gather is not None:
         g = tmp_path / "gather.txt"
         g.write_text(gather, encoding="utf-8")
-    return vc.run(g)
+    return vc.run(g, fleet)
+
+
+#: A figure only a consumer's export produces, and a calculator's fixed-input case.
+YML_PRODUCED = YML.replace("supersedes:", """shortship:
+  cost_3yr:
+    trailing_36m: 888062.40
+calculator:
+  net_case:
+    fixed: -36320
+producers:
+  shortship.cost_3yr.trailing_36m: {kind: export, repo: short-ship-cost, file: web/public/data/summary.json, json: totals.3.cost}
+  calculator.net_case.fixed: {kind: fixed_input, repo: cost-of-saying-yes, file: model/defaults.py, regex: 'NET = (-?[0-9_,]+)', why: fixed deal inputs}
+supersedes:""")
+
+
+def _fleet(tmp_path, cost="888062.4", net="-36_320"):
+    root = tmp_path / "fleet"
+    ss = root / "published" / "short-ship-cost"
+    (ss / ".git").mkdir(parents=True)
+    (ss / "web/public/data").mkdir(parents=True)
+    (ss / "web/public/data/summary.json").write_text(
+        '{"totals": [{}, {}, {}, {"cost": %s}]}' % cost, encoding="utf-8")
+    cy = root / "published" / "cost-of-saying-yes"
+    (cy / ".git").mkdir(parents=True)
+    (cy / "model").mkdir()
+    (cy / "model/defaults.py").write_text(f"NET = {net}\n", encoding="utf-8")
+    return root
+
+
+def test_producer_keys_are_named_not_compared_without_exports(tmp_path, monkeypatch, capsys):
+    assert _run(tmp_path, monkeypatch, yml=YML_PRODUCED) == 0
+    out = capsys.readouterr().out
+    assert "by a named consumer producer: 2; failures: 0" in out
+    assert "not compared in this run (pass --exports): calculator.net_case.fixed, shortship.cost_3yr.trailing_36m" in out
+
+
+def test_producer_keys_pass_against_the_working_copies(tmp_path, monkeypatch, capsys):
+    assert _run(tmp_path, monkeypatch, yml=YML_PRODUCED, fleet=_fleet(tmp_path)) == 0
+
+
+@pytest.mark.parametrize("kw,expect", [
+    ({"cost": "888062.41"}, "shortship.cost_3yr.trailing_36m: documented 888062.40, short-ship-cost gives 888062.41"),
+    ({"net": "-36_321"}, "calculator.net_case.fixed: documented -36320, cost-of-saying-yes gives -36321"),
+    ({"net": "x"}, "regex 'NET = (-?[0-9_,]+)' matches nothing"),
+])
+def test_a_producer_that_disagrees_fails(tmp_path, monkeypatch, capsys, kw, expect):
+    assert _run(tmp_path, monkeypatch, yml=YML_PRODUCED, fleet=_fleet(tmp_path, **kw)) == 1
+    assert expect in capsys.readouterr().out
+
+
+def test_a_missing_working_copy_fails(tmp_path, monkeypatch, capsys):
+    assert _run(tmp_path, monkeypatch, yml=YML_PRODUCED, fleet=tmp_path / "empty") == 1
+    assert "no working copy of cost-of-saying-yes" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("entry,expect", [
+    ("{kind: export, repo: r, file: f}", "needs exactly one of json or regex"),
+    ("{kind: guess, repo: r, file: f, json: a}", "needs kind"),
+    ("{kind: fixed_input, repo: r, file: f, json: a}", "says why its value holds"),
+])
+def test_a_malformed_producer_fails(tmp_path, monkeypatch, capsys, entry, expect):
+    yml = YML_PRODUCED.replace("{kind: export, repo: short-ship-cost, file: web/public/data/summary.json, json: totals.3.cost}",
+                               entry)
+    assert _run(tmp_path, monkeypatch, yml=yml) == 1
+    assert expect in capsys.readouterr().out
+
+
+def test_a_key_with_two_producers_fails(tmp_path, monkeypatch, capsys):
+    gather = GATHER + "shortship.cost_3yr.trailing_36m|888062.40\n"
+    assert _run(tmp_path, monkeypatch, gather=gather, yml=YML_PRODUCED) == 1
+    assert "named in producers; one producer only" in capsys.readouterr().out
+
+
+def test_a_producer_for_no_figure_fails(tmp_path, monkeypatch, capsys):
+    yml = YML_PRODUCED.replace("producers:\n", "producers:\n  nothing.here.x: {kind: export, repo: r, file: f, json: a}\n")
+    assert _run(tmp_path, monkeypatch, yml=yml) == 1
+    assert "nothing.here.x: in producers but not a documented figure" in capsys.readouterr().out
 
 
 def test_the_yml_keeps_its_literal_precision():
@@ -58,7 +136,8 @@ def test_the_yml_keeps_its_literal_precision():
 
 def test_a_matching_gather_passes(tmp_path, monkeypatch, capsys):
     assert _run(tmp_path, monkeypatch) == 0
-    assert "documented figures: 3; produced: 3; failures: 0" in capsys.readouterr().out
+    assert "documented figures: 3; produced by the gather: 3; by a named consumer producer: 0; failures: 0" in \
+        capsys.readouterr().out
 
 
 @pytest.mark.parametrize("gather,expect", [

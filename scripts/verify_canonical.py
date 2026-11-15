@@ -42,7 +42,9 @@ for _stream in (sys.stdout, sys.stderr):
 ROOT = Path(__file__).resolve().parent.parent
 CANONICAL_YAML = ROOT / "reference" / "canonical_values.yml"
 GATHER_SQL = ROOT / "sql" / "canonical_gather.sql"
-NOT_FIGURES = ("meta", "supersedes", "history")
+NOT_FIGURES = ("meta", "supersedes", "history", "producers")
+FLEET_ROOT = Path.home() / "projects"
+PRODUCER_KINDS = ("export", "fixed_input")
 
 if not CANONICAL_YAML.exists():
     print(f"canonical file not found at {CANONICAL_YAML} -- a hard failure, not a skip.", file=sys.stderr)
@@ -88,6 +90,52 @@ def documented(text: str) -> dict[str, Decimal]:
     tree = yaml.load(text, Loader=_ExactLoader)
     walk({k: v for k, v in tree.items() if k not in NOT_FIGURES}, [])
     return out
+
+
+def producers(text: str) -> dict[str, dict]:
+    """The yml's `producers:` block: key -> {kind, repo, file, json | regex, why?} for a figure no gather line produces.
+
+    kind `export`: a consumer's committed export computes it from warehouse data. kind `fixed_input`: a calculator's
+    output on fixed parameters, which a regen cannot move; `why` says why its value holds. Either way `file` with one
+    of `json` (a dotted path; an integer part indexes a list) or `regex` (one capture group) says where the value sits.
+    """
+    block = (yaml.safe_load(text) or {}).get("producers") or {}
+    bad = []
+    for key, p in block.items():
+        if not isinstance(p, dict) or p.get("kind") not in PRODUCER_KINDS or not p.get("repo") or not p.get("file"):
+            bad.append(f"{key}: needs kind ({'/'.join(PRODUCER_KINDS)}), repo and file")
+        elif ("json" in p) == ("regex" in p):
+            bad.append(f"{key}: needs exactly one of json or regex")
+        elif p["kind"] == "fixed_input" and not p.get("why"):
+            bad.append(f"{key}: a fixed_input producer says why its value holds")
+    if bad:
+        raise VerifyError("malformed producers entries: " + "; ".join(bad))
+    return block
+
+
+def read_export(spec: dict, fleet_root: Path) -> Decimal:
+    """The value a producers entry points at, read from the fleet working copy's committed file."""
+    hits = [p for p in fleet_root.glob(f"*/{spec['repo']}") if (p / ".git").exists()]
+    if not hits:
+        raise VerifyError(f"no working copy of {spec['repo']} under {fleet_root}")
+    path = hits[0] / spec["file"]
+    if not path.exists():
+        raise VerifyError(f"{spec['repo']}/{spec['file']} not found")
+    text = path.read_text(encoding="utf-8")
+    if "json" in spec:
+        node = json.loads(text, parse_float=Decimal)
+        for part in str(spec["json"]).split("."):
+            node = node[int(part)] if isinstance(node, list) else node[part]
+        raw = str(node)
+    else:
+        m = re.search(spec["regex"], text)
+        if not m:
+            raise VerifyError(f"{spec['repo']}/{spec['file']}: regex {spec['regex']!r} matches nothing")
+        raw = m.group(1).replace(",", "").replace("_", "")
+    try:
+        return Decimal(raw)
+    except InvalidOperation as e:
+        raise VerifyError(f"{spec['repo']}/{spec['file']}: {raw!r} is not a number") from e
 
 
 def parse_gather(lines) -> dict[str, Decimal]:
@@ -224,10 +272,32 @@ def emit_artifacts() -> None:
     print(f"  emitted {json_path.name} (canon as JSON, head={head or 'unknown'})")
 
 
-def run(gather_file: Path | None) -> int:
+def compare_producers(docs: dict[str, Decimal], prods: dict[str, dict], live: dict[str, Decimal],
+                      fleet_root: Path | None) -> list[str]:
+    """Failures for the keys a consumer's export or a fixed-input model produces. Without a fleet root nothing is
+    read; the caller names those keys as not compared in this run."""
+    bad = [f"{k}: in producers but not a documented figure" for k in sorted(prods) if k not in docs]
+    bad += [f"{k}: produced by canonical_gather.sql and named in producers; one producer only"
+            for k in sorted(prods) if k in live]
+    if fleet_root is None:
+        return bad
+    for k in sorted(set(prods) & set(docs)):
+        try:
+            got = read_export(prods[k], fleet_root)
+        except (VerifyError, KeyError, IndexError, ValueError) as e:
+            bad.append(f"{k}: producer {prods[k]['repo']}/{prods[k]['file']} unreadable: {e}")
+            continue
+        if at_precision(got, docs[k]) != docs[k]:
+            bad.append(f"{k}: documented {docs[k]}, {prods[k]['repo']} gives {got}")
+    return bad
+
+
+def run(gather_file: Path | None, fleet_root: Path | None = None) -> int:
     print("  Emitting derived artifacts ...")
     emit_artifacts()
+    text = CANONICAL_YAML.read_text(encoding="utf-8")
     try:
+        prods = producers(text)
         if gather_file is not None:
             lines = gather_file.read_text(encoding="utf-8").splitlines()
             source = f"gather file {gather_file}"
@@ -240,10 +310,17 @@ def run(gather_file: Path | None) -> int:
     except Exception as e:  # every way of not measuring is a failure
         print(f"\nFAIL: {e.__class__.__name__}: {e}")
         return 1
-    docs = documented(CANONICAL_YAML.read_text(encoding="utf-8"))
-    bad, extra = compare(docs, live)
+    docs = documented(text)
+    bad, extra = compare({k: v for k, v in docs.items() if k not in prods}, live)
+    bad += compare_producers(docs, prods, live, fleet_root)
+    outside = sorted(set(prods) & set(docs))
     print(f"\n  source: {source}")
-    print(f"  documented figures: {len(docs)}; produced: {len(set(docs) & set(live))}; failures: {len(bad)}")
+    print(f"  documented figures: {len(docs)}; produced by the gather: {len(set(docs) & set(live))}; "
+          f"by a named consumer producer: {len(outside)}; failures: {len(bad)}")
+    if outside and fleet_root is None:
+        print(f"  named consumer producers, not compared in this run (pass --exports): {', '.join(outside)}")
+    elif outside:
+        print(f"  consumer producers read from the working copies under {fleet_root}")
     if extra:
         print(f"  gathered, not documented (not a failure): {', '.join(extra)}")
     for b in bad:
@@ -257,8 +334,11 @@ def run(gather_file: Path | None) -> int:
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--gather", type=Path, help="a saved canonical_gather.sql output (key|value lines)")
+    p.add_argument("--exports", nargs="?", const=FLEET_ROOT, type=Path, metavar="FLEET_ROOT",
+                   help="also compare the keys a consumer's committed export produces, read from the working copies "
+                        f"under FLEET_ROOT (default {FLEET_ROOT})")
     args = p.parse_args(argv)
-    return run(args.gather)
+    return run(args.gather, args.exports)
 
 
 if __name__ == "__main__":
