@@ -151,6 +151,7 @@ deductions:
     trailing_12m: 5320
     trailing_24m: 10545
     trailing_36m: 14912
+    all_time: 14947  # U19 2026-11-15: was only in data_windows.retailer_deductions; read via the reader workflow
   retailer_total:
     cy2023: 322788.65
     cy2024: 396845.49
@@ -158,6 +159,13 @@ deductions:
     trailing_12m: 396833.39
     trailing_24m: 793678.88
     trailing_36m: 1116467.53
+    all_time: 1118681.92  # U19 2026-11-15: contract-to-cash's printed total; production via the reader workflow
+  # U19 2026-11-15: the cross-channel backlog as retailer-deduction-recovery prints it (int_all_deductions,
+  # retailer + distributor, all time). Production, read through the reader workflow (run 43757097924).
+  cross_channel_total:
+    all_time: 1346814.55
+  cross_channel_rows:
+    all_time: 16917
 
 distribution:
   authorizations:
@@ -560,6 +568,36 @@ workingcapital:
     trailing_12m: 25.44
     trailing_24m: 25.48
     trailing_36m: 25.58
+
+# U19 2026-11-15: keys for typed figures that had none, each produced by sql/canonical_gather.sql and read in
+# production through the cinderhaven_ci_reader workflow (run 43757097924). No existing value moved.
+lifecycle:  # cents remitted per invoiced dollar: net / gross x100
+  retailer_cents_per_dollar:
+    all_time: 87.22
+  distributor_cents_per_dollar:
+    all_time: 93.13
+  wholesale_cents_per_dollar:  # retailer and distributor combined
+    all_time: 89.08
+
+# Each data_windows row count as a figure of its own (plan U19: "a count held only inside a data_windows string
+# gets a numeric key"). verify_canonical.py reads each from that table's window line in the gather.
+rows:
+  costing_inventory_snapshot: {all_time: 7800}
+  costing_product_costs: {all_time: 1850}
+  costing_supplier_invoices: {all_time: 294}
+  distribution_authorized: {all_time: 9992}
+  distribution_deauthorized: {all_time: 816}
+  distributor_deductions: {all_time: 1970}
+  distributor_orders: {all_time: 9042}
+  distributor_remittances: {all_time: 111}
+  promotions: {all_time: 123}
+  retailer_chargebacks: {all_time: 2873}
+  retailer_deductions: {all_time: 14947}
+  retailer_disputes: {all_time: 5247}
+  retailer_orders: {all_time: 46760}
+  retailer_remittances: {all_time: 222}
+  scan_data: {all_time: 1323569}
+  shopify_orders: {all_time: 18497}
 
 data_windows:  # min_date | max_date | row_count
   costing_inventory_snapshot: '2023-01-07|2025-12-27|7800'

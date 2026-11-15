@@ -1,8 +1,8 @@
 {
  "_generated": {
-  "generated": "2026-10-01",
+  "generated": "2026-11-15",
   "generator": "scripts/verify_canonical.py",
-  "platform_head": "deb0175",
+  "platform_head": "66ed526",
   "source": "reference/canonical_values.yml",
   "verified_against_production": "2026-07-29"
  },
@@ -136,6 +136,12 @@
   "tail_supplier_invoices": "2026-01-31||"
  },
  "deductions": {
+  "cross_channel_rows": {
+   "all_time": 16917
+  },
+  "cross_channel_total": {
+   "all_time": 1346814.55
+  },
   "distributor_total": {
    "cy2023": 71786.02,
    "cy2024": 83528.84,
@@ -161,6 +167,7 @@
    "trailing_36m": 145036.65
   },
   "retailer_rows": {
+   "all_time": 14947,
    "cy2023": 4367,
    "cy2024": 5225,
    "cy2025": 5320,
@@ -169,6 +176,7 @@
    "trailing_36m": 14912
   },
   "retailer_total": {
+   "all_time": 1118681.92,
    "cy2023": 322788.65,
    "cy2024": 396845.49,
    "cy2025": 396833.39,
@@ -279,6 +287,17 @@
   "shipments": {
    "all_retailers_full_corpus": 46760,
    "walmart_full_corpus": 10124
+  }
+ },
+ "lifecycle": {
+  "distributor_cents_per_dollar": {
+   "all_time": 93.13
+  },
+  "retailer_cents_per_dollar": {
+   "all_time": 87.22
+  },
+  "wholesale_cents_per_dollar": {
+   "all_time": 89.08
   }
  },
  "margin": {
@@ -430,6 +449,56 @@
    "trailing_12m": 17293643.52,
    "trailing_24m": 34982679.6,
    "trailing_36m": 52005749.76
+  }
+ },
+ "rows": {
+  "costing_inventory_snapshot": {
+   "all_time": 7800
+  },
+  "costing_product_costs": {
+   "all_time": 1850
+  },
+  "costing_supplier_invoices": {
+   "all_time": 294
+  },
+  "distribution_authorized": {
+   "all_time": 9992
+  },
+  "distribution_deauthorized": {
+   "all_time": 816
+  },
+  "distributor_deductions": {
+   "all_time": 1970
+  },
+  "distributor_orders": {
+   "all_time": 9042
+  },
+  "distributor_remittances": {
+   "all_time": 111
+  },
+  "promotions": {
+   "all_time": 123
+  },
+  "retailer_chargebacks": {
+   "all_time": 2873
+  },
+  "retailer_deductions": {
+   "all_time": 14947
+  },
+  "retailer_disputes": {
+   "all_time": 5247
+  },
+  "retailer_orders": {
+   "all_time": 46760
+  },
+  "retailer_remittances": {
+   "all_time": 222
+  },
+  "scan_data": {
+   "all_time": 1323569
+  },
+  "shopify_orders": {
+   "all_time": 18497
   }
  },
  "supersedes": [
