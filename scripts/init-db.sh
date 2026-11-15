@@ -32,15 +32,7 @@ psql -U postgres -d cinderhaven -f "$DUMP_FILE"
 psql -U postgres -d cinderhaven -c \
     "ALTER DATABASE cinderhaven SET search_path TO public_marts, public_staging, public_intermediate, raw, public;"
 
-# Supplemental seeds not in the Fly.io dump (dbt seeds that haven't
-# been deployed yet).
-SEED_DIR="/data/seeds"
-if [ -d "$SEED_DIR" ]; then
-    for f in "$SEED_DIR"/*.sql; do
-        [ -f "$f" ] || continue
-        echo "Running supplemental seed: $(basename "$f")"
-        psql -U postgres -d cinderhaven -f "$f"
-    done
-fi
+# The dump is the whole world: every raw table, retailer_requirements included,
+# comes from generation/seed_all.py (plan U2). Nothing here writes raw.
 
-echo "Seed complete."
+echo "Restore complete."

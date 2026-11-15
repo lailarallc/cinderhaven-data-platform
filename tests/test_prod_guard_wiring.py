@@ -78,6 +78,17 @@ def test_the_two_retired_write_paths_stay_deleted():
         assert not (ROOT / gone).exists(), f"{gone} is back"
 
 
+def test_the_local_restore_writes_no_raw_table_of_its_own():
+    # U2 close list (owner, 2026-11-14): data/seeds/retailer_requirements.sql truncated
+    # and refilled raw.retailer_requirements after the restore, in a schema seed_all no
+    # longer builds. The dump is the world; init-db.sh runs no supplemental SQL.
+    assert not (ROOT / "data" / "seeds").exists(), "data/seeds is back"
+    init_db = (ROOT / "scripts" / "init-db.sh").read_text(encoding="utf-8")
+    assert "/data/seeds" not in init_db and "TRUNCATE" not in init_db.upper()
+    assert [line for line in init_db.splitlines() if "psql" in line and " -f " in line] == [
+        'psql -U postgres -d cinderhaven -f "$DUMP_FILE"']
+
+
 def _load_assets(monkeypatch, tmp_path):
     """Import assets.py with a one-model manifest and a faked dbt CLI: no dbt, no database."""
     dagster_dbt = pytest.importorskip("dagster_dbt")
