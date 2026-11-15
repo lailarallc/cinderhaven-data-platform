@@ -153,3 +153,25 @@ def test_a_malformed_run_seed_refuses(monkeypatch):
     import pytest
     with pytest.raises(ValueError, match="CINDERHAVEN_RUN_SEED"):
         _seed_config(monkeypatch, "-1")
+
+
+def test_a_generator_failure_stops_the_run_before_any_later_step_reads_its_schema(monkeypatch):
+    import types
+    import pytest
+    seed_all = _seed_all(monkeypatch)
+    ran = []
+
+    def generator(name):
+        ran.append(name)
+        if name == "seed_scan_data":
+            raise RuntimeError("scan data failed partway")
+
+    monkeypatch.setattr(seed_all, "psycopg2", types.SimpleNamespace(connect=lambda *a, **k: types.SimpleNamespace(
+        close=lambda: None, autocommit=False)))
+    monkeypatch.setattr(seed_all, "execute_ddl", lambda conn: ran.append("ddl"))
+    monkeypatch.setattr(seed_all, "run_generator", generator)
+    monkeypatch.setattr(seed_all, "run_dbt", lambda *a: ran.append("dbt " + a[0]))
+    monkeypatch.setattr(seed_all, "verify_counts", lambda conn: ran.append("verify_counts"))
+    with pytest.raises(RuntimeError, match="partway"):
+        seed_all.main()
+    assert ran == ["ddl", "seed_shared", "seed_retailer", "seed_distributor", "seed_dtc", "seed_scan_data"], ran
