@@ -9,6 +9,24 @@ For things that didn't work, see FAILURES.md.
 
 ---
 
+## 2026-11-15 — U5 code complete on branch `u5-registry` (not merged); one owner ruling open
+
+**Did (worktree `../cinderhaven-data-platform-u5`; baseline 0 of 55 differing after each step):**
+- `bb7e6f3` `scripts/vendor_realism.py` + `vendor/realism/` at spec `f980293` (gate CLEAN, 62 checks in
+  the MANIFEST). The spec gate travels in the bundle. `.gitattributes` keeps it byte for byte.
+- `91975fa` `scripts/check_anchor_coverage.py`, step 0 of `seed_all.py`: bundle, seeder keys, seeder
+  prints, first-order (blocking; the 17 pass), effective dating, reverse list; `not_for_citation()`.
+  `seed_config.COVERAGE_KEYS`: 116 constants, 15 exempt, 1 keyed, 100 owed by unit.
+
+**State:** fast tier 177, db tier 118 passed. CI runs on main only, so it runs at merge.
+
+**Open, owner:** the pre-window value (U18 partition row 1481). Session calls flagged in DECISIONS
+2026-11-15: owed-unit assignments; copack's fixtures owed to U15.
+
+**Next:** U8 (schema declarations), then U15. Spec branch `u5-status` carries the plan status.
+
+---
+
 ## 2026-11-14 (later) — U2 DONE, merged to main
 
 **Did (each with the 55-table baseline unchanged):**
