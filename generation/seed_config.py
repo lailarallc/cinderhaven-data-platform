@@ -30,20 +30,20 @@ prod_guard.check(DATABASE_URL)
 # -- Retailers (5 contracted + 1 regional group) --
 
 RETAILERS = [
-    {"retailer_id": "RET-WALMART",    "name": "Walmart",      "dispute_portal_name": "RetailLink", "dispute_portal_url": "https://retaillink.walmart.com", "dispute_method": "portal"},
-    {"retailer_id": "RET-COSTCO",     "name": "Costco",       "dispute_portal_name": "Costco Vendor Portal", "dispute_portal_url": "https://vendor.costco.com", "dispute_method": "portal"},
-    {"retailer_id": "RET-WHOLEFOODS", "name": "Whole Foods",  "dispute_portal_name": "Whole Foods Vendor", "dispute_portal_url": "https://vendor.wholefoods.com", "dispute_method": "email"},
-    {"retailer_id": "RET-SPROUTS",    "name": "Sprouts",      "dispute_portal_name": None, "dispute_portal_url": None, "dispute_method": "email"},
-    {"retailer_id": "RET-KROGER",     "name": "Kroger",       "dispute_portal_name": "Kroger Vendor Net", "dispute_portal_url": "https://vendornet.kroger.com", "dispute_method": "portal"},
-    {"retailer_id": "RET-REGIONAL",   "name": "Regional Group", "dispute_portal_name": None, "dispute_portal_url": None, "dispute_method": "email"},
+    {"retailer_id": "RET-WALMART",    "name": "Walmart",      "dispute_portal_name": "RetailLink", "dispute_portal_url": "https://retaillink.walmart.com", "dispute_method": "portal", "banner_type": "national retailer"},
+    {"retailer_id": "RET-COSTCO",     "name": "Costco",       "dispute_portal_name": "Costco Vendor Portal", "dispute_portal_url": "https://vendor.costco.com", "dispute_method": "portal", "banner_type": "club retailer"},
+    {"retailer_id": "RET-WHOLEFOODS", "name": "Whole Foods",  "dispute_portal_name": "Whole Foods Vendor", "dispute_portal_url": "https://vendor.wholefoods.com", "dispute_method": "email", "banner_type": "natural retailer"},
+    {"retailer_id": "RET-SPROUTS",    "name": "Sprouts",      "dispute_portal_name": None, "dispute_portal_url": None, "dispute_method": "email", "banner_type": "natural retailer"},
+    {"retailer_id": "RET-KROGER",     "name": "Kroger",       "dispute_portal_name": "Kroger Vendor Net", "dispute_portal_url": "https://vendornet.kroger.com", "dispute_method": "portal", "banner_type": "national retailer"},
+    {"retailer_id": "RET-REGIONAL",   "name": "Regional Group", "dispute_portal_name": None, "dispute_portal_url": None, "dispute_method": "email", "banner_type": "regional retailer"},
 ]
 
 # -- Distributors --
 
 DISTRIBUTORS = [
-    {"distributor_id": "DIST-UNFI",  "name": "UNFI",  "type": "national", "margin_pct": 0.22, "payment_terms_days": 30},
-    {"distributor_id": "DIST-KEHE",  "name": "KeHE",  "type": "national", "margin_pct": 0.20, "payment_terms_days": 30},
-    {"distributor_id": "DIST-DPI",   "name": "DPI Northwest", "type": "regional", "margin_pct": 0.18, "payment_terms_days": 21},
+    {"distributor_id": "DIST-UNFI",  "name": "UNFI",  "type": "national", "margin_pct": 0.22, "payment_terms_days": 30, "banner_type": "distributor"},
+    {"distributor_id": "DIST-KEHE",  "name": "KeHE",  "type": "national", "margin_pct": 0.20, "payment_terms_days": 30, "banner_type": "distributor"},
+    {"distributor_id": "DIST-DPI",   "name": "DPI Northwest", "type": "regional", "margin_pct": 0.18, "payment_terms_days": 21, "banner_type": "distributor"},
 ]
 
 # -- Product lines (50 SKUs) --
@@ -1002,3 +1002,180 @@ def compute_defect_profile(seed: int = DEFECT_SEED) -> dict:
 
     return profile
 # ── END DEFECT PROFILE ────────────────────────────────────────────
+
+
+# ── COVERAGE KEYS (plan U5) ───────────────────────────────────────
+# Every module-level constant in generation/seed_*.py whose typed value holds a
+# number (the spec gate's typed-constant reading, DECISIONS#option-c) is listed
+# here in exactly one form, and scripts/check_anchor_coverage.py holds the table
+# to the vendored registry before seed_all.py drops anything:
+#   {"key": "<row>"}                 its row prints every typed value (keyed; the
+#                                    seeder-prints arm checks it)
+#   {"exempt": "<reason>"}           not a figure: a random seed, a chunk size
+#   {"owed": "<unit>", "why": "..."} a value no row prints yet, or one no row
+#                                    governs, that the named unit replaces or
+#                                    retires; with "row", the row that governs it,
+#                                    and the entry fails once that row prints it
+#                                    (paid: remove the note)
+# A keyed entry may carry "periods": [(ISO start, value), ...] for a row dated
+# inside the window, and "start": the start value its row registers; the seeder
+# reads it through value_in_effect(). None does today.
+# The gate reads this table from source; nothing here reads a file.
+COVERAGE_KEYS = {
+    # ---- not figures ----
+    "seed_all.GUARD_TRIP_EXIT": {"exempt": "a process exit code"},
+    "seed_config.SEED": {"exempt": "a random seed"},
+    "seed_config.FULFILLMENT_SEED": {"exempt": "a random seed"},
+    "seed_config.EVIDENCE_SEED": {"exempt": "a random seed"},
+    "seed_config.REMITTANCE_SEED": {"exempt": "a random seed"},
+    "seed_config.DTC_COST_SEED": {"exempt": "a random seed"},
+    "seed_config.DEFECT_SEED": {"exempt": "a random seed"},
+    "seed_config.RUN_SEED_STRIDE": {"exempt": "the run seed's stream offset (plan U2)"},
+    "seed_costing.SEED": {"exempt": "a random seed"},
+    "seed_product_master_history.SEED": {"exempt": "a random seed"},
+    "seed_void_patterns.VOID_SEED": {"exempt": "a random seed"},
+    "seed_void_patterns.ADDRESS_SEED": {"exempt": "a random seed"},
+    "seed_void_patterns.NEVER_SCATTER_SEED": {"exempt": "a random seed"},
+    "seed_distributor.COPY_CHUNK_SIZE": {"exempt": "a COPY chunk size"},
+    "seed_retailer.COPY_CHUNK_SIZE": {"exempt": "a COPY chunk size"},
+
+    # ---- keyed ----
+    "seed_config.EVIDENCE_OUTCOME_WEIGHTS": {"key": "A4.07"},
+
+    # ---- owed: U9, catalogue, velocity driver, price waterfall (origin-R1, R5, R2) ----
+    "seed_config.PRODUCT_LINES": {"owed": "U9", "why": "the catalogue: SKUs, prices, case packs"},
+    "seed_config.DISTRIBUTORS": {"owed": "U9", "why": "distributor margins in the price waterfall"},
+    "seed_config.RETAILER_STORE_COUNTS": {"owed": "U9", "why": "store universe per retailer"},
+    "seed_config.CHANNEL_VELOCITY_MULT": {"owed": "U9", "why": "the velocity driver"},
+    "seed_config.WHOLESALE_MULT": {"owed": "U9", "why": "the price waterfall's wholesale step"},
+    "seed_config.TRADE_SPEND_PCT": {"owed": "U9", "why": "the price waterfall's trade rates"},
+    "seed_config.ARCHETYPE_DISTRIBUTION": {"owed": "U9", "why": "the velocity driver's SKU archetypes"},
+    "seed_config.ARCHETYPE_VELOCITY_MULT": {"owed": "U9", "why": "the velocity driver's SKU archetypes"},
+    "seed_config.PARTIAL_RECOVERY_RANGE": {"owed": "U9", "why": "dispute recovery draws; U9 re-streams EVIDENCE_SEED"},
+    "seed_scan_data._BORDERLINE_TARGETS": {"owed": "U9", "why": "scan velocity targets on the new catalogue"},
+    "seed_void_patterns.NEVER_SCATTER_MIN_STORES": {"owed": "U9", "why": "voidfinder re-planted on the new catalogue"},
+    "seed_void_patterns.NEVER_SCATTER_MAX_STORES": {"owed": "U9", "why": "voidfinder re-planted on the new catalogue"},
+    "seed_void_patterns.WENT_DARK_TARGET_RATE": {"owed": "U9", "why": "voidfinder re-planted on the new catalogue"},
+    "seed_void_patterns.WENT_DARK_MIN_PER_RETAILER": {"owed": "U9", "why": "voidfinder re-planted on the new catalogue"},
+    "seed_void_patterns.WENT_DARK_MIN_WEEKS": {"owed": "U9", "why": "voidfinder re-planted on the new catalogue"},
+    "seed_void_patterns.WENT_DARK_MAX_WEEKS": {"owed": "U9", "why": "voidfinder re-planted on the new catalogue"},
+    "seed_void_patterns.MAX_RETAILER_REVENUE_DELETION": {"owed": "U9", "why": "the deletion guard; every run seed builds"},
+    "seed_costing.SHELF_LIFE_MONTHS": {"owed": "U9", "why": "shelf life by family on the new catalogue (A2.12)"},
+    "seed_costing.NMFC_BREAKS": {"owed": "U9", "why": "freight class from the new catalogue's case dimensions"},
+    "seed_costing.NMFC_DEFAULT_CLASS": {"owed": "U9", "why": "freight class from the new catalogue's case dimensions"},
+    "seed_costing.NMFC_FLOOR_CLASS": {"owed": "U9", "why": "freight class from the new catalogue's case dimensions"},
+    "seed_costing.FREIGHT_BASE_RATE_PER_CWT": {"owed": "U9", "why": "freight cost on the new catalogue (A5.24)"},
+
+    # ---- owed: U10, dispersion, lifecycle, PO lifecycle (origin-R3, R4, R6) ----
+    "seed_config.SEASONALITY": {"owed": "U10", "row": "A7.19", "why": "seasonality from the registry"},
+    "seed_config.SEASONAL_PROFILE_SHAPES": {"owed": "U10", "why": "per-category seasonality overlay"},
+    "seed_config.RETAILER_FILL_TARGET": {"owed": "U10", "why": "fill from origin-R6's PO lifecycle"},
+    "seed_config.DISTRIBUTOR_FILL_TARGET": {"owed": "U10", "why": "fill from origin-R6's PO lifecycle"},
+    "seed_config.Q4_FILL_DIP": {"owed": "U10", "why": "the Q4 build and its fill"},
+    "seed_config.SHORTFALL_REASON_MIX": {"owed": "U10", "why": "shortfall causes in the PO lifecycle"},
+    "seed_config.DISTRIBUTOR_SHORTFALL_MIX": {"owed": "U10", "why": "shortfall causes in the PO lifecycle"},
+    "seed_config.RECEIVING_DISCREPANCY_RATE": {"owed": "U10", "why": "receipts in the PO lifecycle"},
+    "seed_config.RECEIVING_DISCREPANCY_MIX": {"owed": "U10", "why": "receipts in the PO lifecycle"},
+    "seed_config.RETAILER_TRANSIT_DAYS": {"owed": "U10", "why": "transit replaced by registry reads"},
+    "seed_config.RETAILER_OTIF_WINDOW_DAYS": {"owed": "U10", "why": "on-time windows replaced by registry reads"},
+    "seed_config.INTERNAL_OTIF_TOLERANCE_DAYS": {"owed": "U10", "why": "on-time replaced by registry reads"},
+    "seed_config.INTERNAL_ONTIME_TARGET": {"owed": "U10", "why": "on-time replaced by registry reads"},
+    "seed_config.REMITTANCE_RESIDUAL_TARGET": {"owed": "U10", "why": "remittances at A9.11's days to pay"},
+    "seed_config.DTC_RETURN_RATE_GLASS": {"owed": "U10", "why": "refund constants replaced by registry reads"},
+    "seed_config.DTC_RETURN_RATE_NON_GLASS": {"owed": "U10", "why": "refund constants replaced by registry reads"},
+    "seed_dtc.STATE_WEIGHTS": {"owed": "U10", "why": "own-site customers by state"},
+    "seed_retailer.EXPECTED_CONSTRAINED_LOSS": {"owed": "U10", "why": "fill loss from origin-R6"},
+    "seed_distributor.EXPECTED_CONSTRAINED_LOSS": {"owed": "U10", "why": "fill loss from origin-R6"},
+    "seed_costing.LEAD_TIME_DAYS": {"owed": "U10", "why": "builds at the launch and the Q4 build"},
+    "seed_costing.SAFETY_DAYS": {"owed": "U10", "why": "builds at the launch and the Q4 build"},
+    "seed_costing.COVERAGE_WEEKS": {"owed": "U10", "why": "builds at the launch and the Q4 build"},
+    "seed_costing.LAUNCH_BUILD_WEEKS": {"owed": "U10", "why": "launch builds at the launch"},
+
+    # ---- owed: U11, promo migration, error injection (origin-R8, R7) ----
+    "seed_config.SHORT_SHIP_CB_ASSESS_BASE": {"owed": "U11", "why": "A6.22 replaces the assessment constants"},
+    "seed_config.CB_AUTO_DEDUCT_LIFT": {"owed": "U11", "why": "A6.22 replaces the assessment constants"},
+    "seed_config.SHORT_SHIP_CB_RATE": {"owed": "U11", "why": "A6.22 replaces the assessment constants"},
+    "seed_config.LATE_CB_ASSESS": {"owed": "U11", "why": "A6.22 replaces the assessment constants"},
+    "seed_config.LATE_CB_RATE": {"owed": "U11", "why": "A6.22 replaces the assessment constants"},
+    "seed_config.RECEIVING_CB_ASSESS": {"owed": "U11", "why": "A6.22 replaces the assessment constants"},
+    "seed_config.RECEIVING_CB_FEE_MULT": {"owed": "U11", "why": "A6.22 replaces the assessment constants"},
+    "seed_config.CHARGEBACK_CLAMP": {"owed": "U11", "why": "A6.22's bound replaces the clamps"},
+    "seed_config.SHORT_SHIP_DED_ASSESS": {"owed": "U11", "why": "A6.22 replaces the assessment constants"},
+    "seed_config.SHORT_SHIP_DED_RATE": {"owed": "U11", "why": "A6.22 replaces the assessment constants"},
+    "seed_config.SHORT_SHIP_DED_CLAMP": {"owed": "U11", "why": "A6.22's bound replaces the clamps"},
+    "seed_config.LATE_DED_ASSESS": {"owed": "U11", "why": "A6.22 replaces the assessment constants"},
+    "seed_config.LATE_DED_RATE": {"owed": "U11", "why": "A6.22 replaces the assessment constants"},
+    "seed_config.LATE_DED_CLAMP": {"owed": "U11", "why": "A6.22's bound replaces the clamps"},
+    "seed_config.DIST_DELIVERY_WINDOW_DAYS": {"owed": "U11", "why": "event-driven distributor chargebacks"},
+    "seed_config.DIST_SHORT_SHIP_CB_ASSESS": {"owed": "U11", "why": "event-driven distributor chargebacks"},
+    "seed_config.DIST_SHORT_SHIP_CB_RATE": {"owed": "U11", "why": "event-driven distributor chargebacks"},
+    "seed_config.DIST_LATE_CB_ASSESS": {"owed": "U11", "why": "event-driven distributor chargebacks"},
+    "seed_config.DIST_LATE_CB_RATE": {"owed": "U11", "why": "event-driven distributor chargebacks"},
+    "seed_config.DIST_CHARGEBACK_CLAMP": {"owed": "U11", "why": "event-driven distributor chargebacks"},
+    "seed_config.DIST_SHORT_SHIP_DED_ASSESS": {"owed": "U11", "why": "event-driven distributor deductions"},
+    "seed_config.DIST_SHORT_SHIP_DED_RATE": {"owed": "U11", "why": "event-driven distributor deductions"},
+    "seed_config.DIST_SHORT_SHIP_DED_CLAMP": {"owed": "U11", "why": "event-driven distributor deductions"},
+    "seed_config.DIST_LATE_DED_ASSESS": {"owed": "U11", "why": "event-driven distributor deductions"},
+    "seed_config.DIST_LATE_DED_RATE": {"owed": "U11", "why": "event-driven distributor deductions"},
+    "seed_config.DIST_LATE_DED_CLAMP": {"owed": "U11", "why": "event-driven distributor deductions"},
+    "seed_config.GTIN_INVALID_RATE": {"owed": "U11", "why": "error injection (origin-R7)"},
+    "seed_config.MISSING_RATES": {"owed": "U11", "why": "error injection (origin-R7)"},
+    "seed_dtc.DISCOUNT_CODES": {"owed": "U11", "why": "promo migration (origin-R8)"},
+
+    # ---- owed: U13, the company-character block ----
+    "seed_retailer.RETAILER_VOLUME_WEIGHT": {"owed": "U13", "why": "retailer volume on group 9's split"},
+    "seed_distributor.DISTRIBUTOR_VOLUME_WEIGHT": {"owed": "U13", "why": "distributor volume on group 9's split"},
+    "seed_config.RET_POD_STATE_P": {"owed": "U13", "why": "dispute evidence under filing capacity (A9.06)"},
+    "seed_config.RET_FILING_DELAY_P": {"owed": "U13", "why": "filing capacity on retailer disputes (A9.06)"},
+    "seed_config.DIST_FILING_DELAY_P": {"owed": "U13", "why": "filing capacity on distributor disputes (A9.06)"},
+    "seed_config.RET_DISPUTE_PROPENSITY": {"owed": "U13", "why": "filing capacity on retailer disputes (A9.06)"},
+    "seed_config.DIST_DISPUTE_PROPENSITY": {"owed": "U13", "why": "filing capacity on distributor disputes (A9.06)"},
+    "seed_config.LABOR_HOURS_BY_TIER": {"owed": "U13", "why": "dispute labour under filing capacity (A9.06)"},
+    "seed_config.DISPUTE_METHOD_PHONE_P": {"owed": "U13", "why": "filing capacity on disputes (A9.06)"},
+    "seed_config.DISPUTE_CLOSE_DAYS": {"owed": "U13", "why": "filing capacity on disputes (A9.06)"},
+    "seed_config.EVIDENCE_DQ_STRONG_MIN": {"owed": "U13", "why": "evidence tiers under filing capacity (A4.07)"},
+    "seed_config.EVIDENCE_DQ_WEAK_MAX": {"owed": "U13", "why": "evidence tiers under filing capacity (A4.07)"},
+    "seed_config.EVIDENCE_FILING_STRONG_DAYS": {"owed": "U13", "why": "evidence tiers under filing capacity (A4.07)"},
+    "seed_config.EVIDENCE_FILING_MODERATE_DAYS": {"owed": "U13", "why": "evidence tiers under filing capacity (A4.07)"},
+    "seed_costing.OVERHEAD_PCT_OF_REVENUE": {"owed": "U13", "why": "the overhead pool's revenue total"},
+
+    # ---- owed: U15, the spec generators wired in (groups 8 and 9) ----
+    "seed_config.DTC_FULFILLMENT_RATE_BY_QUARTER": {"owed": "U15", "why": "group 8's DTC fulfilment cost"},
+    "seed_config.DTC_FULFILLMENT_WEIGHT_MULT": {"owed": "U15", "why": "group 8's DTC fulfilment cost"},
+    "seed_config.DTC_PLATFORM_FEE_RATE": {"owed": "U15", "why": "group 8's payment and platform fees (A8.05)"},
+    "seed_costing.COPACK_TERMS": {"owed": "U15", "why": "supplier paid dates from U16's daily ledger"},
+    "seed_costing.PACKAGING_TERMS": {"owed": "U15", "why": "supplier paid dates from U16's daily ledger"},
+    "seed_costing.FREIGHT_TERMS": {"owed": "U15", "why": "supplier paid dates from U16's daily ledger"},
+    "seed_costing.DRIFT_START": {"owed": "U15", "why": "group 9's ingredient cost path"},
+    "seed_costing.DRIFT_END": {"owed": "U15", "why": "group 9's ingredient cost path"},
+    "seed_config._COPACK_LINE_RULES": {"owed": "U15", "why": "copack's runs from U16's daily ledger (session call)"},
+    "seed_config.COPACK_PRODUCTION_SCHEDULE": {"owed": "U15", "why": "copack's runs from U16's daily ledger (session call)"},
+    "seed_config.COPACK_SKU_INVENTORY": {"owed": "U15", "why": "copack's stock from U16's daily ledger (session call)"},
+}
+
+
+class PreWindowUnruled(LookupError):
+    """A trended row with no registered start value, read before the window: the owner rules it at first read."""
+
+
+def value_in_effect(periods, on: date, *, row: str, reader: str, start=None):
+    """A keyed constant's value on `on`, from its dated periods [(ISO start, value), ...] (plan U5).
+
+    Inside the window: the latest period starting on or before `on`. Before it,
+    the owner's three cases (2026-11-15, U18 partition row 1481):
+      1. the row registers a start value (A1.01's $25M, A9.13's opening draw):
+         `start` governs;
+      2. the row is constant across y1-y3: that constant;
+      3. the row trends and registers no start: refused, naming the row and the
+         reader, and the owner rules it at that first read. Never y1 by default."""
+    ordered = sorted((date.fromisoformat(s), value) for s, value in periods)
+    if not ordered:
+        raise ValueError(f"{row}: no periods")
+    if on >= ordered[0][0]:
+        return [value for s, value in ordered if s <= on][-1]
+    if start is not None:
+        return start
+    if len({repr(value) for _, value in ordered}) == 1:
+        return ordered[0][1]
+    raise PreWindowUnruled(f"{row} trends across the window and registers no start value; {reader} reads it on "
+                           f"{on}, before the window: the owner rules this read (plan U5, three cases)")

@@ -9,6 +9,63 @@ For things that didn't work, see FAILURES.md.
 
 ---
 
+## 2026-11-15 (later) — U8 code complete on branch `u8-schema` (not merged)
+
+**Base:** cut from `origin/u5-registry` at `fe3baf6` (U5 was not on main yet), so the branch carries U5
+until U5 merges.
+
+**Owner rulings at U8's start (2026-11-15), recorded in DECISIONS and spec `DECISIONS#u8-rulings`:**
+- N35's y3 flag is A3.12's monitor output.
+- Freight, labour, write-off and lost sales reconcile on the ledger alone.
+- `banner_type` gains `independent`.
+- A6.23's remaining streams are out.
+- A11.04's figures stay owed to U13.
+
+**Did (worktree `../cinderhaven-data-platform-u8`; baseline after each step):**
+- `31b8af3` `banner_type` on `raw.retailers` and `raw.distributors`, through to the dims, `int_all_partners`
+  and `fct_chargebacks`.
+- `21deb54` + `eeb2dbb`:
+  - N8's `order_id` and `shipment_id` on both chargeback tables.
+  - G4's subscription tables, and `subscription_id` on `raw.shopify_orders`.
+  - `seed_all.AWAITING_WRITER`: a write target may be empty until its named writer (U10, U11, U13) lands.
+- `138a4cc` 19 more tables (N22, N35, N37, N17, N11), plus `stg_amazon_orders`, `stg_amazon_fees`,
+  `stg_small_account_orders` and `tests/test_r7_write_targets.py` (13 scenarios).
+- `1c2914c` Two existing tests restated for the new tables:
+  - the truth text-scan caught a comment;
+  - the drop-guard harness test hard-coded 41 raw tables.
+
+**Baseline:** 0 of the 55 tables moved on their pre-U8 columns. Five gain columns (`retailers`, `distributors`,
+both chargeback tables, `shopify_orders`); 21 new tables are empty.
+
+**State:** fast tier 181 passed, db tier 132 passed. Nothing touched production. Spec branch `u8-status`
+(`68a52ef`) carries the plan status, `DECISIONS#u8-rulings` and the A6.04 / A6.23 restatement (gate CLEAN).
+
+**Open / next:**
+- Merge both branches on the owner's word.
+- U12 must move deploy-costing's `RAW_REFERENCE_COMMIT` when it rebuilds production on this DDL, or the drop
+  guard refuses every U8 column.
+- The vendored registry is at spec `f980293`. Re-vendor after `u8-status` merges, since A6.04 and A6.23 changed.
+
+---
+
+## 2026-11-15 — U5 code complete on branch `u5-registry` (not merged); one owner ruling open
+
+**Did (worktree `../cinderhaven-data-platform-u5`; baseline 0 of 55 differing after each step):**
+- `bb7e6f3` `scripts/vendor_realism.py` + `vendor/realism/` at spec `f980293` (gate CLEAN, 62 checks in
+  the MANIFEST). The spec gate travels in the bundle. `.gitattributes` keeps it byte for byte.
+- `91975fa` `scripts/check_anchor_coverage.py`, step 0 of `seed_all.py`: bundle, seeder keys, seeder
+  prints, first-order (blocking; the 17 pass), effective dating, reverse list; `not_for_citation()`.
+  `seed_config.COVERAGE_KEYS`: 116 constants, 15 exempt, 1 keyed, 100 owed by unit.
+
+**State:** fast tier 177, db tier 118 passed. CI runs on main only, so it runs at merge.
+
+**Open, owner:** the pre-window value (U18 partition row 1481). Session calls flagged in DECISIONS
+2026-11-15: owed-unit assignments; copack's fixtures owed to U15.
+
+**Next:** U8 (schema declarations), then U15. Spec branch `u5-status` carries the plan status.
+
+---
+
 ## 2026-11-14 (later) — U2 DONE, merged to main
 
 **Did (each with the 55-table baseline unchanged):**

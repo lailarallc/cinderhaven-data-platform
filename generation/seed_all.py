@@ -1,5 +1,7 @@
 """Generate the warehouse: the one entry point (plan U2).
 
+0. The coverage gate (plan U5), scripts/check_anchor_coverage.py: exit 1
+   stops the run before anything is dropped.
 1. DDL, every schema this run owns, in one place: drop the three public_*
    dbt schemas; raw (drops with CASCADE); truth (U4); costing; copack's five
    tables (table-scoped: the schema and that repo's snapshot tables stay).
@@ -44,6 +46,33 @@ DBT_PROFILES = ROOT / "orchestration"  # every value from CINDERHAVEN_PG_*; noth
 # (schema, table) the run seeds outside raw, for verify_counts
 COPACK_TABLES = ("co_packers", "production_lines", "sku_production_config", "production_schedule",
                  "sku_inventory")
+
+# Plan U8: write targets whose schema lands before their writer. Each may be empty
+# after a full run until the unit named here writes it; that unit takes its rows
+# off this list in the same change. Any other empty table still fails the run.
+AWAITING_WRITER = {
+    "raw.shopify_subscriptions": "U10",
+    "raw.shopify_subscription_cancellations": "U11",
+    "raw.marketplace_accounts": "U13",
+    "raw.amazon_orders": "U13",
+    "raw.amazon_order_lines": "U13",
+    "raw.amazon_fees": "U13",
+    "raw.amazon_buy_box": "U11",
+    "raw.amazon_3p_listings": "U11",
+    "raw.marketplace_events": "U11",
+    "raw.map_policy": "U11",
+    "raw.map_price_monitor": "U11",
+    "raw.map_violations": "U11",
+    "raw.small_accounts": "U13",
+    "raw.small_account_orders": "U13",
+    "raw.small_account_order_lines": "U13",
+    "raw.small_account_shipments": "U13",
+    "raw.small_account_shipment_lines": "U13",
+    "raw.small_account_receipt_lines": "U13",
+    "raw.small_account_remittances": "U13",
+    "raw.invoices": "U11",
+    "raw.store_week_oos": "U11",
+}
 
 
 class SeedError(RuntimeError):
@@ -168,14 +197,23 @@ def verify_counts(conn):
         cur.execute(f"SELECT count(*) FROM {table}")
         count = cur.fetchone()[0]
         total += count
-        if count == 0:
+        if count == 0 and table not in AWAITING_WRITER:
             empty.append(table)
-        print(f"  {table:45s} {count:>10,}")
+        owed = f"  (awaiting {AWAITING_WRITER[table]})" if count == 0 and table in AWAITING_WRITER else ""
+        print(f"  {table:45s} {count:>10,}{owed}")
     print(f"  {'TOTAL':45s} {total:>10,}")
     cur.close()
     report_truth(conn)
     if empty:
         raise SeedError(f"empty after a full run: {', '.join(empty)}")
+
+
+def coverage_gate():
+    """Plan U5: the realism gate's teeth. It reads the vendored registry and the seeders' source; exit 1 stops
+    the run before the DDL drops anything."""
+    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "check_anchor_coverage.py")], cwd=ROOT)
+    if r.returncode != 0:
+        raise SeedError(f"the anchor coverage gate refused (exit {r.returncode}); nothing was dropped")
 
 
 def main():
@@ -184,6 +222,8 @@ def main():
     print("=" * 50)
     print("CINDERHAVEN SEED: Full rebuild")
     print("=" * 50)
+    print("\nStep 0: Anchor coverage gate...")
+    coverage_gate()
     dbt_env()  # refuse a mismatched dbt target before anything is dropped
 
     print("\nStep 1: Executing DDL...")

@@ -22,9 +22,9 @@ ROOT = Path(__file__).resolve().parent.parent
 FIX = ROOT / "tests" / "fixtures" / "truth_gate"
 SCAN_ROOTS = ("scripts", "orchestration")
 
-#: List 4: empty here. U5 adds its two scripts/ files that read the vendored
-#: registry, each by path, each with a platform DECISIONS entry.
-IMPORT_BAN_EXEMPT: tuple = ()
+#: List 4: U5's scripts/ files that read the vendored registry, each by path,
+#: each with a platform DECISIONS entry (2026-11-15).
+IMPORT_BAN_EXEMPT: tuple = ("scripts/vendor_realism.py", "scripts/check_anchor_coverage.py")
 
 #: generation/ holds the seeders, the vendored guard and U15's loader, each named.
 GENERATION_NON_SEEDERS = ("prod_guard.py", "realism_bundle.py")
@@ -72,4 +72,5 @@ def test_the_membership_check_fails_on_a_stray_module(tmp_path):
 
 
 def test_the_import_ban_exemption_list_matches_the_logged_decision():
-    assert IMPORT_BAN_EXEMPT == (), "the import-ban exemption list changed: that needs a DECISIONS entry"
+    assert IMPORT_BAN_EXEMPT == ("scripts/vendor_realism.py", "scripts/check_anchor_coverage.py"), \
+        "the import-ban exemption list changed: that needs a DECISIONS entry"

@@ -172,6 +172,23 @@ def test_a_generator_failure_stops_the_run_before_any_later_step_reads_its_schem
     monkeypatch.setattr(seed_all, "run_generator", generator)
     monkeypatch.setattr(seed_all, "run_dbt", lambda *a: ran.append("dbt " + a[0]))
     monkeypatch.setattr(seed_all, "verify_counts", lambda conn: ran.append("verify_counts"))
+    monkeypatch.setattr(seed_all, "coverage_gate", lambda: ran.append("coverage gate"))
     with pytest.raises(RuntimeError, match="partway"):
         seed_all.main()
-    assert ran == ["ddl", "seed_shared", "seed_retailer", "seed_distributor", "seed_dtc", "seed_scan_data"], ran
+    assert ran == ["coverage gate", "ddl", "seed_shared", "seed_retailer", "seed_distributor", "seed_dtc",
+                   "seed_scan_data"], ran
+
+
+def test_a_refusing_coverage_gate_stops_the_run_before_the_ddl(monkeypatch):
+    # Plan U5: exit 1 from scripts/check_anchor_coverage.py stops seed_all.py before anything is dropped.
+    import types
+    import pytest
+    seed_all = _seed_all(monkeypatch)
+    ran = []
+    monkeypatch.setattr(seed_all.subprocess, "run", lambda cmd, **k: (ran.append(Path(cmd[1]).name),
+                                                                     types.SimpleNamespace(returncode=1))[1])
+    monkeypatch.setattr(seed_all, "psycopg2", types.SimpleNamespace(connect=lambda *a, **k: ran.append("connect")))
+    monkeypatch.setattr(seed_all, "execute_ddl", lambda conn: ran.append("ddl"))
+    with pytest.raises(seed_all.SeedError, match="coverage gate refused"):
+        seed_all.main()
+    assert ran == ["check_anchor_coverage.py"], ran

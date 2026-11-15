@@ -209,6 +209,155 @@ Each entry:
   a truth table (reword it); build the needle by concatenation to get past
   the gate.
 
+### 2026-11-15 — Import-ban exemption 1 of 2: `scripts/vendor_realism.py`; the spec gate travels in the bundle
+- **Decision:** `scripts/vendor_realism.py` enters the import ban's list 4
+  (`IMPORT_BAN_EXEMPT`) by path. It writes `vendor/realism/` and reads its
+  MANIFEST to name what a re-vendor moved; it imports no seeder and reads no
+  truth. The bundle also carries the spec gate, `scripts/check_anchors.py`, as
+  `vendor/realism/check_anchors.py`, hashed in the MANIFEST like the registry.
+- **Why:** Plan U5 (spec repo). The script's whole job is the bundle, so it
+  cannot sit outside the ban's reach any other way; an explicit file is the
+  form the U4 doctrine allows. The spec gate travels because U5's first-order
+  arm must compute a row's fingerprint by the spec gate's rule
+  (`figure_fingerprint`), "never a copy that can drift"; a byte-identical copy
+  at the vendored commit, hashed, cannot drift, and the seeder-prints arm reads
+  a row's printed figures through the same module. The plan listed the
+  registry, enums and MANIFEST only; this adds one file to that list.
+- **Scope:** `scripts/vendor_realism.py`, `vendor/realism/`,
+  `tests/test_import_ban.py`, `.gitattributes` (the bundle is stored byte for
+  byte; `-text`).
+- **Do not:** edit any file under `vendor/realism/`; re-vendor instead, from a
+  clean spec checkout whose gate is CLEAN.
+
+### 2026-11-15 — Import-ban exemption 2 of 2: `scripts/check_anchor_coverage.py`; the key table's calls
+- **Decision:** `scripts/check_anchor_coverage.py`, the coverage gate
+  `generation/seed_all.py` runs first, enters list 4 by path. It reads the
+  bundle and the seeders' source, never their runtime values, and never
+  truth. The key table, `seed_config.COVERAGE_KEYS`, lists all 116 numeric
+  module constants: 15 exempt (random seeds, the run seed's stride, two COPY
+  chunk sizes, an exit code), 1 keyed (`EVIDENCE_OUTCOME_WEIGHTS` to A4.07,
+  which prints it "from code"), 100 owed (U9 22, U10 23, U11 29, U13 15,
+  U15 11). Constants typed as a call or as arithmetic on a name
+  (`date(...)`, `0.23 * Q4_FILL_DIP`) are outside the scope, by the spec
+  gate's own reading.
+- **Session calls, for the owner's review (fork policy):**
+  - Owed units follow each unit's Modify lines in the plan; where none names
+    a constant, the unit whose scope covers it (disputes and evidence to
+    U13's filing capacity; chargeback and deduction assessment to U11's
+    A6.22; seeder fill, transit and builds to U10).
+  - copack's three fixture constants (`_COPACK_LINE_RULES`,
+    `COPACK_PRODUCTION_SCHEDULE`, `COPACK_SKU_INVENTORY`, ported in U2) are
+    owed to U15 (runs from U16's daily ledger). No unit names them; they are
+    figures (units per run, stock), so exempt would hide them.
+  - Only one constant is keyed. Single numbers match dozens of rows by
+    coincidence (a 30 or a 0.9 is printed somewhere), so a key is written
+    only where the row governs the constant and prints it.
+- **Pre-window value (owner, 2026-11-15; U18 partition row 1481).** Not a
+  blanket y1 rule, three cases in order: (1) a row that registers a start
+  value (A1.01's $25M, A9.13's opening draw): that governs; (2) a row
+  constant across y1-y3: that constant; (3) a row that trends with no start
+  value: `seed_config.value_in_effect` raises `PreWindowUnruled` naming the
+  row and the reader, and the owner rules it at that first read. A key
+  table `start` must be a value its row prints (seeder-prints arm). No keyed
+  constant is dated today, so nothing reaches case 3 on the platform.
+  Group 11's case-3 reads are listed in spec DECISIONS#pre-window-value.
+- **Reviewed (owner, 2026-11-15):** the session calls above and vendoring the
+  spec gate are accepted.
+- **Scope:** `scripts/check_anchor_coverage.py`, `generation/seed_config.py`
+  (`COVERAGE_KEYS`, `value_in_effect`), `generation/seed_all.py` (step 0),
+  `tests/test_anchor_coverage.py`, `tests/test_import_ban.py`.
+- **Do not:** add a key because a value happens to appear in a row; key a
+  constant to the row that governs it, or owe it.
+
+### 2026-11-15 — U8: the origin-R7 write targets get schema; five owner rulings at U8's start
+- **Decision:** `sql/raw_schema.sql` gains the six write targets plan U8 names
+  (N22, N35, N37, G4, N17, N11), `banner_type` on every account table, and
+  N8's chargeback keys. Schema only: every new table is empty until U13, U10
+  and U11 write it.
+- **Owner rulings (2026-11-15; U18 partition rows routed to U8):**
+  1. *07:170:* N35's year-3 flag is A3.12's monitor output, the monitor
+     extended to a y3 DTC-vs-MAP check. Each `raw.map_violations` row links to
+     its monitor reading and to the DTC order.
+  2. *06:162 against 03:172:* freight, labour allocation, inventory write-off
+     and lost sales reconcile on the ledger alone. N18, N23's labour tables
+     and N27 stay in Phase 4. Unlike Amazon's fees and slotting, the P&L
+     already charges these costs, so no canonical figure is short.
+  3. *`banner_type`:* a seventh value, `independent`, for the small accounts;
+     marketplace accounts carry `marketplace`. The column goes on the
+     marketplace-account table and on each N37 account.
+  4. *A6.23's remaining background streams* (N14's documents, N17's invoices
+     beyond the disasters', G4's fulfilment, claim and fraud tables, the
+     `dtc_customer` base) are out of the window. A6.23's stream list and
+     A6.04's rate pairs are restated to what the window generates (spec side).
+  5. *A11.04's account count and order frequency* stay owed to U13.
+  Already ruled: A11.02's Buy Box share, 95% outside disaster 1 and 0% in the
+  undercut weeks (spec DECISIONS#u18-rulings, 2026-10-20).
+- **Session calls, for the owner's review (fork policy):**
+  - *Value spelling.* The six banner types are stored as the 2026-09-02
+    ruling prints them (`national retailer`, `regional retailer`, `club
+    retailer`, `natural retailer`, `distributor`, `marketplace`), lower case
+    with a space, because the column is rendered text. Each table's CHECK
+    admits only its own values: retailers the four retailer types,
+    distributors `distributor`, marketplace accounts `marketplace`, N37
+    accounts `independent`.
+  - *Table names* follow the plan's staging names and the channel prefixes
+    already in `raw`: `marketplace_accounts`, `amazon_orders`,
+    `amazon_order_lines`, `amazon_fees`, `amazon_buy_box`,
+    `amazon_3p_listings`, `marketplace_events`; `map_policy`,
+    `map_price_monitor`, `map_violations`; `small_accounts`,
+    `small_account_orders`, `_order_lines`, `_shipments`, `_shipment_lines`,
+    `_receipt_lines`, `_remittances`; `shopify_subscriptions`,
+    `shopify_subscription_cancellations`; `invoices`; `store_week_oos`.
+  - *Pre-policy violations are rejected by a key, not a date.* A violation
+    carries its MAP's `(sku, effective_date)` as a foreign key to
+    `map_policy` and must fall on or after it. No window date is typed into
+    the DDL; A3.12's year-3 date reaches it through the policy row.
+  - *N37 gets shipment lines*, which the plan's list leaves out: receipt lines
+    key to them in the retailer pattern, and 05's decomposition test sums
+    shipped per order line, which needs SKU-grain shipments.
+  - *N37 orders carry freight and handling amounts.* 07's week-14 invoice is
+    priced at A3.17's landed band (unit + freight + handling); without them
+    the cascade row has nowhere to land.
+  - *N37's `cancelled_by` takes no CHECK.* 05 codes it `retailer` /
+    `cinderhaven`, and whether the ordering party on a non-retailer order
+    keeps the `retailer` code is 05's open question; U10 rules it.
+  - *`dtc_customer_id` has no foreign key.* Ruling 4 keeps the
+    `dtc_customer` base out of the window, so the converted account carries
+    the Shopify customer key (U11 writes it) without a table to reference.
+  - *Invoices are channel-neutral*, keyed to exactly one shipment (retailer,
+    distributor or N37) by the exactly-one CHECK 05 uses on
+    `po_revisions`: disaster 1's affected invoices are retailer invoices,
+    disaster 2's are N37's.
+  - *The N11 flag is SKU × store × week*, not store × week: the drained
+    stores are out of one SKU, and a store-week flag derives from it.
+  - *Marketplace event types* are A11.02's four: FBA lost and damaged
+    reimbursement, customer return and refund, Buy Box loss, plus disaster
+    2's channel-conflict complaint. Inventory fees are fee rows, not events.
+  - *Empty write targets do not fail the run.* `seed_all.verify_counts`
+    fails on any empty table, so `seed_all.AWAITING_WRITER` names each U8
+    table and the unit that writes it. U13 writes the marketplace accounts,
+    Amazon's orders, lines and fees, and every N37 table. U10 writes the
+    subscriptions. U11 writes the cancellations, the Buy Box readings, the 3P
+    listings, marketplace events, the three MAP tables, invoices and the OOS
+    flag. MAP policy is not named in the plan's writer list, so it goes to
+    U11, whose violations need it. Each writer removes its entries in the
+    change that writes them.
+  - *G4's tables carry the `shopify_` prefix* of the DTC pipeline they sit in.
+    `subscription_id` on `raw.shopify_orders` is not carried into
+    `stg_shopify_orders`, because the plan's file list does not name that
+    model. Group 8's subscription/one-time count reads it when U10 fills it.
+  - *The drop guard's reference stays at `934785e`* (deploy-costing.yml),
+    because production still holds the pre-U8 tables. The harness test's
+    reference is today's DDL, the one its world is built from, and empty write
+    targets are not "populated". Once U12 rebuilds production on this DDL, the
+    guard's column arm would refuse every U8 column unless U12 moves
+    `RAW_REFERENCE_COMMIT` in the same change.
+- **Scope:** `sql/raw_schema.sql`, `generation/seed_config.py`,
+  `generation/seed_shared.py`, the staging, intermediate and mart models plan
+  U8 names, `tests/test_r7_write_targets.py`.
+- **Do not:** give the small-account tier a `raw.retailers` row, or add a
+  vendor chargeback or shortage-claim table for Amazon (A11.01's 3P model).
+
 ## Orchestration
 
 ### 2026-05-13 — Dagster requires --working-directory pointing to orchestration/
@@ -329,6 +478,18 @@ Each entry:
 - **Do not:** Adjust trade spend percentages to force the old target.
   The rates are calibrated to real CPG benchmarks; the target follows
   the data, not the other way around.
+
+### 2026-11-15 — canonical-drift allows "$32.5M" in the vendored registry only (session call)
+
+- **Why:** `fe3baf6` (U5) turned main's canonical-drift job red. `vendor/realism/anchors.yml`
+  prints A1.02's y1 gross as $32.5M; the token collides with the retired pre-reseed
+  scan-revenue form in `reference/canonical_values.json`. The bundle is hashed byte for
+  byte (U5), so the platform cannot edit it. Fixed in `dfbd88f`.
+- **Scope:** `.canonical-allowlist`, one line: `$32.5M @ vendor/realism/anchors.yml`.
+- **Do not:** skip `vendor/realism/` whole, or allow a token across files; each further
+  collision gets its own token-and-file line. Run `scripts/check_canonical_drift.py`
+  before any merge that re-vendors the registry: CI's `ci.yml` does not run it.
+- **Review:** fork-policy call, for the owner's after-the-fact review.
 
 ---
 

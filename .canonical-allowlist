@@ -1,6 +1,11 @@
 # The platform is the canon SOURCE. CINDERHAVEN_CANONICAL.md, DECISIONS.md,
 # HANDOFF.md, canonical_values.*, supersedes.txt, and *-audit.md history docs
-# are auto-excluded by basename. The single remaining exception is a genuine
+# are auto-excluded by basename. One exception is a genuine
 # semantic one: a dbt-test rationale comment that must cite the historical
 # erroneous figures ($458K vs $310K) to explain why the test exists.
 cinderhaven/tests/assert_itemized_deductions_lte_remittance_withheld.sql
+
+# vendor/realism/anchors.yml is a byte-for-byte copy of the spec registry (U5,
+# scripts/vendor_realism.py); the platform cannot edit it. Its "$32.5M" is A1.02's
+# y1 gross, a different figure from the retired pre-reseed scan-revenue token.
+$32.5M @ vendor/realism/anchors.yml
