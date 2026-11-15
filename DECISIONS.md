@@ -479,6 +479,18 @@ Each entry:
   The rates are calibrated to real CPG benchmarks; the target follows
   the data, not the other way around.
 
+### 2026-11-15 — canonical-drift allows "$32.5M" in the vendored registry only (session call)
+
+- **Why:** `fe3baf6` (U5) turned main's canonical-drift job red. `vendor/realism/anchors.yml`
+  prints A1.02's y1 gross as $32.5M; the token collides with the retired pre-reseed
+  scan-revenue form in `reference/canonical_values.json`. The bundle is hashed byte for
+  byte (U5), so the platform cannot edit it. Fixed in `dfbd88f`.
+- **Scope:** `.canonical-allowlist`, one line: `$32.5M @ vendor/realism/anchors.yml`.
+- **Do not:** skip `vendor/realism/` whole, or allow a token across files; each further
+  collision gets its own token-and-file line. Run `scripts/check_canonical_drift.py`
+  before any merge that re-vendors the registry: CI's `ci.yml` does not run it.
+- **Review:** fork-policy call, for the owner's after-the-fact review.
+
 ---
 
 ## Visualization
