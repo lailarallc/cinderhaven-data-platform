@@ -3,12 +3,12 @@
 ```mermaid
 graph LR
     subgraph Sources
-        A1[("cinderhaven-data<br/>(SQLite · 21 tables)")]
-        A2[("Shopify DTC<br/>(generated · 2 tables)")]
+        A1[("One catalog<br/>generation/seed_config.py")]
+        A2[("Generators<br/>generation/seed_*.py · run seed")]
     end
 
     subgraph Ingestion
-        B["Python COPY loader<br/>scripts/ingest_sqlite_to_postgres.py"]
+        B["The one entry point<br/>generation/seed_all.py"]
     end
 
     subgraph "Postgres on Fly.io"
