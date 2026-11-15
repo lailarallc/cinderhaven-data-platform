@@ -761,8 +761,8 @@ CREATE TABLE raw.invoices (
     CHECK (due_date >= invoice_date)
 );
 
--- N11: the out-of-stock flag at SKU x store x week (03:99). truth.outage_episodes
--- (U4) holds which episodes were planted; raw never references truth.
+-- N11: the out-of-stock flag at SKU x store x week (03:99). Which episodes were
+-- planted is quarantined (U4); nothing in raw references it.
 CREATE TABLE raw.store_week_oos (
     sku                     TEXT NOT NULL REFERENCES raw.product_master(sku),
     store_id                TEXT NOT NULL REFERENCES raw.stores(store_id),

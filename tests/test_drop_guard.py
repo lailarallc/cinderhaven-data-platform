@@ -49,8 +49,12 @@ def inputs(db):
         c.execute(scratch)
         c.execute(REF_COLUMNS_SQL, ("dg_reference",))
         ref = c.fetchone()[0]
+        c.execute(REF_COLUMNS_SQL, ("raw",))
+        world = c.fetchone()[0]
     db.rollback()
-    assert len(ref) == 41, f"reference DDL gave {len(ref)} raw tables, expected 41"
+    # The harness world is built from today's DDL, so today's DDL is its reference (production's is
+    # deploy-costing.yml's RAW_REFERENCE_COMMIT). Since U8 the two differ; before it they were one.
+    assert ref == world, f"reference DDL gave {sorted(ref)}, the rebuilt world holds {sorted(world)}"
     expected = [f"raw.{t}" for t in sorted(ref)] + _manifest_relations()
     return {"raw_reference": json.dumps(ref), "expected": ",".join(expected)}
 
@@ -82,8 +86,15 @@ def test_every_populated_generated_table_refuses_by_name_without_force_recreate(
     cur.execute("SELECT n.nspname || '.' || c.relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace "
                 "WHERE c.relkind = 'r' AND (n.nspname IN ('raw', 'costing') "
                 "OR (n.nspname = 'copack' AND c.relname = ANY (%s)))", (list(COPACK_FIVE),))
-    tables = sorted(r[0] for r in cur.fetchall())
-    assert len(tables) == 54, f"expected raw 41 + costing 8 + copack 5, found {len(tables)}"
+    tables = []
+    for (t,) in cur.fetchall():
+        cur.execute(f"SELECT EXISTS (SELECT 1 FROM {t})")
+        if cur.fetchone()[0]:
+            tables.append(t)
+    tables.sort()
+    # U8's write targets are empty until their writers run (seed_all.AWAITING_WRITER): an empty table
+    # is not refused, so the populated set is still the pre-U8 41 raw tables.
+    assert len(tables) == 54, f"expected populated raw 41 + costing 8 + copack 5, found {len(tables)}"
     want = sorted(f"populated: {t} (re-dispatch with force_recreate to drop it)" for t in tables)
     assert sorted(got) == want
 

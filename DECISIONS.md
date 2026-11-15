@@ -346,6 +346,12 @@ Each entry:
     `subscription_id` on `raw.shopify_orders` is not carried into
     `stg_shopify_orders`, because the plan's file list does not name that
     model. Group 8's subscription/one-time count reads it when U10 fills it.
+  - *The drop guard's reference stays at `934785e`* (deploy-costing.yml),
+    because production still holds the pre-U8 tables. The harness test's
+    reference is today's DDL, the one its world is built from, and empty write
+    targets are not "populated". Once U12 rebuilds production on this DDL, the
+    guard's column arm would refuse every U8 column unless U12 moves
+    `RAW_REFERENCE_COMMIT` in the same change.
 - **Scope:** `sql/raw_schema.sql`, `generation/seed_config.py`,
   `generation/seed_shared.py`, the staging, intermediate and mart models plan
   U8 names, `tests/test_r7_write_targets.py`.
