@@ -327,10 +327,11 @@ ORDER BY 1;
 --                      shipped and ordered to the PO's total_units when the
 --                      line aggregate is missing or zero; each rate rounded
 --                      to four places, then x100.
---   Not produced, and so failing verify_canonical.py until a producer is
---   named: trade.all_in_total.trailing_36m (3 x the annual all-in gives
---   10669827.87 against the yml's .88; no definition tried reproduces it) and
---   revenue.defect_sku_ttm (PDHA's R validators define the 27-SKU set).
+--   trade.all_in_total.trailing_36m
+--                      3 x (structural + operational waste): 10669827.87.
+--                      The yml held .88, which no definition reproduces; the
+--                      producer's value replaced it (owner, 2026-11-15).
+--   revenue.defect_sku_ttm is the next statement.
 WITH fp(period, d0, d1) AS (VALUES
   ('cy2023',       DATE '2023-01-01', DATE '2023-12-31'),
   ('cy2024',       DATE '2024-01-01', DATE '2024-12-31'),
@@ -401,6 +402,7 @@ SELECT 'revenue.retail_scan.ttm_through_2025_12_27|'||(
 UNION ALL SELECT 'trade.structural_annual.trailing_52w|'||ROUND(struct, 2)::text FROM tr
 UNION ALL SELECT 'trade.op_waste_annual.trailing_365d|'||ROUND(waste, 2)::text FROM tr
 UNION ALL SELECT 'trade.all_in_annual.trailing_52w|'||ROUND(struct + waste, 2)::text FROM tr
+UNION ALL SELECT 'trade.all_in_total.trailing_36m|'||ROUND(3 * (struct + waste), 2)::text FROM tr
 UNION ALL SELECT 'trade.structural_rate_pct.trailing_52w|'||ROUND(100 * struct / rev, 2)::text FROM tr
 UNION ALL SELECT 'trade.op_waste_rate_pct.trailing_52w|'||ROUND(100 * waste / rev, 2)::text FROM tr
 UNION ALL SELECT 'trade.all_in_rate_pct.trailing_52w|'||ROUND(100 * (struct + waste) / rev, 2)::text FROM tr
@@ -441,3 +443,51 @@ SELECT 'lifecycle.wholesale_cents_per_dollar.all_time|'||(SELECT ROUND(100.0 *
   ((SELECT SUM(net_amount) FROM public_marts.fct_retailer_payments) + (SELECT SUM(net_amount) FROM public_marts.fct_distributor_payments))
   / ((SELECT SUM(gross_amount) FROM public_marts.fct_retailer_payments) + (SELECT SUM(gross_amount) FROM public_marts.fct_distributor_payments)), 2))::text
 ;
+
+-- ── DEFECT-SKU TTM, PORTED FROM PDHA (U19, 2026-11-15) ─────────────
+-- product-data-health-audit's definition (R/02_build_frames.R issue_count,
+-- R/barcode_validators.R), ported so the platform produces its own canon
+-- figure. A SKU is a defect SKU when it fails >= 1 of seven checks: GTIN-14
+-- check digit (mod-10, weights 3,1 from the left over the 13-digit body);
+-- UPC check digit (12 digits: weights 3,1 over 11; 13 digits: 1,3 over 12);
+-- case weight missing; any case dimension missing; country_of_origin missing
+-- or ''; brand_owner missing or ''; case weight more than 20% off
+-- unit_weight_lbs x case_pack_qty (judged only when all three are present; a
+-- zero product counts as off when the case weight is not zero, as R's Inf
+-- does). Summed over week_ending > MAX(week_ending) - 365 days. Reproduced
+-- on the harness 2026-11-15: 27 of 50 SKUs, 19487913.16.
+WITH pm AS (
+  SELECT sku, gtin14::text AS g, upc::text AS u, case_weight_lbs AS cw, unit_weight_lbs AS uw, case_pack_qty AS cpq,
+         case_length_in, case_width_in, case_height_in, country_of_origin, brand_owner
+  FROM raw.product_master
+),
+chk AS (
+  SELECT pm.*,
+         (SELECT (10 - SUM(substr(pm.g, i, 1)::int
+                           * CASE WHEN length(pm.g) = 13 THEN (CASE WHEN i % 2 = 1 THEN 1 ELSE 3 END)
+                                  ELSE (CASE WHEN i % 2 = 1 THEN 3 ELSE 1 END) END) % 10) % 10
+            = substr(pm.g, length(pm.g), 1)::int
+          FROM generate_series(1, length(pm.g) - 1) i
+          WHERE pm.g ~ '^[0-9]{14}$') AS gtin_ok,
+         (SELECT (10 - SUM(substr(pm.u, i, 1)::int
+                           * CASE WHEN length(pm.u) = 13 THEN (CASE WHEN i % 2 = 1 THEN 1 ELSE 3 END)
+                                  ELSE (CASE WHEN i % 2 = 1 THEN 3 ELSE 1 END) END) % 10) % 10
+            = substr(pm.u, length(pm.u), 1)::int
+          FROM generate_series(1, length(pm.u) - 1) i
+          WHERE pm.u ~ '^[0-9]{12,13}$') AS upc_ok
+  FROM pm
+),
+defect AS (
+  SELECT sku FROM chk
+  WHERE NOT COALESCE(gtin_ok, false) OR NOT COALESCE(upc_ok, false)
+     OR cw IS NULL
+     OR case_length_in IS NULL OR case_width_in IS NULL OR case_height_in IS NULL
+     OR COALESCE(country_of_origin, '') = '' OR COALESCE(brand_owner, '') = ''
+     OR (uw IS NOT NULL AND cpq IS NOT NULL AND
+         CASE WHEN uw * cpq = 0 THEN cw <> 0
+              ELSE abs(cw - uw * cpq) / (uw * cpq) > 0.20 END)
+)
+SELECT 'revenue.defect_sku_ttm.ttm_through_2025_12_27|'||(
+  SELECT SUM(dollars_sold) FROM raw.scan_data
+  WHERE sku IN (SELECT sku FROM defect)
+    AND week_ending > (SELECT MAX(week_ending) FROM raw.scan_data) - 365)::numeric(16,2);

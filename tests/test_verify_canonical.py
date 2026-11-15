@@ -107,18 +107,19 @@ def test_extra_gather_keys_are_listed_not_failed(tmp_path, monkeypatch, capsys):
     assert "gathered, not documented (not a failure): volume.units_scan.cy2025" in capsys.readouterr().out
 
 
-#: Documented figures canonical_gather.sql does not produce, each named in the gather's header with why.
-UNPRODUCED = {"trade.all_in_total.trailing_36m", "revenue.defect_sku_ttm.ttm_through_2025_12_27"}
-
-
 @pytest.mark.db
-def test_the_gather_produces_every_documented_figure_but_the_named_two(db):
+def test_the_gather_produces_every_documented_figure(db):
     import harness
 
     lines = vc.gather_from_db(harness.dsn(harness.harness_values()))
     live = vc.parse_gather(lines)
     docs = vc.documented(vc.CANONICAL_YAML.read_text(encoding="utf-8"))
-    assert set(docs) - set(live) == UNPRODUCED
+    assert set(docs) - set(live) == set()
+
+
+def test_the_history_block_is_not_a_figure():
+    yml = YML.replace("supersedes:", "history:\n  - {figure: universe.skus_total.all_time, was: 49, now: 50}\nsupersedes:")
+    assert set(vc.documented(yml)) == set(vc.documented(YML))
 
 
 def test_the_gather_sql_splits_into_statements():

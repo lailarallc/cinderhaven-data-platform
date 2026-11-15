@@ -1,6 +1,6 @@
 """Verify reference/canonical_values.yml against the world, and emit the two artifacts consumers vendor.
 
-Every numeric key in the yml (outside `meta` and `supersedes`) is a documented figure. Each must have a producer,
+Every numeric key in the yml (outside `meta`, `supersedes` and `history`) is a documented figure. Each must have a producer,
 a `metric.basis.period|value` line from sql/canonical_gather.sql, and each is compared at the precision the yml
 stores it: the live value, rounded half-up to the yml literal's decimal places, must equal it exactly. There is no
 tolerance and no hand-kept list of values (plan U19: "every documented figure read from the yml; every silent skip
@@ -42,7 +42,7 @@ for _stream in (sys.stdout, sys.stderr):
 ROOT = Path(__file__).resolve().parent.parent
 CANONICAL_YAML = ROOT / "reference" / "canonical_values.yml"
 GATHER_SQL = ROOT / "sql" / "canonical_gather.sql"
-NOT_FIGURES = ("meta", "supersedes")
+NOT_FIGURES = ("meta", "supersedes", "history")
 
 if not CANONICAL_YAML.exists():
     print(f"canonical file not found at {CANONICAL_YAML} -- a hard failure, not a skip.", file=sys.stderr)

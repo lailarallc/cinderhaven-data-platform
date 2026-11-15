@@ -464,10 +464,10 @@ they tracked the denominator automatically: 11.00% / 9.83% / 1.17% measured.
 | All-in trade cost (annualized) | $3.56M/yr | Structural trade + operational waste excl promo_billback ($3,556,609.29 measured 2026-07-30) |
 | All-in trade cost (trailing-52w) | $3.56M/yr | Same methodology, trailing 52-week window |
 | All-in trade rate | 11.0% | Of trailing-52w scan revenue ($32.32M verified) |
-| All-in trade cost (36mo) | $10.7M | 2023-01-01 to 2026-01-02 ($10,669,827.88 measured 2026-07-30) |
+| All-in trade cost (36mo) | $10.7M | 3 × the annual all-in ($10,669,827.87; the .88 recorded 2026-07-30 reproduced under no definition and took its producer's value 2026-11-15) |
 | Structural trade (36mo) | $9.5M | AVG(trade_spend_pct) × trailing-52w scan revenue per channel |
 | Operational waste (36mo) | $1.14M | 36mo deductions excl promo_billback |
-| Operational waste (annual) | ~$380K/yr | Recoverable via disputes |
+| Operational waste (annual) | ~$380K/yr | The 36-month total ÷ 3 ($379,558.78). Recoverable via disputes. Keyed `trade.op_waste_annual.trailing_365d`; the label is wrong and the rename waits for U12's relock |
 | Structural trade (annual) | ~$3.18M/yr | Rate × trailing-52w channel revenue ($3,177,050.51 measured) |
 | Structural trade rate | 9.8% | Of trailing-52w scan revenue ($32.32M verified) |
 | Operational waste rate | 1.2% | Of trailing-52w scan revenue ($32.32M verified) |
@@ -481,7 +481,7 @@ they tracked the denominator automatically: 11.00% / 9.83% / 1.17% measured.
 All-in trade cost = structural trade + operational waste (excl promo_billback).
 
 - **Structural trade** = AVG(trade_spend_pct) × trailing-52w scan revenue per channel.
-- **Operational waste** = trailing-365 deductions excluding promo_billback (already captured in structural rates — including it would double-count).
+- **Operational waste** = the 36-month total of deductions excluding promo_billback, ÷ 3 (not a trailing-365-day sum, whatever the key's label says) (already captured in structural rates — including it would double-count).
 - **Chargebacks** (separate table) overlap with deduction types and are NOT added to all-in.
 - **Recoverable layer** = operational waste only (~$380K/yr). The $9.6M structural trade is contracted, not recoverable via disputes.
 
@@ -1123,7 +1123,7 @@ Nothing is wired to these tables. No tool, mart or dbt model reads the
 | $826K silent write-offs | Undisputed deduction dollars | Regenerated 2026-07-30: $877,620.27 (10,906 undisputed rows) |
 | $32.8M as the trade-rate denominator | Pre-drift trailing-52w scan figure the 2026-06 trade block was rated on | Re-rated 2026-07-30 on the verified $32,323,139.62; rates unchanged (rate-card-driven), dollar figures re-measured |
 | $3.6M/yr all-in (as an exact figure) | Pre-re-rate all-in dollar | Measured $3,556,609.29 — "~$3.6M/yr" phrasing remains approved |
-| $11.1M all-in trade (36mo) | Pre-re-rate 36-month total | Measured $10,669,827.88 → "$10.7M" |
+| $11.1M all-in trade (36mo) | Pre-re-rate 36-month total | Measured $10,669,827.87 → "$10.7M" (recorded .88 until 2026-11-15) |
 | $9.6M structural (36mo) | Pre-re-rate structural total | Measured $9,531,151.53 → "$9.5M" |
 
 ### SUPERSEDES — added 2026-07-29
