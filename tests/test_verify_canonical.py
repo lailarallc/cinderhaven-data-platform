@@ -23,7 +23,7 @@ revenue:
   retail_scan:
     cy2025: 32323139.62
 supersedes:
-  - {token: '$1.65M', reason: x}
+  - {token: 'a retired fixture token', reason: x}
 """
 GATHER = """--- DATA WINDOWS ---
 universe.skus_total.all_time|50
