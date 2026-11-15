@@ -375,6 +375,9 @@ Each entry:
   because canonical-drift scans `vendor/`. A spec checkout without the plan
   is refused. Re-vendored at spec `6b5a663` (gate CLEAN; `anchors.yml`
   moved, for A6.04 and A6.23). The coverage gate is CLEAN.
+- **Reviewed (owner, 2026-11-15):** the `unit_status.json` call is accepted.
+  This re-vendor merged under the standing rule: a vendored copy of a merged
+  spec commit is not a registry change (entry above).
 - **Scope:** `generation/seed_all.py`, `scripts/vendor_realism.py`,
   `vendor/realism/`, `tests/test_awaiting_writer.py`,
   `tests/test_vendor_realism.py`.
