@@ -10,14 +10,18 @@ Arms run here, each a failure when it does not hold:
   3. Every cited file:line exists in the repo's working copy and names the table it is cited for. A repo with no
      working copy under the fleet root fails by name.
   4. Every canon key the map's "## Canon keys read" lists exists in this repo's reference/canonical_values.json.
+  5. With --warehouse: every listed read and field resolves in the harness instance's information_schema, or is on
+     the map's break list (field `-` for the whole table) with its reader and U12 repoint; and every break-list
+     entry is a table row the instance really breaks, so a fixed read cannot stay listed.
 
-Not built yet (U19a, the next slice): the warehouse arm, each listed read and field resolved in the
-information_schema of the warehouse it is pointed at, or on the break list with its reader and U12 repoint; and the
-page-population arm. Until then this check says nothing about the warehouse.
+The warehouse arm connects to the harness's local test instance only, through tests/harness.py's values and
+scripts/prod_guard.py; it takes no DSN, so it cannot be pointed at production (owner, 2026-11-14: production only
+through the cinderhaven_ci_reader workflow). Without --warehouse it reads code and the vendored canon only, and says
+the warehouse went unchecked.
 
-    python scripts/check_read_map.py [--read-map PATH] [--fleet-root DIR] [--canon PATH]
+Not built yet: the page-population arm.
 
-It reads code and the vendored canon only, never a credential or a database.
+    python scripts/check_read_map.py [--read-map PATH] [--fleet-root DIR] [--canon PATH] [--warehouse]
 """
 from __future__ import annotations
 
@@ -147,12 +151,79 @@ def check_canon(keys: list[tuple[str, str]], canon: dict) -> list[str]:
     return bad
 
 
-def check(read_map: Path, fleet_root: Path, canon_path: Path) -> list[str]:
+BREAK_HEADER = "| Repo | Read | Field | Broken by | U12 repoint |"
+
+
+def parse_breaks(text: str) -> tuple[list[dict], list[str]]:
+    """The break list's entries, and the failures parsing them."""
+    lines = _section(text, "The table").split("\n")
+    if BREAK_HEADER not in lines:
+        return [], [f"the read map's table section has no break list with the header {BREAK_HEADER!r}"]
+    out, bad = [], []
+    for line in lines[lines.index(BREAK_HEADER) + 2:]:
+        if not line.startswith("|"):
+            break
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) != 5 or not all(cells):
+            bad.append(f"break-list row needs five filled cells: {line!r}")
+            continue
+        out.append(dict(repo=cells[0], read=cells[1], field=cells[2], by=cells[3], repoint=cells[4]))
+    return out, bad
+
+
+def check_warehouse(rows: list[dict], breaks: list[dict], catalog: dict[tuple[str, str], set[str]]) -> list[str]:
+    """Each read and field against the instance's catalog, (schema, table) -> columns; the break list both ways."""
+    listed = {(b["repo"], b["read"], b["field"]) for b in breaks}
+    broken, bad = set(), []
+    for r in rows:
+        if r["read"] == NONE:
+            continue
+        cols = catalog.get(tuple(r["read"].split(".")))
+        if cols is None:
+            broken.add((r["repo"], r["read"], NONE))
+            if (r["repo"], r["read"], NONE) not in listed:
+                bad.append(f"{r['repo']}: {r['read']} is not in the instance and not on the break list")
+            continue
+        for f in r["fields"]:
+            if f not in cols:
+                broken.add((r["repo"], r["read"], f))
+                if (r["repo"], r["read"], f) not in listed:
+                    bad.append(f"{r['repo']}: {r['read']}.{f} is not in the instance and not on the break list")
+    for b in sorted(listed - broken):
+        bad.append(f"break list names {b[0]}: {b[1]} field {b[2]}, which the instance does not break")
+    return bad
+
+
+def load_catalog() -> dict[tuple[str, str], set[str]]:
+    """The harness instance's columns. tests/harness.py supplies the values and runs prod_guard first."""
+    sys.path.insert(0, str(ROOT / "tests"))
+    import harness
+    import psycopg2
+
+    vals = harness.harness_values()
+    harness.guard(vals)
+    conn = psycopg2.connect(harness.dsn(vals), connect_timeout=5)
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT table_schema, table_name, column_name FROM information_schema.columns")
+            out: dict[tuple[str, str], set[str]] = {}
+            for s, t, c in cur.fetchall():
+                out.setdefault((s, t), set()).add(c)
+    finally:
+        conn.close()
+    return out
+
+
+def check(read_map: Path, fleet_root: Path, canon_path: Path,
+          catalog: dict[tuple[str, str], set[str]] | None = None) -> list[str]:
     text = read_map.read_text(encoding="utf-8")
     rows, bad = parse_table(text)
     bad += check_classes(rows, parse_list(text))
     bad += check_where(rows, fleet_root)
     bad += check_canon(canon_keys(text), json.loads(canon_path.read_text(encoding="utf-8")))
+    if catalog is not None:
+        breaks, bad_breaks = parse_breaks(text)
+        bad += bad_breaks + check_warehouse(rows, breaks, catalog)
     return bad
 
 
@@ -161,13 +232,17 @@ def main(argv: list[str]) -> int:
     p.add_argument("--read-map", type=Path, default=READ_MAP)
     p.add_argument("--fleet-root", type=Path, default=FLEET_ROOT)
     p.add_argument("--canon", type=Path, default=CANON)
+    p.add_argument("--warehouse", action="store_true", help="also resolve every read in the harness instance")
     args = p.parse_args(argv)
     for path in (args.read_map, args.canon):
         if not path.is_file():
             print(f"not found: {path}", file=sys.stderr)
             return 2
-    failures = check(args.read_map, args.fleet_root, args.canon)
-    print(f"read map: {args.read_map}\narms run: table, classes, file:line, canon keys (warehouse arm not built yet)")
+    catalog = load_catalog() if args.warehouse else None
+    failures = check(args.read_map, args.fleet_root, args.canon, catalog)
+    arms = "table, classes, file:line, canon keys"
+    arms += ", warehouse (harness instance)" if args.warehouse else "; warehouse NOT checked (pass --warehouse)"
+    print(f"read map: {args.read_map}\narms run: {arms}; page population not built")
     print(f"{len(failures)} finding(s)")
     for f in failures:
         print(f"  FAIL {f}")

@@ -36,8 +36,15 @@ A + C = 1 + 1 names.
 | live-repo | A | live | public_marts.fct_scan_data | sku, units_sold | app/db.py:2 |
 | print-repo | C | live | — | — | — |
 
+**Break list.**
+
+| Repo | Read | Field | Broken by | U12 repoint |
+|---|---|---|---|---|
+
 ## Per repo
 """
+CATALOG = {("public_marts", "fct_scan_data"): {"sku", "units_sold", "store_id"}}
+BREAK_ROW = "| Repo | Read | Field | Broken by | U12 repoint |\n|---|---|---|---|---|\n"
 CANON = {"revenue": {"combined_invoiced": {"cy2025": 1.0}}}
 
 
@@ -50,12 +57,43 @@ def _fleet(tmp_path: Path) -> Path:
     return fleet
 
 
-def _run(tmp_path: Path, text: str = MAP, canon: dict = CANON) -> list[str]:
+def _run(tmp_path: Path, text: str = MAP, canon: dict = CANON, catalog: dict | None = None) -> list[str]:
     m = tmp_path / "map.md"
     m.write_text(text, encoding="utf-8")
     c = tmp_path / "canon.json"
     c.write_text(json.dumps(canon), encoding="utf-8")
-    return crm.check(m, _fleet(tmp_path), c)
+    return crm.check(m, _fleet(tmp_path), c, catalog)
+
+
+def test_the_break_anchor_is_unique():
+    assert MAP.count(BREAK_ROW) == 1
+
+
+def test_the_warehouse_arm_passes_when_every_read_and_field_resolves(tmp_path):
+    assert _run(tmp_path, catalog=CATALOG) == []
+
+
+@pytest.mark.parametrize("catalog,breaks,expect", [
+    ({}, "", "public_marts.fct_scan_data is not in the instance and not on the break list"),
+    ({("public_marts", "fct_scan_data"): {"sku"}}, "", "public_marts.fct_scan_data.units_sold is not in the instance"),
+    (CATALOG, "| live-repo | public_marts.fct_scan_data | — | U9 | x |\n", "which the instance does not break"),
+    ({}, "| live-repo | public_marts.fct_scan_data | — | U9 |\n", "break-list row needs five filled cells"),
+])
+def test_the_warehouse_arm_fails(tmp_path, catalog, breaks, expect):
+    failures = _run(tmp_path, MAP.replace(BREAK_ROW, BREAK_ROW + breaks), catalog=catalog)
+    assert any(expect in f for f in failures), failures
+
+
+@pytest.mark.parametrize("catalog,breaks", [
+    ({}, "| live-repo | public_marts.fct_scan_data | — | U9 | dim_x |\n"),
+    ({("public_marts", "fct_scan_data"): {"sku"}}, "| live-repo | public_marts.fct_scan_data | units_sold | U9 | y |\n"),
+])
+def test_a_listed_break_passes(tmp_path, catalog, breaks):
+    assert _run(tmp_path, MAP.replace(BREAK_ROW, BREAK_ROW + breaks), catalog=catalog) == []
+
+
+def test_without_a_catalog_the_warehouse_arm_does_not_run(tmp_path):
+    assert _run(tmp_path, MAP.replace(BREAK_ROW, BREAK_ROW + "| live-repo | x.y | — | U9 | z |\n")) == []
 
 
 def test_a_map_whose_table_list_citations_and_keys_agree_passes(tmp_path):
