@@ -229,6 +229,39 @@ Each entry:
 - **Do not:** edit any file under `vendor/realism/`; re-vendor instead, from a
   clean spec checkout whose gate is CLEAN.
 
+### 2026-11-15 — Import-ban exemption 2 of 2: `scripts/check_anchor_coverage.py`; the key table's calls
+- **Decision:** `scripts/check_anchor_coverage.py`, the coverage gate
+  `generation/seed_all.py` runs first, enters list 4 by path. It reads the
+  bundle and the seeders' source, never their runtime values, and never
+  truth. The key table, `seed_config.COVERAGE_KEYS`, lists all 116 numeric
+  module constants: 15 exempt (random seeds, the run seed's stride, two COPY
+  chunk sizes, an exit code), 1 keyed (`EVIDENCE_OUTCOME_WEIGHTS` to A4.07,
+  which prints it "from code"), 100 owed (U9 22, U10 23, U11 29, U13 15,
+  U15 11). Constants typed as a call or as arithmetic on a name
+  (`date(...)`, `0.23 * Q4_FILL_DIP`) are outside the scope, by the spec
+  gate's own reading.
+- **Session calls, for the owner's review (fork policy):**
+  - Owed units follow each unit's Modify lines in the plan; where none names
+    a constant, the unit whose scope covers it (disputes and evidence to
+    U13's filing capacity; chargeback and deduction assessment to U11's
+    A6.22; seeder fill, transit and builds to U10).
+  - copack's three fixture constants (`_COPACK_LINE_RULES`,
+    `COPACK_PRODUCTION_SCHEDULE`, `COPACK_SKU_INVENTORY`, ported in U2) are
+    owed to U15 (runs from U16's daily ledger). No unit names them; they are
+    figures (units per run, stock), so exempt would hide them.
+  - Only one constant is keyed. Single numbers match dozens of rows by
+    coincidence (a 30 or a 0.9 is printed somewhere), so a key is written
+    only where the row governs the constant and prints it.
+- **Open, owner:** the value a pre-window period takes (U18 partition row
+  1481, a ruling at U5's start). `seed_config.value_in_effect` refuses a
+  pre-window date until it is ruled; no keyed constant is dated today, so
+  nothing reaches it.
+- **Scope:** `scripts/check_anchor_coverage.py`, `generation/seed_config.py`
+  (`COVERAGE_KEYS`, `value_in_effect`), `generation/seed_all.py` (step 0),
+  `tests/test_anchor_coverage.py`, `tests/test_import_ban.py`.
+- **Do not:** add a key because a value happens to appear in a row; key a
+  constant to the row that governs it, or owe it.
+
 ## Orchestration
 
 ### 2026-05-13 — Dagster requires --working-directory pointing to orchestration/

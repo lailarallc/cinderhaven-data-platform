@@ -1,5 +1,7 @@
 """Generate the warehouse: the one entry point (plan U2).
 
+0. The coverage gate (plan U5), scripts/check_anchor_coverage.py: exit 1
+   stops the run before anything is dropped.
 1. DDL, every schema this run owns, in one place: drop the three public_*
    dbt schemas; raw (drops with CASCADE); truth (U4); costing; copack's five
    tables (table-scoped: the schema and that repo's snapshot tables stay).
@@ -178,12 +180,22 @@ def verify_counts(conn):
         raise SeedError(f"empty after a full run: {', '.join(empty)}")
 
 
+def coverage_gate():
+    """Plan U5: the realism gate's teeth. It reads the vendored registry and the seeders' source; exit 1 stops
+    the run before the DDL drops anything."""
+    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "check_anchor_coverage.py")], cwd=ROOT)
+    if r.returncode != 0:
+        raise SeedError(f"the anchor coverage gate refused (exit {r.returncode}); nothing was dropped")
+
+
 def main():
     start = time.time()
 
     print("=" * 50)
     print("CINDERHAVEN SEED: Full rebuild")
     print("=" * 50)
+    print("\nStep 0: Anchor coverage gate...")
+    coverage_gate()
     dbt_env()  # refuse a mismatched dbt target before anything is dropped
 
     print("\nStep 1: Executing DDL...")
