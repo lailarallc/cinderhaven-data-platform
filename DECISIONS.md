@@ -491,6 +491,20 @@ Each entry:
   before any merge that re-vendors the registry: CI's `ci.yml` does not run it.
 - **Review:** fork-policy call, for the owner's after-the-fact review.
 
+### 2026-11-15 — A re-vendor of a merged spec commit is not a registry change (owner)
+
+- **Ruling (owner, 2026-11-15):** "registry values are never covered" (the merge rule, global
+  CLAUDE.md) means changes to the spec's rows or signatures. A vendored copy of a spec commit
+  already on spec main, verified by hash against its MANIFEST, is not a registry change and
+  merges under the standing rule.
+- **Why:** the copy changes nothing; the MANIFEST's sha256 proves it is the same registry.
+- **Scope:** `vendor/realism/`, `scripts/vendor_realism.py`; the U5 merge (`fe3baf6`) and
+  `u8-followups` (spec `6b5a663`).
+- **Do not:** merge a re-vendor of a spec commit that is not on spec main, or one whose files
+  do not hash to that commit; those still need the owner's word. A change to a spec row or
+  signature is never covered.
+- **Owner:** Shawn, ruled 2026-11-15.
+
 ---
 
 ## Visualization
