@@ -1,0 +1,41 @@
+# Enum values for reference/anchors.yml, read by scripts/check_anchors.py.
+#
+# This file exists because DECISIONS.md 2026-09-04 ("Prose never carries a value
+# the registry owns") moved the enums out of the registry's header comment. A
+# comment block is invisible to the gate that reads the registry, and the header
+# had already declared an enum conflict two days after the conflict was resolved.
+# The header keeps the prose that explains WHY a value is what it is, and points
+# here for the values themselves.
+
+tier: [A, B, D]
+
+status: [candidate, decided, derived, practitioner, pinned]
+
+independence:
+  [sec-filing, government, academic, company-published, trade-association,
+   aggregator, vendor, none]
+
+evidence_class:
+  [published-benchmark, retailer-published, practitioner-estimate,
+   derived-from-adjacent, owner-judgment]
+
+unit:
+  [usd-curve, ratio, pct, pct-mix, count, date-range, definition, formula]
+
+# The Tier A gate is membership in this subset -- not a sixth evidence_class
+# value. Source strength is carried separately by `independence`, which never
+# satisfies the gate.
+published_subset: [published-benchmark, retailer-published]
+
+# Units that must carry a non-null `denominator`. Structural, not a regex.
+denominator_required: [pct, pct-mix, ratio]
+
+# Units that make a Tier D row a DEFINITION rather than a magnitude. A
+# definition upstream is satisfied by its decision_ref existing; a numeric one
+# additionally needs owner_signed before it can be pinned or satisfy a
+# dependency.
+definition_units: [definition, formula, date-range]
+
+# Upstream IDs that are package items rather than anchors, and so resolve
+# outside this registry. The header permits these in `depends_on`.
+package_item_pattern: '^[NRGU][0-9]+$'

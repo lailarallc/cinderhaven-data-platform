@@ -1,0 +1,324 @@
+{
+  "files": {
+    "anchor_enums.yml": "45f4c01ef4fdd08f492fb77deb76c61e3dc2f619306a82f833117aa3723df250",
+    "anchors.yml": "f55e3c41bd06768cab52a387c1f7f929bfd894262836519ccb2b689ef3ef0b08",
+    "check_anchors.py": "504372805d95c1a5fed299e431327724bb73c527c9d1ebb31ca2d7d2d9fd3c6b"
+  },
+  "spec_commit": "f98029374296ce680d4ccdb66380ff53dba8a5d7",
+  "spec_gate": {
+    "blocking_findings": 0,
+    "checks": [
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "schema and enums"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "denominators on proportions"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "depends_on resolves"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "no derivation cycles"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "Tier A gate"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "Tier A primary is addressed and not a vendor"
+      },
+      {
+        "findings": 1,
+        "level": "INFO",
+        "name": "Tier A rows resting on owner signature, no outside reviewer"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "every pinned row stands on a U14 record that holds"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "every row in U14's set has its record, and every two_endpoint record states both endpoints"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "the rows flagged first_order are R16's ruled rows, by id"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "every first-order row is owner-signed at its current fingerprint, verified_by empty (U17)"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "Tier D carries its reasoning"
+      },
+      {
+        "findings": 0,
+        "level": "INFO",
+        "name": "numeric Tier D rows not yet owner-signed, so not pinnable"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "sourcing-note slugs resolve"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "decision_ref targets exist"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "line endings and whitespace"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "worklist parity"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "worklist header total equals its tables"
+      },
+      {
+        "findings": 0,
+        "level": "INFO",
+        "name": "worklist rows with no registry row yet, by group"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "depends_on completeness"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "the depends_on ratchet only shrinks"
+      },
+      {
+        "findings": 1,
+        "level": "INFO",
+        "name": "depends_on debt carried in reference/depends_on_exceptions.yml"
+      },
+      {
+        "findings": 0,
+        "level": "WARN",
+        "name": "one value per named quantity"
+      },
+      {
+        "findings": 0,
+        "level": "WARN",
+        "name": "no retired figure reappears live"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "a figure one row credits to another is printed there"
+      },
+      {
+        "findings": 0,
+        "level": "WARN",
+        "name": "credits owed to a later closure unit"
+      },
+      {
+        "findings": 27,
+        "level": "INFO",
+        "name": "a figure another row retired, printed beside its id"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "generator constants mirror the registry"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "every generator constant that names a row publishes its value there"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "every typed generator constant names a row or states why it does not"
+      },
+      {
+        "findings": 0,
+        "level": "WARN",
+        "name": "generator constants owed to a closure unit: named, dated to the unit, not yet printed"
+      },
+      {
+        "findings": 1,
+        "level": "WARN",
+        "name": "no generator constant is published only by a row's history"
+      },
+      {
+        "findings": 21,
+        "level": "INFO",
+        "name": "generator constants exempt from the mirror, each with its reason"
+      },
+      {
+        "findings": 28,
+        "level": "INFO",
+        "name": "generator constants (or elements) computed from other values: the figure checks cover them, this check covers what is typed"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "no typed value survives a one-unit drift: each is printed as itself"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "doc / registry / generator agree"
+      },
+      {
+        "findings": 1,
+        "level": "INFO",
+        "name": "survivability_metric set (A10.01's enumeration, read from the flag)"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "no two rows share one object (no YAML aliases)"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "a signed row still publishes the figures it was signed on"
+      },
+      {
+        "findings": 0,
+        "level": "INFO",
+        "name": "signatures carried forward: value reprinted at a coarser or finer precision (DECISIONS#signature-carry, #u17-start)"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "closed forms agree with a draw of their mechanism"
+      },
+      {
+        "findings": 0,
+        "level": "INFO",
+        "name": "closed forms the draw cannot resolve"
+      },
+      {
+        "findings": 5,
+        "level": "WARN",
+        "name": "every closed form carries a draw"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "doc / registry / generator agree, group 10"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "the door plan is the minimum that clears A5.28's floor"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "the equity call finances the y3 funding gap"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "the dates U16's daily ledger derives are the dates the rows print"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "the daily ledger's flows reconcile to ledger()'s at $1K"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "every daily balance before A10.19's note is the line's own, bit for bit"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "the daily ledger pays on the AP runs, and its largest outflows fall there"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "a part-held run holds the newest invoices and only when the line is spent"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "group 9's doc prints the AP-run schedule the daily ledger pays"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "every printed P&L bridge subtracts to its own totals at printed precision (DECISIONS#u17-start)"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "the owner's review packet prints only what its rows and the generators print (DECISIONS#u17-start)"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "the small-account channel is inside the wholesale roll-up"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "no card-network program reaches its floor at any corner of A8.21's band"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "slotting stays outside A4.05's types and A4.01's and A4.14's rates"
+      },
+      {
+        "findings": 1186,
+        "level": "INFO",
+        "name": "figures printed past the print rule's precision (DECISIONS#print-rule)"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "doc / registry / generator agree, group 11"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "locators anchor on sentence content only"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "catalogue table agrees with its prose and A2.04"
+      },
+      {
+        "findings": 0,
+        "level": "BLOCK",
+        "name": "the figure checks read the generators only through outputs(), and read all it prints"
+      }
+    ],
+    "clean": true
+  }
+}

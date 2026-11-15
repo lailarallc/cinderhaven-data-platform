@@ -209,6 +209,26 @@ Each entry:
   a truth table (reword it); build the needle by concatenation to get past
   the gate.
 
+### 2026-11-15 — Import-ban exemption 1 of 2: `scripts/vendor_realism.py`; the spec gate travels in the bundle
+- **Decision:** `scripts/vendor_realism.py` enters the import ban's list 4
+  (`IMPORT_BAN_EXEMPT`) by path. It writes `vendor/realism/` and reads its
+  MANIFEST to name what a re-vendor moved; it imports no seeder and reads no
+  truth. The bundle also carries the spec gate, `scripts/check_anchors.py`, as
+  `vendor/realism/check_anchors.py`, hashed in the MANIFEST like the registry.
+- **Why:** Plan U5 (spec repo). The script's whole job is the bundle, so it
+  cannot sit outside the ban's reach any other way; an explicit file is the
+  form the U4 doctrine allows. The spec gate travels because U5's first-order
+  arm must compute a row's fingerprint by the spec gate's rule
+  (`figure_fingerprint`), "never a copy that can drift"; a byte-identical copy
+  at the vendored commit, hashed, cannot drift, and the seeder-prints arm reads
+  a row's printed figures through the same module. The plan listed the
+  registry, enums and MANIFEST only; this adds one file to that list.
+- **Scope:** `scripts/vendor_realism.py`, `vendor/realism/`,
+  `tests/test_import_ban.py`, `.gitattributes` (the bundle is stored byte for
+  byte; `-text`).
+- **Do not:** edit any file under `vendor/realism/`; re-vendor instead, from a
+  clean spec checkout whose gate is CLEAN.
+
 ## Orchestration
 
 ### 2026-05-13 — Dagster requires --working-directory pointing to orchestration/
