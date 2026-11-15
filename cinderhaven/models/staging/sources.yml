@@ -153,3 +153,22 @@ sources:
 
       - name: shopify_chargebacks
         description: ~52 DTC chargebacks.
+
+      # ── R7 write targets (plan U8): empty until U13 writes them ──
+      - name: amazon_orders
+        description: N22. Amazon 3P/FBA order headers, keyed to the brand's marketplace account.
+
+      - name: amazon_order_lines
+        description: N22. Amazon order lines at SKU grain.
+
+      - name: amazon_fees
+        description: >
+          N22. One row per Amazon charge, group 9's seven fee types. Per-order
+          fees (referral, fba_fulfillment, returnless_refund) carry order_id;
+          monthly fees (storage, inbound_placement, advertising, selling_plan) do not.
+
+      - name: small_account_orders
+        description: N37. Small-account order headers with their ordering channel and 05's order-level R6 columns.
+
+      - name: small_account_order_lines
+        description: N37. Small-account order lines with 05's R6 line columns.

@@ -333,6 +333,19 @@ Each entry:
   - *Marketplace event types* are A11.02's four: FBA lost and damaged
     reimbursement, customer return and refund, Buy Box loss, plus disaster
     2's channel-conflict complaint. Inventory fees are fee rows, not events.
+  - *Empty write targets do not fail the run.* `seed_all.verify_counts`
+    fails on any empty table, so `seed_all.AWAITING_WRITER` names each U8
+    table and the unit that writes it. U13 writes the marketplace accounts,
+    Amazon's orders, lines and fees, and every N37 table. U10 writes the
+    subscriptions. U11 writes the cancellations, the Buy Box readings, the 3P
+    listings, marketplace events, the three MAP tables, invoices and the OOS
+    flag. MAP policy is not named in the plan's writer list, so it goes to
+    U11, whose violations need it. Each writer removes its entries in the
+    change that writes them.
+  - *G4's tables carry the `shopify_` prefix* of the DTC pipeline they sit in.
+    `subscription_id` on `raw.shopify_orders` is not carried into
+    `stg_shopify_orders`, because the plan's file list does not name that
+    model. Group 8's subscription/one-time count reads it when U10 fills it.
 - **Scope:** `sql/raw_schema.sql`, `generation/seed_config.py`,
   `generation/seed_shared.py`, the staging, intermediate and mart models plan
   U8 names, `tests/test_r7_write_targets.py`.

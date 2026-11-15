@@ -526,6 +526,251 @@ CREATE TABLE raw.scan_data (
 CREATE INDEX idx_scan_data_store ON raw.scan_data(store_id);
 CREATE INDEX idx_scan_data_week ON raw.scan_data(week_ending);
 
+-- ============================================================
+-- ORIGIN-R7 WRITE TARGETS (plan U8): N22, N35, N37, N17, N11
+-- Schema only. U13 writes the in-window channel rows, U11 the two scripted
+-- disasters' rows, Phase 4 the additive halves. G4's tables sit with the DTC
+-- pipeline above; R6's raw.po_revisions is U10's.
+-- ============================================================
+
+-- N22 / N37: the brand's marketplace accounts, Amazon (3P Seller Central with
+-- FBA, A11.01) and Faire. Marketplace events resolve against these, never a listing.
+CREATE TABLE raw.marketplace_accounts (
+    marketplace_account_id  TEXT PRIMARY KEY,
+    marketplace             TEXT NOT NULL CHECK (marketplace IN ('amazon', 'faire')),
+    name                    TEXT NOT NULL,
+    banner_type             TEXT NOT NULL CHECK (banner_type = 'marketplace')
+);
+
+-- N22: Amazon orders and order lines at SKU grain (seed_costing and the margin mart cost by SKU).
+CREATE TABLE raw.amazon_orders (
+    order_id                TEXT PRIMARY KEY,
+    marketplace_account_id  TEXT NOT NULL REFERENCES raw.marketplace_accounts(marketplace_account_id),
+    order_date              DATE NOT NULL,
+    total_units             INTEGER NOT NULL,
+    total_value             NUMERIC(12,2) NOT NULL
+);
+CREATE INDEX idx_amazon_orders_date ON raw.amazon_orders(order_date);
+
+CREATE TABLE raw.amazon_order_lines (
+    order_id                TEXT NOT NULL REFERENCES raw.amazon_orders(order_id),
+    sku                     TEXT NOT NULL REFERENCES raw.product_master(sku),
+    quantity                INTEGER NOT NULL,
+    unit_price              NUMERIC(8,2) NOT NULL,
+    line_total              NUMERIC(10,2) NOT NULL,
+    PRIMARY KEY (order_id, sku)
+);
+
+-- N22: one row per charge, group 9's seven marketplace_fees(t) components (A11.22,
+-- A11.30, A11.31). Per-order fees carry their order; monthly fees carry none.
+-- No vendor chargebacks and no shortage claims: a 3P brand has neither (A11.01).
+CREATE TABLE raw.amazon_fees (
+    fee_id                  TEXT PRIMARY KEY,
+    marketplace_account_id  TEXT NOT NULL REFERENCES raw.marketplace_accounts(marketplace_account_id),
+    order_id                TEXT REFERENCES raw.amazon_orders(order_id),
+    fee_type                TEXT NOT NULL CHECK (fee_type IN
+                                ('referral', 'fba_fulfillment', 'returnless_refund',
+                                 'storage', 'inbound_placement', 'advertising', 'selling_plan')),
+    fee_date                DATE NOT NULL,
+    amount                  NUMERIC(10,2) NOT NULL,
+    CHECK ((order_id IS NOT NULL) = (fee_type IN ('referral', 'fba_fulfillment', 'returnless_refund')))
+);
+CREATE INDEX idx_amazon_fees_order ON raw.amazon_fees(order_id);
+
+-- N22: the brand's own offer's Buy Box share by SKU and week (A11.02).
+CREATE TABLE raw.amazon_buy_box (
+    sku                     TEXT NOT NULL REFERENCES raw.product_master(sku),
+    week_ending             DATE NOT NULL,
+    buy_box_share           NUMERIC(5,4) NOT NULL CHECK (buy_box_share BETWEEN 0 AND 1),
+    PRIMARY KEY (sku, week_ending)
+);
+
+-- N22: third-party sellers' listings of the brand's SKUs (disaster 1's week 2).
+CREATE TABLE raw.amazon_3p_listings (
+    listing_id              TEXT PRIMARY KEY,
+    sku                     TEXT NOT NULL REFERENCES raw.product_master(sku),
+    seller_name             TEXT NOT NULL,
+    listed_date             DATE NOT NULL,
+    delisted_date           DATE,
+    listed_price            NUMERIC(8,2) NOT NULL,
+    units_listed            INTEGER
+);
+
+-- N35: MAP from year 3 (A3.12); the monitor of 3P listed price against DTC from
+-- year 1, extended in year 3 to DTC price against MAP (owner, 2026-11-15); the
+-- flagged violations are the monitor's output, each keyed to its reading and a DTC order.
+CREATE TABLE raw.map_policy (
+    sku                     TEXT NOT NULL REFERENCES raw.product_master(sku),
+    effective_date          DATE NOT NULL,
+    map_price               NUMERIC(8,2) NOT NULL,
+    PRIMARY KEY (sku, effective_date)
+);
+
+CREATE TABLE raw.map_price_monitor (
+    reading_id              TEXT PRIMARY KEY,
+    sku                     TEXT NOT NULL REFERENCES raw.product_master(sku),
+    reading_date            DATE NOT NULL,
+    basis                   TEXT NOT NULL CHECK (basis IN ('3p_vs_dtc', 'dtc_vs_map')),
+    observed_price          NUMERIC(8,2) NOT NULL,  -- 3P listed price, or the DTC price
+    reference_price         NUMERIC(8,2) NOT NULL,  -- the DTC price, or MAP
+    listing_id              TEXT REFERENCES raw.amazon_3p_listings(listing_id),
+    map_effective_date      DATE,
+    fired                   BOOLEAN NOT NULL,
+    FOREIGN KEY (sku, map_effective_date) REFERENCES raw.map_policy(sku, effective_date),
+    CHECK ((basis = 'dtc_vs_map') = (map_effective_date IS NOT NULL)),
+    CHECK (reading_date >= map_effective_date)
+);
+
+-- A violation exists only under a policy in effect: its MAP's (sku, effective_date)
+-- is a foreign key, and the violation falls on or after it.
+CREATE TABLE raw.map_violations (
+    violation_id            TEXT PRIMARY KEY,
+    reading_id              TEXT NOT NULL REFERENCES raw.map_price_monitor(reading_id),
+    order_id                TEXT NOT NULL REFERENCES raw.shopify_orders(order_id),
+    sku                     TEXT NOT NULL REFERENCES raw.product_master(sku),
+    violation_date          DATE NOT NULL,
+    observed_price          NUMERIC(8,2) NOT NULL,
+    map_effective_date      DATE NOT NULL,
+    FOREIGN KEY (sku, map_effective_date) REFERENCES raw.map_policy(sku, effective_date),
+    CHECK (violation_date >= map_effective_date)
+);
+
+-- N37: the small-account tier, a channel of its own (owner, 2026-10-09): its own
+-- accounts and order-to-cash tables, and no raw.retailers row.
+CREATE TABLE raw.small_accounts (
+    small_account_id        TEXT PRIMARY KEY,
+    name                    TEXT NOT NULL,
+    account_type            TEXT NOT NULL,
+    origin                  TEXT NOT NULL CHECK (origin IN ('inbound', 'broker', 'faire', 'converted_from_dtc')),
+    dtc_customer_id         TEXT,  -- the converted account's Shopify customer; no DTC customer table in the window
+    rep                     TEXT,
+    price_tier              TEXT NOT NULL,
+    moq_cases               INTEGER,
+    freight_policy          TEXT,
+    payment_terms_days      INTEGER,
+    first_order_date        DATE,
+    last_order_date         DATE,
+    banner_type             TEXT NOT NULL CHECK (banner_type = 'independent'),
+    -- A converted account names its DTC customer and the rep who converted it; no other account has a DTC customer.
+    CHECK (CASE WHEN origin = 'converted_from_dtc' THEN dtc_customer_id IS NOT NULL AND rep IS NOT NULL
+                ELSE dtc_customer_id IS NULL END)
+);
+
+-- 05's order-level R6 columns; U13's writer fills them on insert, at revision zero.
+CREATE TABLE raw.small_account_orders (
+    order_id                TEXT PRIMARY KEY,
+    small_account_id        TEXT NOT NULL REFERENCES raw.small_accounts(small_account_id),
+    ordering_channel        TEXT NOT NULL CHECK (ordering_channel IN ('faire_marketplace', 'faire_direct', 'direct')),
+    po_date                 DATE NOT NULL,
+    requested_ship_date     DATE,
+    total_units             INTEGER NOT NULL,
+    total_value             NUMERIC(12,2) NOT NULL,
+    freight_amount          NUMERIC(10,2) NOT NULL DEFAULT 0,
+    handling_amount         NUMERIC(10,2) NOT NULL DEFAULT 0,
+    order_status            TEXT NOT NULL CHECK (order_status IN
+                                ('open', 'revised', 'partially_cancelled', 'cancelled', 'shipped')),
+    cancelled_date          DATE,
+    cancelled_by            TEXT
+);
+CREATE INDEX idx_small_account_orders_account ON raw.small_account_orders(small_account_id);
+CREATE INDEX idx_small_account_orders_po_date ON raw.small_account_orders(po_date);
+
+-- 05's line columns; units_acknowledged is NULL for the non-EDI shops (A5.20).
+CREATE TABLE raw.small_account_order_lines (
+    order_id                    TEXT NOT NULL REFERENCES raw.small_account_orders(order_id),
+    sku                         TEXT NOT NULL REFERENCES raw.product_master(sku),
+    units_originally_requested  INTEGER NOT NULL,
+    units_current               INTEGER NOT NULL,
+    units_acknowledged          INTEGER,
+    revision_count              INTEGER NOT NULL DEFAULT 0,
+    is_cancelled                BOOLEAN NOT NULL DEFAULT FALSE,
+    unit_price                  NUMERIC(8,2) NOT NULL,
+    line_total                  NUMERIC(10,2) NOT NULL,
+    PRIMARY KEY (order_id, sku)
+);
+
+CREATE TABLE raw.small_account_shipments (
+    shipment_id             TEXT PRIMARY KEY,
+    order_id                TEXT NOT NULL REFERENCES raw.small_account_orders(order_id),
+    ship_date               DATE NOT NULL,
+    delivery_date           DATE,
+    carrier                 TEXT,
+    units_shipped           INTEGER NOT NULL
+);
+CREATE INDEX idx_small_account_shipments_order ON raw.small_account_shipments(order_id);
+
+CREATE TABLE raw.small_account_shipment_lines (
+    shipment_id                 TEXT NOT NULL REFERENCES raw.small_account_shipments(shipment_id),
+    sku                         TEXT NOT NULL REFERENCES raw.product_master(sku),
+    units_originally_requested  INTEGER NOT NULL,
+    units_shipped               INTEGER NOT NULL,
+    shortfall_reason            TEXT,
+    PRIMARY KEY (shipment_id, sku)
+);
+
+CREATE TABLE raw.small_account_receipt_lines (
+    shipment_id             TEXT NOT NULL,
+    sku                     TEXT NOT NULL,
+    units_received          INTEGER NOT NULL,
+    discrepancy_reason      TEXT,
+    PRIMARY KEY (shipment_id, sku),
+    FOREIGN KEY (shipment_id, sku)
+        REFERENCES raw.small_account_shipment_lines(shipment_id, sku)
+);
+
+-- Faire pays the brand net of its commission and processing (A3.20); direct accounts pay in full.
+CREATE TABLE raw.small_account_remittances (
+    remittance_id           TEXT PRIMARY KEY,
+    small_account_id        TEXT NOT NULL REFERENCES raw.small_accounts(small_account_id),
+    ordering_channel        TEXT NOT NULL CHECK (ordering_channel IN ('faire_marketplace', 'faire_direct', 'direct')),
+    received_date           DATE NOT NULL,
+    gross_amount            NUMERIC(12,2) NOT NULL,
+    fees_amount             NUMERIC(10,2) NOT NULL DEFAULT 0,
+    net_amount              NUMERIC(12,2) NOT NULL
+);
+CREATE INDEX idx_small_account_remittances_account ON raw.small_account_remittances(small_account_id);
+
+-- N22: A11.02's 3P/FBA event types and the Faire channel-conflict complaint
+-- (disaster 2), keyed to the brand's marketplace account.
+CREATE TABLE raw.marketplace_events (
+    event_id                TEXT PRIMARY KEY,
+    marketplace_account_id  TEXT NOT NULL REFERENCES raw.marketplace_accounts(marketplace_account_id),
+    event_date              DATE NOT NULL,
+    event_type              TEXT NOT NULL CHECK (event_type IN
+                                ('fba_lost_damaged_reimbursement', 'customer_return_refund',
+                                 'buy_box_loss', 'channel_conflict_complaint')),
+    sku                     TEXT REFERENCES raw.product_master(sku),
+    small_account_id        TEXT REFERENCES raw.small_accounts(small_account_id),  -- the complaining shop
+    amount                  NUMERIC(10,2),
+    resolution              TEXT,
+    notes                   TEXT
+);
+
+-- N17: the invoice between a shipment and its remittance (03:81), keyed to exactly
+-- one channel's shipment, as raw.po_revisions keys exactly one channel's order (05).
+CREATE TABLE raw.invoices (
+    invoice_id                  TEXT PRIMARY KEY,
+    retailer_shipment_id        TEXT REFERENCES raw.retailer_shipments(shipment_id),
+    distributor_shipment_id     TEXT REFERENCES raw.distributor_shipments(shipment_id),
+    small_account_shipment_id   TEXT REFERENCES raw.small_account_shipments(shipment_id),
+    invoice_date                DATE NOT NULL,
+    terms                       TEXT NOT NULL,
+    due_date                    DATE NOT NULL,
+    invoice_amount              NUMERIC(12,2) NOT NULL,
+    CHECK (num_nonnulls(retailer_shipment_id, distributor_shipment_id, small_account_shipment_id) = 1),
+    CHECK (due_date >= invoice_date)
+);
+
+-- N11: the out-of-stock flag at SKU x store x week (03:99). truth.outage_episodes
+-- (U4) holds which episodes were planted; raw never references truth.
+CREATE TABLE raw.store_week_oos (
+    sku                     TEXT NOT NULL REFERENCES raw.product_master(sku),
+    store_id                TEXT NOT NULL REFERENCES raw.stores(store_id),
+    week_ending             DATE NOT NULL,
+    out_of_stock            BOOLEAN NOT NULL,
+    PRIMARY KEY (sku, store_id, week_ending)
+);
+
 -- Ownership (owned sequences follow their table) and grants travel with the schema (plan U4; roles in sql/truth_roles.sql):
 -- DROP SCHEMA raw CASCADE takes its grants with it, so every rebuild restates them.
 DO $$

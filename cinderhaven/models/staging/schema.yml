@@ -503,3 +503,34 @@ models:
         tests: [not_null]
       - name: chargeback_amount
         tests: [not_null]
+
+  - name: stg_amazon_orders
+    description: N22 (plan U8). Amazon orders at SKU grain. Empty until U13.
+    columns:
+      - name: order_id
+        tests: [not_null]
+      - name: sku
+        tests: [not_null]
+
+  - name: stg_amazon_fees
+    description: N22 (plan U8). Amazon fee rows by fee type. Empty until U13.
+    columns:
+      - name: fee_id
+        tests: [unique, not_null]
+      - name: fee_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['referral', 'fba_fulfillment', 'returnless_refund', 'storage', 'inbound_placement', 'advertising', 'selling_plan']
+
+  - name: stg_small_account_orders
+    description: N37 (plan U8). Small-account orders at SKU grain. Empty until U13.
+    columns:
+      - name: order_id
+        tests: [not_null]
+      - name: small_account_id
+        tests: [not_null]
+      - name: ordering_channel
+        tests:
+          - accepted_values:
+              values: ['faire_marketplace', 'faire_direct', 'direct']

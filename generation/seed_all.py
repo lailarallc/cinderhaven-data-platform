@@ -53,6 +53,25 @@ COPACK_TABLES = ("co_packers", "production_lines", "sku_production_config", "pro
 AWAITING_WRITER = {
     "raw.shopify_subscriptions": "U10",
     "raw.shopify_subscription_cancellations": "U11",
+    "raw.marketplace_accounts": "U13",
+    "raw.amazon_orders": "U13",
+    "raw.amazon_order_lines": "U13",
+    "raw.amazon_fees": "U13",
+    "raw.amazon_buy_box": "U11",
+    "raw.amazon_3p_listings": "U11",
+    "raw.marketplace_events": "U11",
+    "raw.map_policy": "U11",
+    "raw.map_price_monitor": "U11",
+    "raw.map_violations": "U11",
+    "raw.small_accounts": "U13",
+    "raw.small_account_orders": "U13",
+    "raw.small_account_order_lines": "U13",
+    "raw.small_account_shipments": "U13",
+    "raw.small_account_shipment_lines": "U13",
+    "raw.small_account_receipt_lines": "U13",
+    "raw.small_account_remittances": "U13",
+    "raw.invoices": "U11",
+    "raw.store_week_oos": "U11",
 }
 
 
