@@ -8,5 +8,7 @@ select
     distributor_id,
     reason,
     sku,
-    amount as chargeback_amount
+    amount as chargeback_amount,
+    order_id,
+    shipment_id
 from source

@@ -241,7 +241,11 @@ CREATE TABLE raw.retailer_chargebacks (
     reason                  TEXT NOT NULL,
     sku                     TEXT NOT NULL REFERENCES raw.product_master(sku),
     amount                  NUMERIC(10,2) NOT NULL,
-    triggered_by_field      TEXT
+    triggered_by_field      TEXT,
+    -- N8 (03:97, plan U8): the order and shipment a chargeback answers to. NULL
+    -- until U11 makes chargebacks event-driven.
+    order_id                TEXT REFERENCES raw.retailer_orders(order_id),
+    shipment_id             TEXT REFERENCES raw.retailer_shipments(shipment_id)
 );
 CREATE INDEX idx_retailer_chargebacks_retailer ON raw.retailer_chargebacks(retailer_id);
 
@@ -372,13 +376,33 @@ CREATE TABLE raw.distributor_chargebacks (
     distributor_id          TEXT NOT NULL REFERENCES raw.distributors(distributor_id),
     reason                  TEXT NOT NULL,
     sku                     TEXT NOT NULL REFERENCES raw.product_master(sku),
-    amount                  NUMERIC(10,2) NOT NULL
+    amount                  NUMERIC(10,2) NOT NULL,
+    order_id                TEXT REFERENCES raw.distributor_orders(order_id),       -- N8, as the retailer table
+    shipment_id             TEXT REFERENCES raw.distributor_shipments(shipment_id)
 );
 CREATE INDEX idx_distributor_chargebacks_distributor ON raw.distributor_chargebacks(distributor_id);
 
 -- ============================================================
--- DTC PIPELINE — SHOPIFY (6 tables)
+-- DTC PIPELINE — SHOPIFY (6 tables, and G4's two subscription tables)
 -- ============================================================
+
+-- G4 (plan U8): the subscriptions the window's subscription orders carry (U10
+-- writes them) and the cancellations with their reason (disaster 1's, U11).
+CREATE TABLE raw.shopify_subscriptions (
+    subscription_id         TEXT PRIMARY KEY,
+    email                   TEXT NOT NULL,
+    sku                     TEXT REFERENCES raw.product_master(sku),
+    interval_days           INTEGER,
+    started_date            DATE NOT NULL,
+    status                  TEXT NOT NULL CHECK (status IN ('active', 'paused', 'cancelled'))
+);
+
+CREATE TABLE raw.shopify_subscription_cancellations (
+    cancellation_id         TEXT PRIMARY KEY,
+    subscription_id         TEXT NOT NULL UNIQUE REFERENCES raw.shopify_subscriptions(subscription_id),
+    cancelled_date          DATE NOT NULL,
+    reason                  TEXT NOT NULL
+);
 
 CREATE TABLE raw.shopify_orders (
     order_id                TEXT PRIMARY KEY,
@@ -393,7 +417,9 @@ CREATE TABLE raw.shopify_orders (
     total                   NUMERIC(10,2) NOT NULL,
     discount_code           TEXT,
     discount_amount         NUMERIC(10,2) NOT NULL DEFAULT 0,
-    fulfillment_cost        NUMERIC(10,2) NOT NULL DEFAULT 0
+    fulfillment_cost        NUMERIC(10,2) NOT NULL DEFAULT 0,
+    -- G4: set on a subscription order, NULL on a one-time order (group 8's two types).
+    subscription_id         TEXT REFERENCES raw.shopify_subscriptions(subscription_id)
 );
 CREATE INDEX idx_shopify_orders_created ON raw.shopify_orders(created_at);
 

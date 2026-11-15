@@ -9,5 +9,7 @@ select
     reason,
     sku,
     amount as chargeback_amount,
-    triggered_by_field
+    triggered_by_field,
+    order_id,
+    shipment_id
 from source
