@@ -47,6 +47,14 @@ DBT_PROFILES = ROOT / "orchestration"  # every value from CINDERHAVEN_PG_*; noth
 COPACK_TABLES = ("co_packers", "production_lines", "sku_production_config", "production_schedule",
                  "sku_inventory")
 
+# Plan U8: write targets whose schema lands before their writer. Each may be empty
+# after a full run until the unit named here writes it; that unit takes its rows
+# off this list in the same change. Any other empty table still fails the run.
+AWAITING_WRITER = {
+    "raw.shopify_subscriptions": "U10",
+    "raw.shopify_subscription_cancellations": "U11",
+}
+
 
 class SeedError(RuntimeError):
     pass
@@ -170,9 +178,10 @@ def verify_counts(conn):
         cur.execute(f"SELECT count(*) FROM {table}")
         count = cur.fetchone()[0]
         total += count
-        if count == 0:
+        if count == 0 and table not in AWAITING_WRITER:
             empty.append(table)
-        print(f"  {table:45s} {count:>10,}")
+        owed = f"  (awaiting {AWAITING_WRITER[table]})" if count == 0 and table in AWAITING_WRITER else ""
+        print(f"  {table:45s} {count:>10,}{owed}")
     print(f"  {'TOTAL':45s} {total:>10,}")
     cur.close()
     report_truth(conn)
