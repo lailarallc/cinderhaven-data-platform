@@ -157,7 +157,8 @@ def test_a_seed_that_cannot_be_built_fails_the_run_loudly():
 def test_the_record_is_written_with_commit_seeds_and_verdicts(tmp_path):
     rec = seed_runs.run([0, 1, 2], lambda s: None, _stub_gates())
     data = json.loads(seed_runs.write_record(rec, tmp_path).read_text())
-    assert set(data) == {"commit", "mode", "seeds", "passed", "outcomes", "verdicts", "not_built"}
+    assert set(data) == {"commit", "mode", "seeds", "passed", "outcomes", "verdicts", "not_built", "measures",
+                         "band_spread"}
     assert data["seeds"] == [0, 1, 2]
 
 

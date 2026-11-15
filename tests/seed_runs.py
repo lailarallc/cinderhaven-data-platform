@@ -102,6 +102,7 @@ class RunRecord:
     not_built: dict[int, dict] = field(default_factory=dict)  # seed -> what tripped
     worlds: dict[int, dict] = field(default_factory=dict)  # seed -> table hashes, built seeds only
     repeat: Optional[dict] = None  # {"repeat_of": seed, "world": ...}: a second rebuild of one seed
+    measures: dict[int, dict] = field(default_factory=dict)  # seed -> band_measures.measure(), seeds whose models built
 
     @property
     def passed(self) -> bool:
@@ -149,7 +150,8 @@ def _save(progress: Optional[Path], entry: dict) -> None:
 
 
 def run(seeds: list[int], rebuild: Callable[[int], None], gates: list[Gate],
-        progress: Optional[Path] = None, fingerprint: Optional[Callable[[int], dict]] = None) -> RunRecord:
+        progress: Optional[Path] = None, fingerprint: Optional[Callable[[int], dict]] = None,
+        measure: Optional[Callable[[int], dict]] = None) -> RunRecord:
     """Rebuild at each seed, record one outcome per gate per seed, then judge across seeds.
 
     With `progress`, each seed's result is appended to that file the moment the
@@ -164,6 +166,10 @@ def run(seeds: list[int], rebuild: Callable[[int], None], gates: list[Gate],
     With `fingerprint`, each built seed also saves its world (table hashes), and
     after the last seed the first built seed is rebuilt once more and saved as
     the repeat, so determinism and distinctness are judged from saved results.
+
+    With `measure`, every seed whose models built saves what each band test
+    measured (tests/band_measures.py): a built seed, and a seed refused only
+    because dbt tests failed, whose models are all there (owner, 2026-11-14).
     """
     if not gates:
         raise ValueError("no gates: a run that judges nothing would pass vacuously")
@@ -190,6 +196,8 @@ def run(seeds: list[int], rebuild: Callable[[int], None], gates: list[Gate],
         except SeedNotBuilt as e:
             print(f"seed {seed}: not built, {e.detail}", flush=True)
             entry = {"seed": seed, "not_built": e.detail}
+            if measure is not None and e.detail.get("guard") == "dbt_tests":
+                entry["measures"] = measure(seed)
             _save(progress, entry)
             results.append(entry)
             continue
@@ -202,6 +210,8 @@ def run(seeds: list[int], rebuild: Callable[[int], None], gates: list[Gate],
         entry = {"seed": seed, "outcomes": outcomes}
         if fingerprint is not None:
             entry["world"] = fingerprint(seed)
+        if measure is not None:
+            entry["measures"] = measure(seed)
         _save(progress, entry)
         results.append(entry)
     built = [e["seed"] for e in results if "outcomes" in e]
@@ -221,6 +231,7 @@ def run(seeds: list[int], rebuild: Callable[[int], None], gates: list[Gate],
         if "world" in e:
             rec.worlds[e["seed"]] = e["world"]
     rec.not_built = {e["seed"]: e["not_built"] for e in results if "not_built" in e}
+    rec.measures = {e["seed"]: e["measures"] for e in results if "measures" in e}
     rec.repeat = repeat
     for g in gates:
         rec.verdicts[g.name] = judge(g, rec.outcomes[g.name])
@@ -266,8 +277,16 @@ def write_record(rec: RunRecord, out_dir: Path = OUT_DIR) -> Path:
     path = out_dir / f"{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}.json"
     path.write_text(json.dumps({"commit": rec.commit, "mode": rec.mode, "seeds": rec.seeds, "passed": rec.passed,
                                 "outcomes": rec.outcomes, "verdicts": rec.verdicts,
-                                "not_built": {str(s): d for s, d in rec.not_built.items()}}, indent=2))
+                                "not_built": {str(s): d for s, d in rec.not_built.items()},
+                                "measures": {str(s): m for s, m in rec.measures.items()},
+                                "band_spread": band_spread(rec)}, indent=2))
     return path
+
+
+def band_spread(rec: RunRecord) -> dict:
+    """U7's work list (owner, 2026-11-14): each band test's observed range and out-of-band seeds."""
+    import band_measures
+    return band_measures.spread([{"seed": s, "measures": m} for s, m in sorted(rec.measures.items())])
 
 
 # ── The platform's gates today ──────────────────────────────────────
@@ -313,7 +332,7 @@ def _repeat_gate() -> Gate:
 #: What a rebuild and its gates read; uncommitted edits here would make saved
 #: seeds and later seeds come from different trees.
 RUN_INPUTS = ("generation", "sql", "cinderhaven", "orchestration", "tests/harness.py", "tests/seed_runs.py",
-              "tests/table_hashes.py", "tests/test_costing_integrity.sql")
+              "tests/table_hashes.py", "tests/test_costing_integrity.sql", "tests/band_measures.py")
 
 
 def _dirty_inputs() -> list[str]:
@@ -330,6 +349,14 @@ def _platform_rebuild(seed: int) -> None:
     except harness.GuardTripped as e:
         raise SeedNotBuilt(e.detail) from e
     print(f"seed {seed}: rebuilt in {time.time() - t0:.0f}s", flush=True)
+
+
+def _platform_measures(seed: int) -> dict:
+    import psycopg2
+    import harness
+    import band_measures
+    with psycopg2.connect(harness.dsn(harness.harness_values()), connect_timeout=5) as conn:
+        return band_measures.measure(conn)
 
 
 def _platform_world(seed: int) -> dict:
@@ -359,7 +386,8 @@ def main(argv: list[str]) -> int:
                   f"the commit's: {', '.join(dirty)}", file=sys.stderr)
             return 2
         progress = OUT_DIR / f"progress-{_commit()[:12]}-{args.seeds}seeds.jsonl"
-        rec = run(list(range(args.seeds)), _platform_rebuild, _platform_gates(), progress, _platform_world)
+        rec = run(list(range(args.seeds)), _platform_rebuild, _platform_gates(), progress, _platform_world,
+                  _platform_measures)
         baseline = json.loads(U2_BASELINE.read_text())["tables"]
         rec.verdicts["u2_run_seed"] = run_seed_machinery(rec, baseline)
     path = write_record(rec)
@@ -376,6 +404,12 @@ def main(argv: list[str]) -> int:
                 else f"dbt tests failed: {', '.join(d.get('tests', []))}" if d.get("guard") == "dbt_tests"
                 else str(d))
         print(f"  guard trip (reported, not a U2 failure): seed {s}: {what}")
+    for name, keys in band_spread(rec).items():
+        for key, s in keys.items():
+            if s["out_of_band_seeds"]:
+                seen = "no value" if s["min"] is None else f"{s['min']:.4f}..{s['max']:.4f}"
+                print(f"  band out at seeds {s['out_of_band_seeds']}: {name}[{key}] observed "
+                      f"{seen} over {s['seeds']} seeds, band {s['band'][0]}..{s['band'][1]}")
     return 0 if rec.passed else 1
 
 
