@@ -79,7 +79,11 @@ CREATE TABLE raw.retailers (
     dispute_portal_name     TEXT,
     dispute_portal_url      TEXT,
     dispute_method          TEXT,
-    notes                   TEXT
+    notes                   TEXT,
+    -- Headline-surface category (spec DECISIONS 2026-09-02; plan U8). Rendered
+    -- on public pages in place of the name.
+    banner_type             TEXT NOT NULL CHECK (banner_type IN
+                                ('national retailer', 'regional retailer', 'club retailer', 'natural retailer'))
 );
 
 CREATE TABLE raw.retailer_rules (
@@ -272,7 +276,8 @@ CREATE TABLE raw.distributors (
     name                    TEXT NOT NULL,
     type                    TEXT NOT NULL,
     margin_pct              NUMERIC(5,4),
-    payment_terms_days      INTEGER
+    payment_terms_days      INTEGER,
+    banner_type             TEXT NOT NULL CHECK (banner_type = 'distributor')
 );
 
 CREATE TABLE raw.sku_distributors (

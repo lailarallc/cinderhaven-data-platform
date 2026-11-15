@@ -25,6 +25,7 @@ select
     r.dispute_portal_name,
     r.dispute_portal_url,
     r.dispute_method,
+    r.banner_type,
     coalesce(sc.store_count, 0) as store_count,
     coalesce(os.total_orders, 0) as total_orders,
     coalesce(os.total_order_value, 0) as total_order_value,

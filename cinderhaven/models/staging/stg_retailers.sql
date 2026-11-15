@@ -8,5 +8,6 @@ select
     dispute_portal_name,
     dispute_portal_url,
     dispute_method,
-    notes
+    notes,
+    banner_type
 from source

@@ -269,6 +269,76 @@ Each entry:
 - **Do not:** add a key because a value happens to appear in a row; key a
   constant to the row that governs it, or owe it.
 
+### 2026-11-15 — U8: the origin-R7 write targets get schema; five owner rulings at U8's start
+- **Decision:** `sql/raw_schema.sql` gains the six write targets plan U8 names
+  (N22, N35, N37, G4, N17, N11), `banner_type` on every account table, and
+  N8's chargeback keys. Schema only: every new table is empty until U13, U10
+  and U11 write it.
+- **Owner rulings (2026-11-15; U18 partition rows routed to U8):**
+  1. *07:170:* N35's year-3 flag is A3.12's monitor output, the monitor
+     extended to a y3 DTC-vs-MAP check. Each `raw.map_violations` row links to
+     its monitor reading and to the DTC order.
+  2. *06:162 against 03:172:* freight, labour allocation, inventory write-off
+     and lost sales reconcile on the ledger alone. N18, N23's labour tables
+     and N27 stay in Phase 4. Unlike Amazon's fees and slotting, the P&L
+     already charges these costs, so no canonical figure is short.
+  3. *`banner_type`:* a seventh value, `independent`, for the small accounts;
+     marketplace accounts carry `marketplace`. The column goes on the
+     marketplace-account table and on each N37 account.
+  4. *A6.23's remaining background streams* (N14's documents, N17's invoices
+     beyond the disasters', G4's fulfilment, claim and fraud tables, the
+     `dtc_customer` base) are out of the window. A6.23's stream list and
+     A6.04's rate pairs are restated to what the window generates (spec side).
+  5. *A11.04's account count and order frequency* stay owed to U13.
+  Already ruled: A11.02's Buy Box share, 95% outside disaster 1 and 0% in the
+  undercut weeks (spec DECISIONS#u18-rulings, 2026-10-20).
+- **Session calls, for the owner's review (fork policy):**
+  - *Value spelling.* The six banner types are stored as the 2026-09-02
+    ruling prints them (`national retailer`, `regional retailer`, `club
+    retailer`, `natural retailer`, `distributor`, `marketplace`), lower case
+    with a space, because the column is rendered text. Each table's CHECK
+    admits only its own values: retailers the four retailer types,
+    distributors `distributor`, marketplace accounts `marketplace`, N37
+    accounts `independent`.
+  - *Table names* follow the plan's staging names and the channel prefixes
+    already in `raw`: `marketplace_accounts`, `amazon_orders`,
+    `amazon_order_lines`, `amazon_fees`, `amazon_buy_box`,
+    `amazon_3p_listings`, `marketplace_events`; `map_policy`,
+    `map_price_monitor`, `map_violations`; `small_accounts`,
+    `small_account_orders`, `_order_lines`, `_shipments`, `_shipment_lines`,
+    `_receipt_lines`, `_remittances`; `shopify_subscriptions`,
+    `shopify_subscription_cancellations`; `invoices`; `store_week_oos`.
+  - *Pre-policy violations are rejected by a key, not a date.* A violation
+    carries its MAP's `(sku, effective_date)` as a foreign key to
+    `map_policy` and must fall on or after it. No window date is typed into
+    the DDL; A3.12's year-3 date reaches it through the policy row.
+  - *N37 gets shipment lines*, which the plan's list leaves out: receipt lines
+    key to them in the retailer pattern, and 05's decomposition test sums
+    shipped per order line, which needs SKU-grain shipments.
+  - *N37 orders carry freight and handling amounts.* 07's week-14 invoice is
+    priced at A3.17's landed band (unit + freight + handling); without them
+    the cascade row has nowhere to land.
+  - *N37's `cancelled_by` takes no CHECK.* 05 codes it `retailer` /
+    `cinderhaven`, and whether the ordering party on a non-retailer order
+    keeps the `retailer` code is 05's open question; U10 rules it.
+  - *`dtc_customer_id` has no foreign key.* Ruling 4 keeps the
+    `dtc_customer` base out of the window, so the converted account carries
+    the Shopify customer key (U11 writes it) without a table to reference.
+  - *Invoices are channel-neutral*, keyed to exactly one shipment (retailer,
+    distributor or N37) by the exactly-one CHECK 05 uses on
+    `po_revisions`: disaster 1's affected invoices are retailer invoices,
+    disaster 2's are N37's.
+  - *The N11 flag is SKU × store × week*, not store × week: the drained
+    stores are out of one SKU, and a store-week flag derives from it.
+  - *Marketplace event types* are A11.02's four: FBA lost and damaged
+    reimbursement, customer return and refund, Buy Box loss, plus disaster
+    2's channel-conflict complaint. Inventory fees are fee rows, not events.
+- **Scope:** `sql/raw_schema.sql`, `generation/seed_config.py`,
+  `generation/seed_shared.py`, the staging, intermediate and mart models plan
+  U8 names, `tests/test_r7_write_targets.py`.
+- **Do not:** give the small-account tier a `raw.retailers` row, or add a
+  vendor chargeback or shortage-claim table for Amazon (A11.01's 3P model).
+
 ## Orchestration
 
 ### 2026-05-13 — Dagster requires --working-directory pointing to orchestration/

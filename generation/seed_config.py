@@ -30,20 +30,20 @@ prod_guard.check(DATABASE_URL)
 # -- Retailers (5 contracted + 1 regional group) --
 
 RETAILERS = [
-    {"retailer_id": "RET-WALMART",    "name": "Walmart",      "dispute_portal_name": "RetailLink", "dispute_portal_url": "https://retaillink.walmart.com", "dispute_method": "portal"},
-    {"retailer_id": "RET-COSTCO",     "name": "Costco",       "dispute_portal_name": "Costco Vendor Portal", "dispute_portal_url": "https://vendor.costco.com", "dispute_method": "portal"},
-    {"retailer_id": "RET-WHOLEFOODS", "name": "Whole Foods",  "dispute_portal_name": "Whole Foods Vendor", "dispute_portal_url": "https://vendor.wholefoods.com", "dispute_method": "email"},
-    {"retailer_id": "RET-SPROUTS",    "name": "Sprouts",      "dispute_portal_name": None, "dispute_portal_url": None, "dispute_method": "email"},
-    {"retailer_id": "RET-KROGER",     "name": "Kroger",       "dispute_portal_name": "Kroger Vendor Net", "dispute_portal_url": "https://vendornet.kroger.com", "dispute_method": "portal"},
-    {"retailer_id": "RET-REGIONAL",   "name": "Regional Group", "dispute_portal_name": None, "dispute_portal_url": None, "dispute_method": "email"},
+    {"retailer_id": "RET-WALMART",    "name": "Walmart",      "dispute_portal_name": "RetailLink", "dispute_portal_url": "https://retaillink.walmart.com", "dispute_method": "portal", "banner_type": "national retailer"},
+    {"retailer_id": "RET-COSTCO",     "name": "Costco",       "dispute_portal_name": "Costco Vendor Portal", "dispute_portal_url": "https://vendor.costco.com", "dispute_method": "portal", "banner_type": "club retailer"},
+    {"retailer_id": "RET-WHOLEFOODS", "name": "Whole Foods",  "dispute_portal_name": "Whole Foods Vendor", "dispute_portal_url": "https://vendor.wholefoods.com", "dispute_method": "email", "banner_type": "natural retailer"},
+    {"retailer_id": "RET-SPROUTS",    "name": "Sprouts",      "dispute_portal_name": None, "dispute_portal_url": None, "dispute_method": "email", "banner_type": "natural retailer"},
+    {"retailer_id": "RET-KROGER",     "name": "Kroger",       "dispute_portal_name": "Kroger Vendor Net", "dispute_portal_url": "https://vendornet.kroger.com", "dispute_method": "portal", "banner_type": "national retailer"},
+    {"retailer_id": "RET-REGIONAL",   "name": "Regional Group", "dispute_portal_name": None, "dispute_portal_url": None, "dispute_method": "email", "banner_type": "regional retailer"},
 ]
 
 # -- Distributors --
 
 DISTRIBUTORS = [
-    {"distributor_id": "DIST-UNFI",  "name": "UNFI",  "type": "national", "margin_pct": 0.22, "payment_terms_days": 30},
-    {"distributor_id": "DIST-KEHE",  "name": "KeHE",  "type": "national", "margin_pct": 0.20, "payment_terms_days": 30},
-    {"distributor_id": "DIST-DPI",   "name": "DPI Northwest", "type": "regional", "margin_pct": 0.18, "payment_terms_days": 21},
+    {"distributor_id": "DIST-UNFI",  "name": "UNFI",  "type": "national", "margin_pct": 0.22, "payment_terms_days": 30, "banner_type": "distributor"},
+    {"distributor_id": "DIST-KEHE",  "name": "KeHE",  "type": "national", "margin_pct": 0.20, "payment_terms_days": 30, "banner_type": "distributor"},
+    {"distributor_id": "DIST-DPI",   "name": "DPI Northwest", "type": "regional", "margin_pct": 0.18, "payment_terms_days": 21, "banner_type": "distributor"},
 ]
 
 # -- Product lines (50 SKUs) --

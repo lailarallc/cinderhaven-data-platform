@@ -126,17 +126,18 @@ def seed_sku_costs(cur, rng):
 
 
 def seed_retailers(cur):
-    cols = ["retailer_id", "name", "dispute_portal_name", "dispute_portal_url", "dispute_method", "notes"]
+    cols = ["retailer_id", "name", "dispute_portal_name", "dispute_portal_url", "dispute_method", "notes",
+            "banner_type"]
     rows = [(r["retailer_id"], r["name"], r["dispute_portal_name"],
-             r["dispute_portal_url"], r["dispute_method"], None) for r in RETAILERS]
+             r["dispute_portal_url"], r["dispute_method"], None, r["banner_type"]) for r in RETAILERS]
     copy_rows(cur, "raw.retailers", cols, rows)
     print(f"  retailers: {len(rows)} rows")
 
 
 def seed_distributors(cur):
-    cols = ["distributor_id", "name", "type", "margin_pct", "payment_terms_days"]
+    cols = ["distributor_id", "name", "type", "margin_pct", "payment_terms_days", "banner_type"]
     rows = [(d["distributor_id"], d["name"], d["type"], d["margin_pct"],
-             d["payment_terms_days"]) for d in DISTRIBUTORS]
+             d["payment_terms_days"], d["banner_type"]) for d in DISTRIBUTORS]
     copy_rows(cur, "raw.distributors", cols, rows)
     print(f"  distributors: {len(rows)} rows")
 

@@ -9,6 +9,11 @@ models:
         tests: [unique, not_null]
       - name: retailer_name
         tests: [not_null]
+      - name: banner_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['national retailer', 'regional retailer', 'club retailer', 'natural retailer']
 
   - name: fct_retailer_orders
     description: Retailer order fact with line counts and shipment details.
@@ -100,6 +105,11 @@ models:
         tests: [unique, not_null]
       - name: distributor_name
         tests: [not_null]
+      - name: banner_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['distributor']
 
   - name: fct_distributor_orders
     description: Distributor order fact with line counts and shipment details.
@@ -261,6 +271,11 @@ models:
         tests: [not_null]
       - name: retailer
         tests: [not_null]
+      - name: banner_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['national retailer', 'regional retailer', 'club retailer', 'natural retailer']
       - name: amount
         tests: [not_null]
       - name: reason

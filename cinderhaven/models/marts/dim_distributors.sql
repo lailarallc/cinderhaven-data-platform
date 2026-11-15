@@ -25,6 +25,7 @@ select
     d.distributor_type,
     d.margin_pct,
     d.payment_terms_days,
+    d.banner_type,
     coalesce(sc.sku_count, 0) as sku_count,
     coalesce(os.total_orders, 0) as total_orders,
     coalesce(os.total_order_value, 0) as total_order_value,
