@@ -358,6 +358,29 @@ Each entry:
 - **Do not:** give the small-account tier a `raw.retailers` row, or add a
   vendor chargeback or shortage-claim table for Amazon (A11.01's 3P model).
 
+### 2026-11-15 — `AWAITING_WRITER` only shrinks; the vendored bundle carries each unit's DONE status
+- **Decision (owner, 2026-11-15):** `seed_all.AWAITING_WRITER` is an
+  exceptions list, and exceptions here only shrink.
+  `tests/test_awaiting_writer.py` freezes the list as U8 merged it (21
+  tables) and fails in three cases:
+  - a table is added to the list;
+  - a table's writer changes;
+  - in the DB tier, a listed table is still empty when its writer unit reads
+    DONE.
+- **Session call, for the owner's review:** the platform held no unit
+  status, so `scripts/vendor_realism.py` now derives `unit_status.json` from
+  the regen plan at the vendored commit. Each unit gets its status date and
+  whether the status starts with DONE ("Done in substance" and "Code
+  complete" do not count). Only that is vendored, never the plan's prose,
+  because canonical-drift scans `vendor/`. A spec checkout without the plan
+  is refused. Re-vendored at spec `6b5a663` (gate CLEAN; `anchors.yml`
+  moved, for A6.04 and A6.23). The coverage gate is CLEAN.
+- **Scope:** `generation/seed_all.py`, `scripts/vendor_realism.py`,
+  `vendor/realism/`, `tests/test_awaiting_writer.py`,
+  `tests/test_vendor_realism.py`.
+- **Do not:** add a table to `AWAITING_WRITER` or widen the ceiling in the
+  test. A new schema-first table needs its own owner ruling.
+
 ## Orchestration
 
 ### 2026-05-13 — Dagster requires --working-directory pointing to orchestration/

@@ -50,6 +50,8 @@ COPACK_TABLES = ("co_packers", "production_lines", "sku_production_config", "pro
 # Plan U8: write targets whose schema lands before their writer. Each may be empty
 # after a full run until the unit named here writes it; that unit takes its rows
 # off this list in the same change. Any other empty table still fails the run.
+# The list only shrinks (owner, 2026-11-15): tests/test_awaiting_writer.py fails on
+# a table added or a writer changed, and on a DONE writer's table still empty.
 AWAITING_WRITER = {
     "raw.shopify_subscriptions": "U10",
     "raw.shopify_subscription_cancellations": "U11",

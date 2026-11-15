@@ -1,0 +1,94 @@
+{
+ "U1": {
+  "date": "2026-10-07",
+  "done": true
+ },
+ "U10": {
+  "date": "2026-10-07",
+  "done": false
+ },
+ "U11": {
+  "date": "2026-10-07",
+  "done": false
+ },
+ "U12": {
+  "date": "2026-10-07",
+  "done": false
+ },
+ "U13": {
+  "date": "2026-10-07",
+  "done": false
+ },
+ "U14": {
+  "date": "2026-10-23",
+  "done": false
+ },
+ "U15": {
+  "date": "2026-10-07",
+  "done": false
+ },
+ "U16": {
+  "date": "2026-10-22",
+  "done": true
+ },
+ "U17": {
+  "date": "2026-11-12",
+  "done": true
+ },
+ "U18": {
+  "date": "2026-10-21",
+  "done": true
+ },
+ "U19": {
+  "date": "2026-11-15",
+  "done": false
+ },
+ "U2": {
+  "date": "2026-11-14",
+  "done": true
+ },
+ "U20": {
+  "date": "2026-10-07",
+  "done": false
+ },
+ "U21": {
+  "date": "2026-10-23",
+  "done": true
+ },
+ "U22": {
+  "date": "2026-10-09",
+  "done": false
+ },
+ "U23": {
+  "date": "2026-10-13",
+  "done": true
+ },
+ "U3": {
+  "date": "2026-11-09",
+  "done": true
+ },
+ "U4": {
+  "date": "2026-11-11",
+  "done": true
+ },
+ "U5": {
+  "date": "2026-11-15",
+  "done": false
+ },
+ "U6": {
+  "date": "2026-10-07",
+  "done": false
+ },
+ "U7": {
+  "date": "2026-10-07",
+  "done": false
+ },
+ "U8": {
+  "date": "2026-11-15",
+  "done": false
+ },
+ "U9": {
+  "date": "2026-10-07",
+  "done": false
+ }
+}

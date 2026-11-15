@@ -4616,12 +4616,15 @@
   unit: pct-mix
   denominator: errors of the kind / transactions of the kind, per actor - each pair names its own base
   value: 'BASE ERROR RATE PER ACTOR, per transaction of the named kind, y1 -> y3 (A1.11 scales the Cinderhaven-side
-    rates only): cinderhaven_staff - manual order line 7.4% (A6.02), item-setup attribute 3% per attribute, invoice 1.0% of invoices, ASN 6% of shipments (A5.19), remittance mis-application 2% of remittances, price-file entry 2% of SKU-quarters;
+    rates only): cinderhaven_staff - manual order line 7.4% (A6.02), item-setup attribute 3% per attribute, ASN 6% of shipments (A5.19), remittance mis-application 2% of remittances, price-file entry 2% of SKU-quarters;
     retailer - deduction taken in error 25% of deductions by count (A4.02 bucket 1 = 20% of $), receiving miscount 1.0% of receipts (A6.21: 40% of its 2.5%), PO keying 1% of manual POs; distributor - receipt discrepancy 1.5% of distributor receipts, invalid MCB claim 7.9% of
     claims (A4.31); carrier - damage 0.8% of shipments, lost POD 5% of deliveries, carrier-caused late 4% (30% of all late shipments);
-    dtc_customer - bad address 1.5% of orders, chargeback 0.9% of own-site orders (A8.04), fraud 0.3% of own-site orders; system - document sync failure 0.5% of EDI documents,
-    price-file drift 2% of SKU-quarters; supplier/co-packer - lot spec deviation 2% of lots (A5.23), label misprint 0.5% of lots.'
-  history: 'Until 2026-11-03 (owner, DECISIONS#u14) the row printed the retailer''s receiving miscount at 2% of
+    dtc_customer - chargeback 0.9% of own-site orders (A8.04); system - price-file drift 2% of SKU-quarters; supplier/co-packer - lot spec deviation 2% of lots (A5.23), label misprint 0.5% of lots.'
+  history: 'Until 2026-11-15 (owner, DECISIONS#u8-rulings) the row also carried four pairs whose base the
+    window does not generate: staff invoice errors 1.0% of invoices (N17''s invoices beyond the disasters''), system
+    document sync failure 0.5% of EDI documents (N14), DTC bad address 1.5% of orders and DTC fraud 0.3% of
+    own-site orders (G4''s fulfilment, claim and fraud tables). They return with their streams in Phase 4.
+    Until 2026-11-03 (owner, DECISIONS#u14) the row printed the retailer''s receiving miscount at 2% of
     receipts, against A6.21''s 40% of 2.5% = 1.0%, and seven rates named no base though the row said each pair
     names its own.'
   source_url: null
@@ -5235,9 +5238,11 @@
   two_endpoint: false
   unit: formula
   value: 'Planted count = sum over streams of base rate (A6.04, clustered by A6.18) x stream volume (A5.02 lines,
-    A5.20 documents, A2 SKU x partner setups, receipts, remittances, DTC orders from group 8). An OUTPUT - assert
-    the stream list, never the count. Order-of-magnitude at y3 volumes: ~2,500-3,500 ledger rows per year, ~7,000-9,000
-    over the window; retires ''400 defects'' and ''847 errors''.'
+    A2 SKU x partner setups, receipts, remittances, DTC orders from group 8) - the streams the window generates
+    (owner, 2026-11-15, DECISIONS#u8-rulings; A5.20''s EDI documents, N17''s background invoices and G4''s
+    fulfilment and fraud bases are Phase 4''s). An OUTPUT - assert the stream list, never the count. Order-of-magnitude
+    at y3 volumes: ~2,500-3,500 ledger rows per year, ~7,000-9,000 over the window, computed before the four
+    streams left; U11 derives the count over this list; retires ''400 defects'' and ''847 errors''.'
   source_url: null
   source_date: null
   figure: null

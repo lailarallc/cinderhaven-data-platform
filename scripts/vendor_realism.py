@@ -13,6 +13,9 @@ Copies into vendor/realism/:
 - check_anchors.py: the spec gate itself, so the coverage gate computes a
   first-order row's fingerprint and reads a row's printed figures by the spec
   gate's own functions, not a copy that can drift (platform DECISIONS 2026-11-15);
+- unit_status.json: derived from the regen plan's `**Status (date):**` line per
+  unit: its date and whether it reads DONE. Only that, never the plan's prose:
+  seed_all.AWAITING_WRITER's test reads whether a table's writer unit is DONE;
 - MANIFEST.json: the spec commit, a SHA-256 per file, and the spec gate's
   result per check (name, level, finding count), ok checks included.
 
@@ -25,6 +28,7 @@ import argparse
 import hashlib
 import importlib.util
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -35,6 +39,26 @@ VENDOR = ROOT / "vendor" / "realism"
 BUNDLE = {"anchors.yml": "reference/anchors.yml",
           "anchor_enums.yml": "reference/anchor_enums.yml",
           "check_anchors.py": "scripts/check_anchors.py"}
+#: the regen plan, read for unit_status.json only
+PLAN = "docs/plans/2026-09-02-001-feat-cinderhaven-realism-regen-plan.md"
+UNIT_STATUS = "unit_status.json"
+_UNIT = re.compile(r"^### (U\d+)\.", re.M)
+_STATUS = re.compile(r"^\*\*Status \((\d{4}-\d{2}-\d{2})[^)]*\):\*\*\s*(\S+)", re.M)
+
+
+def unit_status(plan: str) -> dict:
+    """{unit: {"date", "done"}} from each unit's first Status line. A unit is DONE when its status
+    starts with DONE; "Done in substance" and "Code complete" are not."""
+    out: dict = {}
+    heads = list(_UNIT.finditer(plan))
+    for i, h in enumerate(heads):
+        body = plan[h.end():heads[i + 1].start() if i + 1 < len(heads) else len(plan)]
+        s = _STATUS.search(body)
+        if s:
+            out[h.group(1)] = {"date": s.group(1), "done": s.group(2).rstrip(".,;:") == "DONE"}
+    if not out:
+        raise VendorRefused(f"{PLAN} gave no unit status")
+    return out
 
 
 class VendorRefused(RuntimeError):
@@ -96,7 +120,13 @@ def vendor(spec: Path, commit: str, out: Path = VENDOR, gate=run_spec_gate) -> d
     if spec_state(spec) != (head, []):
         raise VendorRefused(f"the spec gate run changed the spec tree at {head[:12]}")
     sources = {name: spec / rel for name, rel in BUNDLE.items()}
+    if not (spec / PLAN).is_file():
+        raise VendorRefused(f"the spec checkout has no {PLAN}")
+    status = (json.dumps(unit_status((spec / PLAN).read_text(encoding="utf-8")), indent=1, sort_keys=True)
+              + "\n").encode("utf-8")
     new = manifest(head, sources, checks)
+    new["files"][UNIT_STATUS] = hashlib.sha256(status).hexdigest()
+    new["files"] = dict(sorted(new["files"].items()))
     if not new["spec_gate"]["clean"]:
         bad = [f"{c['name']} ({c['findings']})" for c in checks if c["level"] == "BLOCK" and c["findings"]]
         raise VendorRefused(f"the spec gate is not CLEAN at {head[:12]}: {'; '.join(bad)}")
@@ -105,6 +135,7 @@ def vendor(spec: Path, commit: str, out: Path = VENDOR, gate=run_spec_gate) -> d
     out.mkdir(parents=True, exist_ok=True)
     for name, src in sources.items():
         (out / name).write_bytes(src.read_bytes())
+    (out / UNIT_STATUS).write_bytes(status)
     old_path.write_text(json.dumps(new, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     new["moved"] = moved(old, new)
     return new

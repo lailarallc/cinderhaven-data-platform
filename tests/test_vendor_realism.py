@@ -12,6 +12,11 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 import vendor_realism  # noqa: E402
 
+PLAN_STUB = ("### U1. One\n\n**Status (2026-10-07):** DONE 2026-09-02. A record.\n\n"
+             "### U6. Six\n\n**Status (2026-10-07):** Done in substance.\n\n"
+             "### U8. Eight\n\n**Status (2026-11-15, later):** DONE, merged.\n\n"
+             "### U9. Nine\n\n**Status (2026-10-07):** Not started. DONE later.\n")
+
 CLEAN = [{"name": "check one", "level": "BLOCK", "findings": 0},
          {"name": "check two", "level": "WARN", "findings": 3},
          {"name": "check three", "level": "INFO", "findings": 0}]
@@ -27,6 +32,8 @@ def spec(tmp_path):
     for rel in vendor_realism.BUNDLE.values():
         (s / rel).parent.mkdir(parents=True, exist_ok=True)
         (s / rel).write_text(f"# {rel}\n", encoding="utf-8")
+    (s / vendor_realism.PLAN).parent.mkdir(parents=True, exist_ok=True)
+    (s / vendor_realism.PLAN).write_text(PLAN_STUB, encoding="utf-8")
     _git(s, "init", "-q")
     _git(s, "-c", "user.email=t@t", "-c", "user.name=t", "add", "-A")
     _git(s, "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "x")
@@ -37,11 +44,16 @@ def test_a_clean_gate_vendors_every_file_and_records_every_check_with_its_level(
     out = tmp_path / "vendor"
     m = vendor_realism.vendor(spec, _git(spec, "rev-parse", "HEAD"), out, gate=lambda s: CLEAN)
     assert sorted(p.name for p in out.iterdir()) == ["MANIFEST.json", "anchor_enums.yml", "anchors.yml",
-                                                     "check_anchors.py"]
+                                                     "check_anchors.py", "unit_status.json"]
     saved = json.loads((out / "MANIFEST.json").read_text())
     assert saved["spec_gate"] == {"clean": True, "blocking_findings": 0, "checks": CLEAN}
     assert saved["files"]["anchors.yml"] == vendor_realism.sha256(out / "anchors.yml")
-    assert m["moved"] == ["anchor_enums.yml", "anchors.yml", "check_anchors.py"]
+    assert saved["files"]["unit_status.json"] == vendor_realism.sha256(out / "unit_status.json")
+    assert m["moved"] == ["anchor_enums.yml", "anchors.yml", "check_anchors.py", "unit_status.json"]
+    # DONE leads the status; "Done in substance" and a later "DONE" in the prose do not count.
+    assert json.loads((out / "unit_status.json").read_text()) == {
+        "U1": {"date": "2026-10-07", "done": True}, "U6": {"date": "2026-10-07", "done": False},
+        "U8": {"date": "2026-11-15", "done": True}, "U9": {"date": "2026-10-07", "done": False}}
 
 
 def test_a_gate_that_is_not_clean_is_refused_and_nothing_is_written(spec, tmp_path):
@@ -85,4 +97,11 @@ def test_the_committed_bundle_matches_its_manifest_and_a_clean_spec_gate():
     m = json.loads((vendor / "MANIFEST.json").read_text(encoding="utf-8"))
     assert {n: vendor_realism.sha256(vendor / n) for n in m["files"]} == m["files"]
     assert m["spec_gate"]["clean"] and m["spec_gate"]["blocking_findings"] == 0
-    assert set(m["files"]) == set(vendor_realism.BUNDLE)
+    assert set(m["files"]) == set(vendor_realism.BUNDLE) | {vendor_realism.UNIT_STATUS}
+
+
+def test_a_spec_checkout_without_the_plan_is_refused(spec, tmp_path):
+    (spec / vendor_realism.PLAN).unlink()
+    _git(spec, "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qam", "no plan")
+    with pytest.raises(vendor_realism.VendorRefused, match="has no"):
+        vendor_realism.vendor(spec, _git(spec, "rev-parse", "HEAD"), tmp_path / "v", gate=lambda s: CLEAN)
