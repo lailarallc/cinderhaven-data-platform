@@ -25,6 +25,7 @@ import psycopg2
 import psycopg2.extras
 
 import prod_guard
+import realism_bundle  # the one import of the spec generators' outputs (plan U15)
 from seed_config import init_rng  # the run seed shifts this stream too (plan U2)
 
 # Isolated RNG stream — cannot cascade into trade/count generation.
@@ -58,9 +59,8 @@ NMFC_DEFAULT_CLASS = 175      # fallback when case dimensions are missing
 NMFC_FLOOR_CLASS = 250
 FREIGHT_BASE_RATE_PER_CWT = 18.00   # scaled to the anchor; shape only
 
-# Supplier payment terms
-COPACK_TERMS = 30
-PACKAGING_TERMS = 45
+# Supplier payment terms: the co-packers' and the packaging (glass) supplier's are A9.11's, read through the
+# bundle (U15); freight's is registered by no row, so it stays typed here, owed.
 FREIGHT_TERMS = 21
 
 # Inventory policy
@@ -206,16 +206,16 @@ def load_inputs(cur):
 
 # ── Suppliers ───────────────────────────────────────────────────────
 
-def build_suppliers(products):
+def build_suppliers(products, bundle):
     lines = sorted({p["product_line"] for p in products.values()})
     rows = []
     for i, line in enumerate(lines, 1):
         rows.append((
             f"SUP-COPACK-{i:02d}", f"{line.split()[0]} Co-Pack Partners",
-            "copacker", line, COPACK_TERMS, "Net 30", 0, None, date(2022, 10, 1),
+            "copacker", line, bundle.supplier_terms("co-packers"), "Net 30", 0, None, date(2022, 10, 1),
         ))
     rows.append(("SUP-PKG-01", "Cascade Packaging Group", "packaging", None,
-                 PACKAGING_TERMS, "2/10 Net 45", 0.02, 10, date(2022, 11, 1)))
+                 bundle.supplier_terms("glass"), "2/10 Net 45", 0.02, 10, date(2022, 11, 1)))
     rows.append(("SUP-FRT-01", "Meridian Freight Systems", "freight", None,
                  FREIGHT_TERMS, "Net 21", 0, None, date(2022, 11, 15)))
     return rows
@@ -419,9 +419,51 @@ def simulate(products, demand, shipped, stockout_weeks, slug_skus, rng):
     return runs, lots, balances, snaps
 
 
+def plan(bundle, invoices):
+    """Due and paid dates from the bundle (plan U15): `invoices` with both filled in.
+
+    `invoices` are fct_supplier_invoices rows with due_date and paid_date None: (invoice_id, supplier_id, run_id,
+    invoice_date, None, None, invoice_type, goods, surcharge, moq_fee, credit). Nothing is drawn:
+    - the due date is the invoice date plus A9.11's co-packer terms;
+    - each invoice belongs to the AP run group 9's own rule gives it, the run nearest its DPO day (A9.11);
+    - at each run of the noted ledger's schedule, the invoices due by then are paid oldest first, up to the share of
+      the platform's queue the ledger itself paid at that run, (due - held) / due; an invoice that does not fit
+      waits whole, with every newer one, for the next run (U18: a part-held run pays oldest first). The ledger's
+      dated release is the run that pays them;
+    - an invoice whose run falls after the schedule's last, outside the window, is paid at its run.
+    Runs at the held co-packer slip in U9, which builds A5.30's co-packers (platform DECISIONS 2026-11-15, U15).
+    """
+    runs = bundle.ap_schedule()
+    last = runs[-1]["day"]
+    run_of = {r[0]: bundle.ap_run(r[3]) for r in invoices}
+    terms = timedelta(days=bundle.supplier_terms("co-packers"))
+    amount = {r[0]: float(r[7]) + float(r[8]) + float(r[9]) - float(r[10]) for r in invoices}
+    queue = sorted(invoices, key=lambda r: (r[3], r[0]))
+    paid = {}
+    for run in runs:
+        due = [r[0] for r in queue if r[0] not in paid and run_of[r[0]] <= run["day"]]
+        if not due:
+            continue
+        share = (run["due"] - run["held"]) / run["due"] if run["due"] > 0 else 1.0
+        room = share * sum(amount[i] for i in due)
+        spent = 0.0
+        for i in due:
+            if spent + amount[i] > room + 1e-9:
+                break
+            paid[i] = run["day"]
+            spent += amount[i]
+    for r in queue:
+        if r[0] not in paid:
+            if run_of[r[0]] <= last:
+                raise RuntimeError(f"{r[0]} is left unpaid at the daily ledger's last AP run, {last}")
+            paid[r[0]] = run_of[r[0]]
+    return [r[:4] + (r[3] + terms, paid[r[0]]) + r[6:] for r in invoices]
+
+
 def main():
     rng = init_rng(SEED)
     prod_guard.check(DATABASE_URL)  # refuses a fly tunnel to production
+    bundle = realism_bundle.load()   # verified and memo-keyed; never solves
     conn = psycopg2.connect(DATABASE_URL)
     conn.autocommit = False
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -439,7 +481,7 @@ def main():
     # sql/costing_schema.sql is applied by seed_all.py's DDL step (plan U2), so
     # schema creation happens in one place; costing is empty here.
     print("Building suppliers ...")
-    sup = build_suppliers(products)
+    sup = build_suppliers(products, bundle)
     psycopg2.extras.execute_values(cur, """
         INSERT INTO costing.dim_suppliers (supplier_id, supplier_name, supplier_type,
             product_line, payment_terms_days, terms_code, discount_pct, discount_days, onboarded_date)
@@ -493,17 +535,17 @@ def main():
         man = (pcm[0][4] + pcm[0][5] + pcm[0][6]) if pcm else float(products[sku]["cogs_per_unit"])
         goods = round(u * man, 2)
         n += 1
-        terms = COPACK_TERMS
-        due = comp + timedelta(days=terms)
         # modelled +/-2% causes
         surcharge = round(goods * rng.uniform(0.004, 0.018), 2) if rng.random() < 0.35 else 0
         moq = round(rng.uniform(150, 600), 2) if u < 4000 else 0
         credit = round(goods * rng.uniform(0.003, 0.02), 2) if rng.random() < 0.18 else 0
-        # AP scatter, with a visible stretch during pre-peak build months
+        # The retired paid-date draw (U15): consumed and discarded where it stood, so every later charge and lot
+        # shipment keeps its stream; plan() pays from the daily ledger below.
         stretch = 12 if comp.month in (10, 11, 12) else 0
-        paid = due + timedelta(days=int(rng.gauss(2 + stretch, 6)))
-        inv.append((f"SINV-{n:06d}", sid, rid, comp, due, paid, "copack",
+        int(rng.gauss(2 + stretch, 6))
+        inv.append((f"SINV-{n:06d}", sid, rid, comp, None, None, "copack",
                     goods, surcharge, moq, credit))
+    inv = plan(bundle, inv)
     psycopg2.extras.execute_values(cur, """
         INSERT INTO costing.fct_supplier_invoices (invoice_id, supplier_id, run_id,
             invoice_date, due_date, paid_date, invoice_type, goods_amount,

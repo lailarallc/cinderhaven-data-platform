@@ -34,8 +34,6 @@ HERE = Path(__file__).resolve().parent
 ROUTES = json.loads((HERE / "parity_routes.json").read_text(encoding="utf-8"))
 UNITS = json.loads((ROOT / "vendor" / "realism" / "unit_status.json").read_text(encoding="utf-8"))
 AP = realism_bundle.AP_SCHEDULE
-#: red by design: committed before U15's step 5 gives seed_costing plan(bundle) and its paid-date rule
-RED_UNTIL_STEP_5 = pytest.mark.xfail(strict=True, reason="committed red before U15 step 5's seed_costing edit")
 
 
 @pytest.fixture(scope="module")
@@ -103,13 +101,14 @@ def _invoices():
 
 def _moved(b):
     """Each output seed_costing reads through the bundle, moved one unit (a day; a day of DPO or terms; one AP-run
-    day of the month; one $M of a run's held share)."""
+    day of the month; $0.01M of a part-held run's held)."""
     sched = b.ap_schedule()
     return {
         "the AP-run schedule's days": b.patched(("printed",) + AP, [dict(r, day=r["day"] + timedelta(1))
                                                                     for r in sched]),
-        "the AP-run schedule's held": b.patched(("printed",) + AP, [dict(r, held=min(r["due"], r["held"] + 1.0))
-                                                                    for r in sched]),
+        # $0.01M at each part-held run: a $1K move falls below one whole invoice of the fixture and moves nothing
+        "the AP-run schedule's held": b.patched(("printed",) + AP, [dict(r, held=r["held"] + 0.01) if r["held"] > 0
+                                                                    else r for r in sched]),
         "A9.11's DPO": b.patched(("constant", "group9_ledger", "DPO"), b.constant("group9_ledger", "DPO") + 1),
         "A9.11's AP-run days": b.patched(("constant", "group9_ledger", "AP_RUN_DAYS"), (2, 17)),
         "A9.11's co-packer terms": b.patched(("constant", "group10_floors", "SUPPLIER_TERMS"),
@@ -118,7 +117,6 @@ def _moved(b):
     }
 
 
-@RED_UNTIL_STEP_5
 @pytest.mark.parametrize("output", ["the AP-run schedule's days", "the AP-run schedule's held", "A9.11's DPO",
                                     "A9.11's AP-run days", "A9.11's co-packer terms"])
 def test_each_output_seed_costing_reads_moves_its_planned_rows(bundle, output):
@@ -132,7 +130,6 @@ def test_each_output_seed_costing_reads_moves_its_planned_rows(bundle, output):
     assert seed_costing.plan(_moved(bundle)[output], _invoices()) != seed_costing.plan(bundle, _invoices())
 
 
-@RED_UNTIL_STEP_5
 def test_the_packaging_suppliers_terms_move_its_row(bundle):
     import seed_costing
     p = bundle.patched(("constant", "group10_floors", "SUPPLIER_TERMS"),
@@ -183,14 +180,12 @@ def _written(db):
 
 
 @pytest.mark.db
-@RED_UNTIL_STEP_5
 def test_every_copack_invoice_is_paid_on_the_daily_ledgers_schedule(db, bundle):
     rows = _written(db)
     assert rows, "costing.fct_supplier_invoices holds no copack invoice"
     assert paid_date_problems(bundle, rows) == []
 
 
-@RED_UNTIL_STEP_5
 def test_one_invoice_paid_a_day_off_the_ledger_fails_the_arm(bundle):
     import seed_costing
     given = _invoices()[:200]
@@ -200,3 +195,24 @@ def test_one_invoice_paid_a_day_off_the_ledger_fails_the_arm(bundle):
     i, d, due, paid, *rest = rows[57]
     rows[57] = (i, d, due, paid + timedelta(1), *rest)
     assert any(p.startswith(f"{i}:") for p in paid_date_problems(bundle, rows))
+
+
+# ---------------------------------------------------------------- characterization (U15 step 5)
+@pytest.mark.db
+def test_seed_costing_moves_nothing_but_due_and_paid_dates(db):
+    """On the same raw input, seed_costing writes the rows it wrote before U15, except paid dates (and the
+    days_vs_terms they generate): a moved surcharge, MOQ fee, credit or lot shipment means the stream moved. Due
+    dates do not move: A9.11's co-packer terms are the 30 days the seeder typed."""
+    from psycopg2 import sql
+    before = json.loads((ROOT / "tests" / "fixtures" / "costing_invoices_before_u15.json").read_text(encoding="utf-8"))
+    with db.cursor() as cur:
+        cur.execute(sql.SQL("SELECT count(*), md5(coalesce(string_agg(r, '|' ORDER BY r), '')) FROM "
+                            "(SELECT ROW({})::text r FROM costing.fct_supplier_invoices t) s").format(
+            sql.SQL(", ").join(sql.SQL("t.") + sql.Identifier(c) for c in before["columns"])))
+        assert cur.fetchone() == (before["rows"], before["hash"])
+        world = json.loads((ROOT / "tests" / "fixtures" / "world_hashes_before_u2.json").read_text())["tables"]
+        for t in ("dim_suppliers", "fct_product_costs", "fct_production_runs", "dim_inventory_lots",
+                  "fct_lot_balances", "fct_inventory_snapshot", "fct_lot_shipments"):
+            cur.execute(sql.SQL("SELECT count(*), md5(coalesce(string_agg(t::text, '|' ORDER BY t::text), '')) "
+                                "FROM costing.{} t").format(sql.Identifier(t)))
+            assert cur.fetchone() == (world[f"costing.{t}"]["rows"], world[f"costing.{t}"]["hash"]), t

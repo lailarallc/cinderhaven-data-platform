@@ -1,0 +1,23 @@
+{
+ "recorded_at": "a8324cb (pre-U15 seeder), run seed 0, spec bundle 42bbbff",
+ "table": "costing.fct_supplier_invoices",
+ "excluded": [
+  "paid_date",
+  "days_vs_terms"
+ ],
+ "columns": [
+  "invoice_id",
+  "supplier_id",
+  "run_id",
+  "invoice_date",
+  "due_date",
+  "invoice_type",
+  "goods_amount",
+  "freight_surcharge",
+  "moq_fee",
+  "short_ship_credit",
+  "invoice_amount"
+ ],
+ "rows": 294,
+ "hash": "9dc2d9af230009964a81b82cc9e2816d"
+}

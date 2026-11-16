@@ -1143,8 +1143,6 @@ COVERAGE_KEYS = {
     "seed_config.DTC_FULFILLMENT_RATE_BY_QUARTER": {"owed": "U15", "why": "group 8's DTC fulfilment cost"},
     "seed_config.DTC_FULFILLMENT_WEIGHT_MULT": {"owed": "U15", "why": "group 8's DTC fulfilment cost"},
     "seed_config.DTC_PLATFORM_FEE_RATE": {"owed": "U15", "why": "group 8's payment and platform fees (A8.05)"},
-    "seed_costing.COPACK_TERMS": {"owed": "U15", "why": "supplier paid dates from U16's daily ledger"},
-    "seed_costing.PACKAGING_TERMS": {"owed": "U15", "why": "supplier paid dates from U16's daily ledger"},
     "seed_costing.FREIGHT_TERMS": {"owed": "U15", "why": "supplier paid dates from U16's daily ledger"},
     "seed_costing.DRIFT_START": {"owed": "U15", "why": "group 9's ingredient cost path"},
     "seed_costing.DRIFT_END": {"owed": "U15", "why": "group 9's ingredient cost path"},
