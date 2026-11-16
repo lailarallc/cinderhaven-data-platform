@@ -3,9 +3,19 @@
     "anchor_enums.yml": "45f4c01ef4fdd08f492fb77deb76c61e3dc2f619306a82f833117aa3723df250",
     "anchors.yml": "5636accf520df41ab55406ce32db6f92310e6d4e6e465e41f684294d1df7f962",
     "check_anchors.py": "504372805d95c1a5fed299e431327724bb73c527c9d1ebb31ca2d7d2d9fd3c6b",
-    "unit_status.json": "c3dfcbbf42f35a469efc4f48fceecc53a60d32f3cbc9147d93c76607487df77a"
+    "group10_floors.py": "8e5769a8c45c693d022c961ee1ba1459c9eeb6f79ebf4a4666f1340d92883fbb",
+    "group11_compliance.py": "06385b8e511e3470957b79978c0de5660c365c9237a086a8707da40cbf89ae91",
+    "group8_dtc.py": "0fdafeef975d0395b55afd36931f693f9ee20fe05ba492f325c14748c03e72e5",
+    "group9_ledger.py": "d188629b5353eebcd3fb8cfe59ea2e237c803243d5b9f3c456804321b1d10603",
+    "outputs.json": "6b8a9692b3fad5820b124a367b9949b069987c635dbe129d486599006c9c71f7",
+    "unit_status.json": "20387fda704ed13d1b2f1c71a295275610a77a3385e1bcc0b4b441d9d233c777"
   },
-  "spec_commit": "6b5a66392942186bf0f8ba825031107c20383e23",
+  "memo_sha256": "46be65a07ad44b2d1d5eb61d46e370dbbf57ccca451562dcfecf43d302fac263",
+  "pinned_trial": {
+    "digest": "65c7d4eb58646bfc5fa7fa326a225eee37765bf90f97135d48a21405a977fb3c",
+    "index": 0
+  },
+  "spec_commit": "42bbbff92f5ed2783a67bd299eac2c64df97f5d8",
   "spec_gate": {
     "blocking_findings": 0,
     "checks": [
