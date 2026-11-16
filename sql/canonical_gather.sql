@@ -491,3 +491,49 @@ SELECT 'revenue.defect_sku_ttm.ttm_through_2025_12_27|'||(
   SELECT SUM(dollars_sold) FROM raw.scan_data
   WHERE sku IN (SELECT sku FROM defect)
     AND week_ending > (SELECT MAX(week_ending) FROM raw.scan_data) - 365)::numeric(16,2);
+
+-- ── KEYS BATCH 1: TRAILING-365 RETAILER WASTE (U19, 2026-11-15) ─────
+-- trade-spend-data-diagnostic's operational waste (sql/trade_rate/
+-- all_in_trade_rate.sql, sql/deductions/waste_by_category.sql): retailer
+-- deductions only, every type but promo_billback, deduction_date in
+-- (MAX(week_ending) - 365 days, MAX(week_ending)]; its rate is over the
+-- trailing-52-week scan revenue that trade.structural_rate_pct uses. Not
+-- trade.op_waste_annual, which is the 36-month retailer-and-distributor
+-- total / 3. Reproduced on the harness 2026-11-15: 343280.70, 4,772 events,
+-- 1.06% of 32323139.62.
+WITH mx AS (SELECT MAX(week_ending) AS d FROM raw.scan_data),
+w AS (SELECT DISTINCT week_ending FROM raw.scan_data ORDER BY week_ending DESC LIMIT 52),
+rev AS (SELECT SUM(dollars_sold) AS r FROM raw.scan_data WHERE week_ending >= (SELECT MIN(week_ending) FROM w)),
+rw AS (SELECT SUM(amount) AS amt, COUNT(*) AS n FROM raw.retailer_deductions, mx
+       WHERE deduction_type <> 'promo_billback' AND deduction_date > mx.d - 365 AND deduction_date <= mx.d)
+SELECT 'trade.op_waste_retailer.trailing_365d|'||ROUND(amt, 2)::text FROM rw
+UNION ALL SELECT 'trade.op_waste_retailer_events.trailing_365d|'||n::text FROM rw
+UNION ALL SELECT 'trade.op_waste_retailer_rate_pct.trailing_52w|'||ROUND(100 * amt / r, 2)::text FROM rw, rev;
+
+-- ── KEYS BATCH 2: COUNTS AND RATIOS CONSUMERS QUERY (U19, 2026-11-15) ─
+-- the-question-engine (scripts/check_canonical.py), each to four places:
+-- the top retailer's share of all-time order value (fct_retailer_orders
+-- total_value); recovered / gross over fct_retailer_deductions; the share of
+-- fct_retailer_shipments with asn_sent_late; the mean of total_deductions /
+-- gross_amount over fct_retailer_payments. retail-velocity-decision-tool
+-- (tests/test_canonical_regression.py): promotions per retailer; retailer
+-- requirement rows, all and required. price-point-architecture
+-- (analysis/readiness_gate.py A2): distinct unit_weight_lbs, rounded to four
+-- places, per product line. And retailer gross invoiced, all time (the sum
+-- of fct_retailer_payments.gross_amount; CINDERHAVEN_CANONICAL.md documents
+-- it, the yml had no key), which contract-to-cash restates to.
+WITH rev AS (SELECT retailer_id, SUM(total_value) AS v FROM public_marts.fct_retailer_orders GROUP BY retailer_id)
+SELECT 'concentration.top_retailer_share_of_orders.all_time|'||ROUND(MAX(v) / SUM(v), 4)::text FROM rev
+UNION ALL SELECT 'deductions_recovery.retailer_recovery_rate.all_time|'||
+  ROUND(SUM(recovered_amount) / NULLIF(SUM(deduction_amount), 0), 4)::text FROM public_marts.fct_retailer_deductions
+UNION ALL SELECT 'shipments.asn_late_rate.all_time|'||
+  ROUND(SUM(CASE WHEN asn_sent_late THEN 1 ELSE 0 END)::numeric / COUNT(*), 4)::text FROM public_marts.fct_retailer_shipments
+UNION ALL SELECT 'payments.retailer_mean_deduction_rate.all_time|'||
+  ROUND(AVG(total_deductions / NULLIF(gross_amount, 0))::numeric, 4)::text FROM public_marts.fct_retailer_payments
+UNION ALL SELECT 'promotions_by_retailer.'||lower(replace(r.name, ' ', '_'))||'.all_time|'||COUNT(*)::text
+  FROM raw.promotions p JOIN raw.retailers r ON r.retailer_id = p.retailer_id GROUP BY r.name
+UNION ALL SELECT 'retailer_requirements.rows.all_time|'||COUNT(*)::text FROM raw.retailer_requirements
+UNION ALL SELECT 'retailer_requirements.required.all_time|'||COUNT(*) FILTER (WHERE required)::text FROM raw.retailer_requirements
+UNION ALL SELECT 'products.distinct_unit_weights.'||lower(replace(product_line, ' ', '_'))||'.all_time|'||
+  COUNT(DISTINCT ROUND(unit_weight_lbs, 4))::text FROM raw.product_master GROUP BY product_line
+UNION ALL SELECT 'revenue_invoiced.gross_invoiced_retailer.all_time|'||SUM(gross_amount)::numeric(16,2)::text FROM public_marts.fct_retailer_payments;

@@ -453,6 +453,15 @@ trade:
     trailing_365d: 379558.78
   op_waste_rate_pct:
     trailing_52w: 1.17
+  # Retailer deductions only, every type but promo_billback, over the 365 days
+  # to the last scan week -- trade-spend-data-diagnostic's operational waste.
+  # Not op_waste_annual (36-month retailer + distributor total / 3).
+  op_waste_retailer:
+    trailing_365d: 343280.70
+  op_waste_retailer_events:
+    trailing_365d: 4772
+  op_waste_retailer_rate_pct:
+    trailing_52w: 1.06
   promotional_spend:
     cy2023: 194512.94
     cy2024: 134377.94
@@ -584,6 +593,36 @@ lifecycle:  # cents remitted per invoiced dollar: net / gross x100
     all_time: 93.13
   wholesale_cents_per_dollar:  # retailer and distributor combined
     all_time: 89.08
+
+# Keys batch 2 (U19, 2026-11-15): counts and ratios consumers query, given keys so a regen that moves them is
+# seen. Producers: sql/canonical_gather.sql, "KEYS BATCH 2".
+concentration:
+  top_retailer_share_of_orders: {all_time: 0.2070}   # the-question-engine q01, prints ~21%
+deductions_recovery:
+  retailer_recovery_rate: {all_time: 0.1421}         # recovered / gross; the-question-engine q10, prints ~15%
+shipments:
+  asn_late_rate: {all_time: 0.0857}                  # the-question-engine q13, prints ~8.6%
+payments:
+  retailer_mean_deduction_rate: {all_time: 0.1274}   # mean per remittance; the-question-engine q15, prints ~13.2%
+promotions_by_retailer:
+  costco: {all_time: 22}
+  kroger: {all_time: 16}
+  regional_group: {all_time: 16}
+  sprouts: {all_time: 24}
+  walmart: {all_time: 25}
+  whole_foods: {all_time: 20}
+retailer_requirements:
+  rows: {all_time: 66}
+  required: {all_time: 53}
+products:
+  distinct_unit_weights:                             # price-point-architecture gate A2
+    artisan_sauces: {all_time: 10}
+    dried_goods: {all_time: 8}
+    pantry_staples: {all_time: 10}
+    snack_bites: {all_time: 10}
+    specialty_condiments: {all_time: 9}
+revenue_invoiced:
+  gross_invoiced_retailer: {all_time: 52128777.36}   # CINDERHAVEN_CANONICAL.md "Gross invoiced (retailer, 36mo)"
 
 # Each data_windows row count as a figure of its own (plan U19: "a count held only inside a data_windows string
 # gets a numeric key"). verify_canonical.py reads each from that table's window line in the gather.
