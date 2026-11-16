@@ -9,6 +9,43 @@ For things that didn't work, see FAILURES.md.
 
 ---
 
+## 2026-11-15 (evening) — U15 code complete on branch `u15-generators` (not merged; findings for the owner)
+
+**Base:** worktree `../cinderhaven-data-platform-u15`, cut from `origin/main` at `4e28226`.
+
+**Owner rulings at U15's start** (spec `DECISIONS#u15-rulings`, merged to spec main `42bbbff`):
+- 1449: Test A was already ruled; trial 0 decides.
+- 1398: the mature hazard stands; the "inside 5–8%" text is corrected.
+- 1448: A3.21 is routed to U10's start, with 14.62% of count against 2–4%.
+
+**Did (baseline after each step):**
+- `1666f24` the whole bundle at spec `42bbbff`: four generators, `outputs.json`, memo key (`memo_sha256`), trial
+  0's digest. `scripts/vendor_realism.py` runs the slow recompute before installing; it held (17m46s).
+  `generation/realism_bundle.py` is the one import.
+- `2d32b9f` bundle tests; one import; no literal (owed list 22 values, 10 series; shrink-only);
+  U4's ban now names the four generators (a bare `import group11_compliance` passed it).
+- `a8324cb` `tests/acceptance/test_generator_parity.py`, red before the seeder edit; 651 keys routed.
+- `1f3c1af` `seed_costing.plan`: paid dates from the daily ledger's AP schedule, oldest first; the old draw
+  consumed. `COVERAGE_KEYS` U15 owed 11 -> 9.
+
+**Baseline:** steps 1–3, 55 of 55 tables identical (five on pre-U8 columns), 21 empty. Step 4: 54 of 55;
+`costing.fct_supplier_invoices` moves in `paid_date` (and its generated `days_vs_terms`) only, proven against
+`tests/fixtures/costing_invoices_before_u15.json`.
+
+**State:** fast tier 289 passed, db tier 136 passed; coverage and canonical-drift gates clean. Nothing touched
+production.
+
+**For the owner (DECISIONS 2026-11-15, U15):**
+- Owed parity arms are pre-registered assertions, not SQL; the columns they read do not exist yet.
+- A10.07's ladder and the held co-packer's slip wait on U9.
+- The rule on today's lumpy invoices writes y2 days past terms up to 164 (ledger ~48). Ship now, or hold
+  the paid-date change until U9?
+- Nine `COVERAGE_KEYS` stay owed to U15 with no U15 landing in the plan.
+
+**Next:** the owner's rulings on the findings, then "merge it".
+
+---
+
 ## 2026-11-15 (later) — U8 code complete on branch `u8-schema` (not merged)
 
 **Base:** cut from `origin/u5-registry` at `fe3baf6` (U5 was not on main yet), so the branch carries U5

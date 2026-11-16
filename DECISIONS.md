@@ -384,6 +384,87 @@ Each entry:
 - **Do not:** add a table to `AWAITING_WRITER` or widen the ceiling in the
   test. A new schema-first table needs its own owner ruling.
 
+### 2026-11-15 — U15: the spec generators wired in; owner rulings at its start; session calls
+- **Owner rulings at U15's start (2026-11-15; spec `DECISIONS#u15-rulings`,
+  spec `42bbbff`):** 1449, Test A, was already ruled (trial 0 decides);
+  1398, the mature hazard: the figure stands and the "inside 5–8%" text is
+  corrected; 1448, A3.21's `pricing_error` rate, is routed to U10's start,
+  carrying 14.62% of count at A10.17's means against A3.21's 2–4%.
+- **The bundle:** `vendor/realism/` at spec `42bbbff` (gate CLEAN): the
+  registry, its enums, the spec gate, the four generators and `outputs.json`
+  from the gate's own `--export`. The MANIFEST adds the memo key as
+  `memo_sha256` (the spec gate's cache key, recomputed by the loader from
+  the vendored copies; named for what it is, a digest, after the gitleaks
+  hook read a `*_key` field as an API key) and
+  trial 0's digest. `scripts/vendor_realism.py` is the one procedure: it
+  stages every file, runs the slow recompute on the staged bytes in a fresh
+  process (groups 8 and 9 recomputed; 10 and 11 on the memo's factor; a
+  fresh solve), and installs nothing unless it holds.
+- **Session calls, for the owner's review (fork policy):**
+  - *The memo key and trial digest live in the MANIFEST, not `outputs.json`.*
+    The spec gate's `--export` writes `{commit, generators}` only; the
+    vendor step adds both, computed by the loader's own functions.
+  - *The seed-time replay calls `catalogue_draws(trials=1, replay=0)`, not
+    group 11's `outputs()`.* `outputs()` recomputes every printed value;
+    the replay alone takes 12 s and equals the exported `trial` exactly.
+  - *The paid-date rule binds to the generator, not the plan's prose.* The
+    plan says "the first AP run on or after its due date"; group 9's
+    `_ap_run` pays at the run nearest the invoice's DPO day (A9.11,
+    owner-signed 2026-10-21), which can fall before the due date. U18 Q8
+    binds A10.07 exactly to the ledger, so `seed_costing.plan` calls
+    `_ap_run` through the bundle.
+  - *A part-held run on whole invoices.* At each run the platform pays its
+    queue oldest first up to the ledger's paid share, (due − held) / due; the
+    first invoice that does not fit waits whole, with every newer one. An
+    invoice whose run falls after the schedule's last is paid at its run.
+  - *Terms through the bundle:* co-packers read A9.11's co-packer terms (30);
+    the packaging supplier reads A9.11's glass terms (45). Neither value
+    moves. `COPACK_TERMS` and `PACKAGING_TERMS` leave `COVERAGE_KEYS`;
+    `FREIGHT_TERMS` (21) has no row and stays owed.
+  - *U4's ban names the four generators by bare module name.* A scan-root
+    `import group11_compliance` passed it; the trial names which SKUs the
+    world declines.
+  - *The literal test ships with an owed list* (22 values and 10 series in
+    today's seeders, owed to U9 and U10), only ever shrinking, keyed by file
+    and value; a hit beyond it fails. Significant figures follow the plan:
+    400, 1200 and 2000 have one or two, so A7.04's round door counts in
+    `seed_config.py` are not caught as single values (they are not typed as
+    a series in plan order either).
+  - *Parity routes as data:* `tests/acceptance/parity_routes.json` routes
+    all 651 keys (1 arm here, 142 owed arms pre-registered with class,
+    assertion and writer, 177 to another suite, 331 read by no seeder). An
+    owed arm whose writer the vendored plan marks DONE fails.
+- **Findings for the owner's ruling** (U15's report lists them):
+  - *The owed arms are pre-registered as assertions, not SQL.* Most read
+    columns that do not exist yet (`raw.stores` has no banner or year;
+    `raw.shopify_chargebacks` no network). SQL on columns the writer has not
+    named would be a guess, so each writer writes its arm with the shape.
+  - *A10.07's ladder and the held co-packer's slip need U9.* Invoice dollars
+    equal the ledger's only on U9's COGS, and the held co-packer is A5.30's,
+    which U9 builds; until then U15 writes paid dates only, no slipped run.
+  - *On today's invoices the rule writes a y2 tail the ledger does not
+    hold.* The platform's 294 copack invoices are lumpy (median $110K,
+    largest $662K) and do not follow the ledger's daily purchases. Days past
+    terms by invoice year, worst / mean: 10 / 2.0 (y1), 164 / 26.2 (y2),
+    9 / 3.5 (y3). The ledger's own worst is about 48 in y2 (A10.07, the
+    line's own cash), and its y1 holds barely show. Paying the invoice that
+    crosses the line (or rounding it at half) still leaves 90 days in y2, so
+    the rule is not the cause; the invoices are. The strict rule stays (it
+    never pays past the ledger's line). Owner: ship U15's paid dates now, or
+    hold the paid-date change until U9's invoices.
+  - *Nine `COVERAGE_KEYS` stay owed to U15* with no U15 landing in the plan:
+    group 8's three DTC fee constants (U10's `seed_dtc.py`), the two drift
+    constants (U9's COGS), `FREIGHT_TERMS` (no row) and copack's three
+    fixtures (no generator output carries per-SKU copack runs).
+- **Scope:** `scripts/vendor_realism.py`, `vendor/realism/`,
+  `generation/realism_bundle.py`, `generation/seed_costing.py`,
+  `generation/seed_config.py` (`COVERAGE_KEYS`), `quarantine/truth_gate.py`,
+  `tests/test_vendor_realism.py`, `tests/test_realism_bundle.py`,
+  `tests/fixtures/bundle/`, `tests/acceptance/`.
+- **Do not:** import a group module or read `vendor/realism/` outside
+  `generation/realism_bundle.py`; solve the account factor at seed time;
+  draw a paid date.
+
 ## Orchestration
 
 ### 2026-05-13 — Dagster requires --working-directory pointing to orchestration/
