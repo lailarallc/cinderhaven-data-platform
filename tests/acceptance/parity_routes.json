@@ -83,77 +83,77 @@
   "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
  },
  "group10_floors|printed|A10.07|A10.07's hold-cut fit: the co-pack lead it slips by": {
-  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers; U9 turns on U15's paid-date rule, and no invoice runs past the ledger's worst days (owner, 2026-11-15)",
   "class": "exact",
   "route": "owed",
   "suite": "generator parity",
   "writer": "U9"
  },
  "group10_floors|printed|A10.07|A10.07's hold-cut fit: the cover in days, then the net cut's ends": {
-  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers; U9 turns on U15's paid-date rule, and no invoice runs past the ledger's worst days (owner, 2026-11-15)",
   "class": "exact",
   "route": "owed",
   "suite": "generator parity",
   "writer": "U9"
  },
  "group10_floors|printed|A10.07|A10.07's hold-cut fit: the gross co-pack slip the cover absorbed": {
-  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers; U9 turns on U15's paid-date rule, and no invoice runs past the ledger's worst days (owner, 2026-11-15)",
   "class": "exact",
   "route": "owed",
   "suite": "generator parity",
   "writer": "U9"
  },
  "group10_floors|printed|A10.07|A10.07's hold-cut fit: the in-house lead the materials slip by": {
-  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers; U9 turns on U15's paid-date rule, and no invoice runs past the ledger's worst days (owner, 2026-11-15)",
   "class": "exact",
   "route": "owed",
   "suite": "generator parity",
   "writer": "U9"
  },
  "group10_floors|printed|A10.07|A10.07's hold-cut fit: the materials' gross slip": {
-  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers; U9 turns on U15's paid-date rule, and no invoice runs past the ledger's worst days (owner, 2026-11-15)",
   "class": "exact",
   "route": "owed",
   "suite": "generator parity",
   "writer": "U9"
  },
  "group10_floors|printed|A10.07|A10.07's hold-cut fit: y3's allocation_shortage budget, then A5.10's share and A5.12's rate": {
-  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers; U9 turns on U15's paid-date rule, and no invoice runs past the ledger's worst days (owner, 2026-11-15)",
   "class": "exact",
   "route": "owed",
   "suite": "generator parity",
   "writer": "U9"
  },
  "group10_floors|printed|A10.07|A10.07's oldest unpaid invoice at worst, y1 / y2 / y3, the line's own cash": {
-  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers; U9 turns on U15's paid-date rule, and no invoice runs past the ledger's worst days (owner, 2026-11-15)",
   "class": "exact",
   "route": "owed",
   "suite": "generator parity",
   "writer": "U9"
  },
  "group10_floors|printed|A10.07|A10.07's release: the held invoices the note pays, then the cash-in-advance orders": {
-  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers; U9 turns on U15's paid-date rule, and no invoice runs past the ledger's worst days (owner, 2026-11-15)",
   "class": "exact",
   "route": "owed",
   "suite": "generator parity",
   "writer": "U9"
  },
  "group10_floors|printed|A10.07|A10.07's y1 priority-loss day": {
-  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers; U9 turns on U15's paid-date rule, and no invoice runs past the ledger's worst days (owner, 2026-11-15)",
   "class": "exact",
   "route": "owed",
   "suite": "generator parity",
   "writer": "U9"
  },
  "group10_floors|printed|A10.07|A10.07's y2 days: priority loss, the late fee, the hold": {
-  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers; U9 turns on U15's paid-date rule, and no invoice runs past the ledger's worst days (owner, 2026-11-15)",
   "class": "exact",
   "route": "owed",
   "suite": "generator parity",
   "writer": "U9"
  },
  "group10_floors|printed|A10.07|A10.07's y2 edge: the run before, then the run after": {
-  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers; U9 turns on U15's paid-date rule, and no invoice runs past the ledger's worst days (owner, 2026-11-15)",
   "class": "exact",
   "route": "owed",
   "suite": "generator parity",
@@ -3129,9 +3129,10 @@
  },
  "group9_ledger|printed|A9.11|the AP-run schedule, A10.19's note in it, $M": {
   "class": "exact",
+  "note": "built and off until U9 rebuilds the invoices from the ledger's purchases and turns it on (owner, 2026-11-15)",
   "route": "arm",
   "test": "test_every_copack_invoice_is_paid_on_the_daily_ledgers_schedule",
-  "writer": "U15"
+  "writer": "U9"
  },
  "group9_ledger|printed|A9.12|A9.12's Q4 build, +40% of finished goods, the row and group 9's doc": {
   "assertion": "finished goods and the Q4 build, valued at the P&L's landed cost, reproduce A9.12's within one minimum co-packed run (A5.29's 5,000 units at that year's landed cost; U18 Q8)",

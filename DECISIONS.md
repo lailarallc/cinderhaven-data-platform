@@ -417,10 +417,11 @@ Each entry:
     queue oldest first up to the ledger's paid share, (due − held) / due; the
     first invoice that does not fit waits whole, with every newer one. An
     invoice whose run falls after the schedule's last is paid at its run.
-  - *Terms through the bundle:* co-packers read A9.11's co-packer terms (30);
-    the packaging supplier reads A9.11's glass terms (45). Neither value
-    moves. `COPACK_TERMS` and `PACKAGING_TERMS` leave `COVERAGE_KEYS`;
-    `FREIGHT_TERMS` (21) has no row and stays owed.
+  - *Terms through the bundle:* co-packers read A9.11's co-packer terms (30;
+    the value does not move); `COPACK_TERMS` leaves `COVERAGE_KEYS`.
+    ~~The packaging supplier reads A9.11's glass terms (45).~~ Struck by the
+    owner, 2026-11-15 ("a guess wearing a rule's clothes"): `PACKAGING_TERMS`
+    stays typed and owed (rulings below).
   - *U4's ban names the four generators by bare module name.* A scan-root
     `import group11_compliance` passed it; the trial names which SKUs the
     world declines.
@@ -434,7 +435,32 @@ Each entry:
     all 651 keys (1 arm here, 142 owed arms pre-registered with class,
     assertion and writer, 177 to another suite, 331 read by no seeder). An
     owed arm whose writer the vendored plan marks DONE fails.
-- **Findings for the owner's ruling** (U15's report lists them):
+- **The four findings, RULED (owner, 2026-11-15, relayed verbatim through the
+  U3 session):**
+  1. *Hold the paid-date rule.* "The rule is right; the invoices underneath
+     it are wrong, and U9 rebuilds them." It stays built and OFF
+     (`seed_costing.PAID_DATES_FROM_LEDGER = False`): the AP scatter writes
+     paid dates, and the baseline does not move. Its arm is red by design
+     (strict xfail on the switch); a test fails once U9 is DONE with the
+     switch still off. U9's Depends-on gains "turn on the paid-date rule; no
+     invoice past the ledger's worst days" (spec plan).
+  2. *The 142 owed arms are accepted on one condition:* a list that only
+     shrinks, each tied to the unit that creates its columns, each becoming
+     SQL when that unit lands. `OWED_CEILING` in the parity suite (U7 8,
+     U9 86, U10 43, U13 5) is tested.
+  3. *A10.07's exact ladder and the held co-packer's slipped runs* go in
+     U9's Depends-on (spec plan).
+  4. *The nine keys:* group 8's three DTC fee constants to U10; the two drift
+     constants to U9; copack's three fixtures to U10, with an owner ruling at
+     U10's start (derive the booked runs from the co-packed share and A5.29's
+     run floor, or register them). `FREIGHT_TERMS`: A5.24 does not print
+     freight terms, so it is a registry row owed, not "no unit".
+     `PACKAGING_TERMS` likewise. Both are owed to U9 (the gate requires a
+     window unit; U9 owns the supplier rows and the freight constants), the
+     why naming the missing row. That routing is a session call.
+  - On the fork calls: the `memo_sha256` rename and the paid-date rule
+    (`_ap_run`, the generator's rule) stand.
+- **The findings as raised** (kept for the record):
   - *The owed arms are pre-registered as assertions, not SQL.* Most read
     columns that do not exist yet (`raw.stores` has no banner or year;
     `raw.shopify_chargebacks` no network). SQL on columns the writer has not

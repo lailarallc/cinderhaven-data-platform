@@ -29,6 +29,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "generation"))
 import realism_bundle  # noqa: E402
+import seed_costing  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
 ROUTES = json.loads((HERE / "parity_routes.json").read_text(encoding="utf-8"))
@@ -87,6 +88,26 @@ def test_a_writer_that_has_landed_leaves_no_owed_arm():
     assert landed == [], f"{landed} are DONE in the vendored plan; write their owed arms as tests here"
 
 
+#: The owed arms as U15 registered them (owner, 2026-11-15): a list that only shrinks, each tied to the unit that
+#: creates its columns and turned into SQL when that unit lands. Only ever lower a count.
+OWED_CEILING = {"U7": 8, "U9": 86, "U10": 43, "U13": 5}
+
+
+def test_the_owed_arms_only_shrink():
+    owed = {}
+    for r in ROUTES.values():
+        if r["route"] == "owed":
+            owed[r["writer"]] = owed.get(r["writer"], 0) + 1
+    over = {u: (n, OWED_CEILING.get(u, 0)) for u, n in owed.items() if n > OWED_CEILING.get(u, 0)}
+    assert over == {}, f"owed arms beyond the ceiling (now, ceiling): {over}; an owed arm leaves as SQL, never joins"
+    assert sum(OWED_CEILING.values()) == 142
+
+
+def test_the_paid_date_rule_is_on_once_u9_lands():
+    """Off until U9 rebuilds the invoices from the ledger's purchases (owner, 2026-11-15); U9 turns it on."""
+    assert seed_costing.PAID_DATES_FROM_LEDGER or not UNITS["U9"]["done"]
+
+
 # ---------------------------------------------------------------- perturbation
 def _invoices():
     """A fixed invoice set across the window, mixed sizes, so a moved run or share moves whole invoices."""
@@ -130,10 +151,9 @@ def test_each_output_seed_costing_reads_moves_its_planned_rows(bundle, output):
     assert seed_costing.plan(_moved(bundle)[output], _invoices()) != seed_costing.plan(bundle, _invoices())
 
 
-def test_the_packaging_suppliers_terms_move_its_row(bundle):
-    import seed_costing
+def test_the_co_packers_terms_move_their_supplier_rows(bundle):
     p = bundle.patched(("constant", "group10_floors", "SUPPLIER_TERMS"),
-                       dict(bundle.constant("group10_floors", "SUPPLIER_TERMS"), glass=46))
+                       dict(bundle.constant("group10_floors", "SUPPLIER_TERMS"), **{"co-packers": 31}))
     products = {"S1": {"product_line": "Sauces"}}
     assert seed_costing.build_suppliers(products, p) != seed_costing.build_suppliers(products, bundle)
 
@@ -180,6 +200,8 @@ def _written(db):
 
 
 @pytest.mark.db
+@pytest.mark.xfail(not seed_costing.PAID_DATES_FROM_LEDGER, strict=True, raises=AssertionError,
+                   reason="the rule is built and off until U9 rebuilds the invoices (owner, 2026-11-15)")
 def test_every_copack_invoice_is_paid_on_the_daily_ledgers_schedule(db, bundle):
     rows = _written(db)
     assert rows, "costing.fct_supplier_invoices holds no copack invoice"
@@ -201,8 +223,9 @@ def test_one_invoice_paid_a_day_off_the_ledger_fails_the_arm(bundle):
 @pytest.mark.db
 def test_seed_costing_moves_nothing_but_due_and_paid_dates(db):
     """On the same raw input, seed_costing writes the rows it wrote before U15, except paid dates (and the
-    days_vs_terms they generate): a moved surcharge, MOQ fee, credit or lot shipment means the stream moved. Due
-    dates do not move: A9.11's co-packer terms are the 30 days the seeder typed."""
+    days_vs_terms they generate) once the ledger's rule is on: a moved surcharge, MOQ fee, credit or lot shipment
+    means the stream moved. Due dates do not move: A9.11's co-packer terms are the 30 days the seeder typed. With
+    the rule off the whole world is unchanged, which the baseline check proves."""
     from psycopg2 import sql
     before = json.loads((ROOT / "tests" / "fixtures" / "costing_invoices_before_u15.json").read_text(encoding="utf-8"))
     with db.cursor() as cur:

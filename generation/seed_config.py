@@ -1139,16 +1139,24 @@ COVERAGE_KEYS = {
     "seed_config.EVIDENCE_FILING_MODERATE_DAYS": {"owed": "U13", "why": "evidence tiers under filing capacity (A4.07)"},
     "seed_costing.OVERHEAD_PCT_OF_REVENUE": {"owed": "U13", "why": "the overhead pool's revenue total"},
 
-    # ---- owed: U15, the spec generators wired in (groups 8 and 9) ----
-    "seed_config.DTC_FULFILLMENT_RATE_BY_QUARTER": {"owed": "U15", "why": "group 8's DTC fulfilment cost"},
-    "seed_config.DTC_FULFILLMENT_WEIGHT_MULT": {"owed": "U15", "why": "group 8's DTC fulfilment cost"},
-    "seed_config.DTC_PLATFORM_FEE_RATE": {"owed": "U15", "why": "group 8's payment and platform fees (A8.05)"},
-    "seed_costing.FREIGHT_TERMS": {"owed": "U15", "why": "supplier paid dates from U16's daily ledger"},
-    "seed_costing.DRIFT_START": {"owed": "U15", "why": "group 9's ingredient cost path"},
-    "seed_costing.DRIFT_END": {"owed": "U15", "why": "group 9's ingredient cost path"},
-    "seed_config._COPACK_LINE_RULES": {"owed": "U15", "why": "copack's runs from U16's daily ledger (session call)"},
-    "seed_config.COPACK_PRODUCTION_SCHEDULE": {"owed": "U15", "why": "copack's runs from U16's daily ledger (session call)"},
-    "seed_config.COPACK_SKU_INVENTORY": {"owed": "U15", "why": "copack's stock from U16's daily ledger (session call)"},
+    # ---- owed, re-routed from U15 (owner, 2026-11-15; platform DECISIONS, U15) ----
+    "seed_config.DTC_FULFILLMENT_RATE_BY_QUARTER": {"owed": "U10", "why": "group 8's DTC fulfilment cost"},
+    "seed_config.DTC_FULFILLMENT_WEIGHT_MULT": {"owed": "U10", "why": "group 8's DTC fulfilment cost"},
+    "seed_config.DTC_PLATFORM_FEE_RATE": {"owed": "U10", "why": "group 8's payment and platform fees (A8.05)"},
+    "seed_costing.DRIFT_START": {"owed": "U9", "why": "group 9's ingredient cost path (A3.01, A9.16)"},
+    "seed_costing.DRIFT_END": {"owed": "U9", "why": "group 9's ingredient cost path (A3.01, A9.16)"},
+    "seed_costing.FREIGHT_TERMS": {"owed": "U9", "why": "a registry row is owed: no row prints the freight "
+                                                        "supplier's terms (A5.24 does not)"},
+    "seed_costing.PACKAGING_TERMS": {"owed": "U9", "why": "a registry row is owed: no row prints the packaging "
+                                                          "supplier's terms (A9.11's glass is not it)"},
+    "seed_config._COPACK_LINE_RULES": {"owed": "U10", "why": "copack's runs: derived from the co-packed share and "
+                                                            "A5.29's run floor, or registered (owner ruling at U10's start)"},
+    "seed_config.COPACK_PRODUCTION_SCHEDULE": {"owed": "U10", "why": "copack's runs: derived from the co-packed "
+                                                                    "share and A5.29's run floor, or registered "
+                                                                    "(owner ruling at U10's start)"},
+    "seed_config.COPACK_SKU_INVENTORY": {"owed": "U10", "why": "copack's stock: derived from the co-packed share and "
+                                                              "A5.29's run floor, or registered (owner ruling at "
+                                                              "U10's start)"},
 }
 
 

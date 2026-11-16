@@ -59,9 +59,15 @@ NMFC_DEFAULT_CLASS = 175      # fallback when case dimensions are missing
 NMFC_FLOOR_CLASS = 250
 FREIGHT_BASE_RATE_PER_CWT = 18.00   # scaled to the anchor; shape only
 
-# Supplier payment terms: the co-packers' and the packaging (glass) supplier's are A9.11's, read through the
-# bundle (U15); freight's is registered by no row, so it stays typed here, owed.
+# Supplier payment terms: the co-packers' are A9.11's, read through the bundle (U15). No row registers the
+# packaging or the freight supplier's, so both stay typed here, owed (owner, 2026-11-15).
+PACKAGING_TERMS = 45
 FREIGHT_TERMS = 21
+
+# U15's paid-date rule (plan(), below) is built and OFF (owner, 2026-11-15): on today's invoices it writes y2 days
+# past terms the ledger cannot hold (164 against its ~48). U9 rebuilds the invoices from the ledger's purchases and
+# turns it on; until then the AP scatter below writes paid dates, and the baseline does not move.
+PAID_DATES_FROM_LEDGER = False
 
 # Inventory policy
 LEAD_TIME_DAYS = 35
@@ -215,7 +221,7 @@ def build_suppliers(products, bundle):
             "copacker", line, bundle.supplier_terms("co-packers"), "Net 30", 0, None, date(2022, 10, 1),
         ))
     rows.append(("SUP-PKG-01", "Cascade Packaging Group", "packaging", None,
-                 bundle.supplier_terms("glass"), "2/10 Net 45", 0.02, 10, date(2022, 11, 1)))
+                 PACKAGING_TERMS, "2/10 Net 45", 0.02, 10, date(2022, 11, 1)))
     rows.append(("SUP-FRT-01", "Meridian Freight Systems", "freight", None,
                  FREIGHT_TERMS, "Net 21", 0, None, date(2022, 11, 15)))
     return rows
@@ -539,13 +545,15 @@ def main():
         surcharge = round(goods * rng.uniform(0.004, 0.018), 2) if rng.random() < 0.35 else 0
         moq = round(rng.uniform(150, 600), 2) if u < 4000 else 0
         credit = round(goods * rng.uniform(0.003, 0.02), 2) if rng.random() < 0.18 else 0
-        # The retired paid-date draw (U15): consumed and discarded where it stood, so every later charge and lot
-        # shipment keeps its stream; plan() pays from the daily ledger below.
+        # AP scatter, with a visible stretch during pre-peak build months. With the ledger's rule on, this draw is
+        # still taken where it stood, so every later charge and lot shipment keeps its stream; plan() replaces it.
+        due = comp + timedelta(days=bundle.supplier_terms("co-packers"))
         stretch = 12 if comp.month in (10, 11, 12) else 0
-        int(rng.gauss(2 + stretch, 6))
-        inv.append((f"SINV-{n:06d}", sid, rid, comp, None, None, "copack",
+        paid = due + timedelta(days=int(rng.gauss(2 + stretch, 6)))
+        inv.append((f"SINV-{n:06d}", sid, rid, comp, due, paid, "copack",
                     goods, surcharge, moq, credit))
-    inv = plan(bundle, inv)
+    if PAID_DATES_FROM_LEDGER:
+        inv = plan(bundle, inv)
     psycopg2.extras.execute_values(cur, """
         INSERT INTO costing.fct_supplier_invoices (invoice_id, supplier_id, run_id,
             invoice_date, due_date, paid_date, invoice_type, goods_amount,
