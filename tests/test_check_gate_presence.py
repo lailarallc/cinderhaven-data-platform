@@ -30,7 +30,12 @@ def _platform(tmp_path: Path) -> Path:
     for src_dir, fname, _ in gp.ARTIFACTS:
         (plat / src_dir).mkdir(parents=True, exist_ok=True)
         (plat / src_dir / fname).write_bytes(f"# {fname}\nline two\n".encode())
+    (plat / gp.CEILINGS).parent.mkdir(parents=True, exist_ok=True)
+    (plat / gp.CEILINGS).write_text("# ceilings\nrepo-a: 2  # two typed figures\n", encoding="utf-8")
     return plat
+
+
+LEDGER = "# a comment\nfile_line\tprinted\nREADME.md:1\t$1.2M\nREADME.md:2\t42%\n"
 
 
 def _repo(fleet: Path, plat: Path, name: str, files: dict[str, str] | None = None) -> Path:
@@ -51,7 +56,8 @@ def _repo(fleet: Path, plat: Path, name: str, files: dict[str, str] | None = Non
 def _run(tmp_path: Path, a_files: dict[str, str] | None = None, classes: str = "ABCD", mutate=None):
     plat = _platform(tmp_path)
     fleet = tmp_path / "fleet"
-    a = _repo(fleet, plat, "repo-a", {"app/db.py": "SELECT sku FROM raw.scan_data\n", **(a_files or {})})
+    a = _repo(fleet, plat, "repo-a", {"app/db.py": "SELECT sku FROM raw.scan_data\n", gp.LEDGER: LEDGER,
+                                      **(a_files or {})})
     _repo(fleet, plat, "repo-c")
     if mutate:
         mutate(a)
@@ -62,6 +68,34 @@ def _run(tmp_path: Path, a_files: dict[str, str] | None = None, classes: str = "
 
 def test_a_conforming_fleet_passes_and_the_retired_repo_is_skipped(tmp_path):
     assert _run(tmp_path) == ([], ["old-repo"])
+
+
+@pytest.mark.parametrize("ledger,expect", [
+    (LEDGER + "README.md:3\t9.8%\n", "repo-a: reference/typed_unkeyed.tsv has 3 rows, over its ceiling of 2"),
+    (LEDGER.rsplit("README.md:2", 1)[0], "repo-a: reference/typed_unkeyed.tsv has 1 rows; lower its ceiling in "
+                                         "reference/typed_unkeyed_ceilings.yml from 2 to 1"),
+])
+def test_the_ledger_is_held_to_its_ceiling_both_ways(tmp_path, ledger, expect):
+    bad, _ = _run(tmp_path, {gp.LEDGER: ledger})
+    assert bad == [expect]
+
+
+def test_a_missing_ledger_under_a_ceiling_fails(tmp_path):
+    bad, _ = _run(tmp_path, mutate=lambda a: (a / gp.LEDGER).unlink())
+    assert bad == ["repo-a: reference/typed_unkeyed.tsv missing (ceiling 2)"]
+
+
+def test_a_ledger_without_a_ceiling_fails_once_it_has_rows(tmp_path):
+    def add(a):
+        (a.parent / "repo-c" / "reference").mkdir(exist_ok=True)
+        (a.parent / "repo-c" / gp.LEDGER).write_text(LEDGER, encoding="utf-8")
+    bad, _ = _run(tmp_path, mutate=add)
+    assert bad == ["repo-c: reference/typed_unkeyed.tsv has 2 rows, over its ceiling of 0"]
+
+
+def test_the_platform_ceilings_file_parses():
+    ceilings = gp.load_ceilings(gp.ROOT)
+    assert ceilings and all(isinstance(v, int) and v >= 0 for v in ceilings.values())
 
 
 def test_crlf_line_endings_are_not_drift(tmp_path):

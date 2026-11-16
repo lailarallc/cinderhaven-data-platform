@@ -15,6 +15,9 @@ Per repo, each a failure when it does not hold:
   4. No tracked script holds DDL or DML against a platform schema (raw, costing, truth, copack, voidfinder, public,
      public_*), schema-qualified, or unqualified in a file whose literal search_path names one. The exceptions are
      named in EXCEPTIONS, never inferred.
+  5. Its ledger of typed, unkeyed figures (reference/typed_unkeyed.tsv) holds exactly as many rows as its ceiling
+     in the platform's reference/typed_unkeyed_ceilings.yml (owner, 2026-11-15). More fails; fewer fails too, until
+     the ceiling is lowered to match, so the count only falls. A repo with no ceiling has a ceiling of 0.
 
 Not checked yet: the truth-gate CI job, which U12 or U22 installs.
 
@@ -36,6 +39,8 @@ from refresh_canonical import ARTIFACTS
 
 ROOT = Path(__file__).resolve().parent.parent
 DRIFT_WORKFLOW = ".github/workflows/canonical-drift.yml"
+LEDGER = "reference/typed_unkeyed.tsv"
+CEILINGS = Path("reference") / "typed_unkeyed_ceilings.yml"
 PLATFORM_SCHEMAS = r"(?:raw|costing|truth|copack|voidfinder|public|public_\w+)"
 WRITE_VERB = r"(?:CREATE\s+(?:OR\s+REPLACE\s+)?(?:TEMP\w*\s+)?(?:TABLE|VIEW|SCHEMA|INDEX[^;]*?\bON)|DROP\s+(?:TABLE|VIEW|SCHEMA)" \
              r"|ALTER\s+TABLE|TRUNCATE(?:\s+TABLE)?|INSERT\s+INTO|UPDATE|DELETE\s+FROM|COPY)"
@@ -131,8 +136,37 @@ def check_writes(name: str, repo: Path) -> list[str]:
     return bad
 
 
+def load_ceilings(platform: Path) -> dict[str, int]:
+    out = {}
+    for line in (platform / CEILINGS).read_text(encoding="utf-8").splitlines():
+        line = line.split("#", 1)[0].strip()
+        if line:
+            name, _, n = line.partition(":")
+            out[name.strip()] = int(n)
+    return out
+
+
+def ledger_rows(path: Path) -> int:
+    """Data rows: neither a `#` comment nor the header."""
+    lines = [ln for ln in path.read_text(encoding="utf-8").splitlines() if ln.strip() and not ln.startswith("#")]
+    return max(len(lines) - 1, 0)
+
+
+def check_ledger(name: str, repo: Path, ceiling: int) -> list[str]:
+    path = repo / LEDGER
+    n = ledger_rows(path) if path.is_file() else 0
+    if ceiling and not path.is_file():
+        return [f"{name}: {LEDGER} missing (ceiling {ceiling})"]
+    if n > ceiling:
+        return [f"{name}: {LEDGER} has {n} rows, over its ceiling of {ceiling}"]
+    if n < ceiling:
+        return [f"{name}: {LEDGER} has {n} rows; lower its ceiling in {CEILINGS.as_posix()} from {ceiling} to {n}"]
+    return []
+
+
 def check(read_map: Path, fleet_root: Path, classes: str, platform: Path = ROOT) -> tuple[list[str], list[str]]:
     repos, retired, bad = named_list(read_map, classes)
+    ceilings = load_ceilings(platform)
     for name, _cls in repos:
         repo = find_repo(name, fleet_root)
         if repo is None:
@@ -140,6 +174,7 @@ def check(read_map: Path, fleet_root: Path, classes: str, platform: Path = ROOT)
             continue
         bad += check_artifacts(name, repo, platform)
         bad += check_writes(name, repo)
+        bad += check_ledger(name, repo, ceilings.get(name, 0))
     return bad, retired
 
 
