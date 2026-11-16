@@ -2,7 +2,7 @@
  "_generated": {
   "generated": "2026-11-15",
   "generator": "scripts/verify_canonical.py",
-  "platform_head": "29713ee",
+  "platform_head": "9f3283a",
   "source": "reference/canonical_values.yml",
   "verified_against_production": "2026-07-29"
  },
@@ -86,6 +86,11 @@
    "trailing_12m": 12150677.15,
    "trailing_24m": 24538710.9,
    "trailing_36m": 36705475.65
+  }
+ },
+ "concentration": {
+  "top_retailer_share_of_orders": {
+   "all_time": 0.207
   }
  },
  "cost": {
@@ -183,6 +188,11 @@
    "trailing_12m": 396833.39,
    "trailing_24m": 793678.88,
    "trailing_36m": 1116467.53
+  }
+ },
+ "deductions_recovery": {
+  "retailer_recovery_rate": {
+   "all_time": 0.1421
   }
  },
  "distribution": {
@@ -431,6 +441,11 @@
   "verified_against_production": "2026-07-29",
   "workflow_run": 30488858977
  },
+ "payments": {
+  "retailer_mean_deduction_rate": {
+   "all_time": 0.1274
+  }
+ },
  "price_history": {
   "baseline": {
    "effective_date": "2023-01-01",
@@ -442,6 +457,45 @@
   "provenance": "observed against live raw.price_history 2026-08-01 (read-only proxy); pending canonical_gather.sql",
   "row_count": 407
  },
+ "products": {
+  "distinct_unit_weights": {
+   "artisan_sauces": {
+    "all_time": 10
+   },
+   "dried_goods": {
+    "all_time": 8
+   },
+   "pantry_staples": {
+    "all_time": 10
+   },
+   "snack_bites": {
+    "all_time": 10
+   },
+   "specialty_condiments": {
+    "all_time": 9
+   }
+  }
+ },
+ "promotions_by_retailer": {
+  "costco": {
+   "all_time": 22
+  },
+  "kroger": {
+   "all_time": 16
+  },
+  "regional_group": {
+   "all_time": 16
+  },
+  "sprouts": {
+   "all_time": 24
+  },
+  "walmart": {
+   "all_time": 25
+  },
+  "whole_foods": {
+   "all_time": 20
+  }
+ },
  "recoveries": {
   "retailer_amount": {
    "cy2023": 44982.37,
@@ -450,6 +504,14 @@
    "trailing_12m": 55558.92,
    "trailing_24m": 113358.73,
    "trailing_36m": 158341.1
+  }
+ },
+ "retailer_requirements": {
+  "required": {
+   "all_time": 53
+  },
+  "rows": {
+   "all_time": 66
   }
  },
  "revenue": {
@@ -530,6 +592,11 @@
    "trailing_36m": 52005749.76
   }
  },
+ "revenue_invoiced": {
+  "gross_invoiced_retailer": {
+   "all_time": 52128777.36
+  }
+ },
  "rows": {
   "costing_inventory_snapshot": {
    "all_time": 7800
@@ -578,6 +645,11 @@
   },
   "shopify_orders": {
    "all_time": 18497
+  }
+ },
+ "shipments": {
+  "asn_late_rate": {
+   "all_time": 0.0857
   }
  },
  "supersedes": [
@@ -761,6 +833,15 @@
   },
   "op_waste_rate_pct": {
    "trailing_52w": 1.17
+  },
+  "op_waste_retailer": {
+   "trailing_365d": 343280.7
+  },
+  "op_waste_retailer_events": {
+   "trailing_365d": 4772
+  },
+  "op_waste_retailer_rate_pct": {
+   "trailing_52w": 1.06
   },
   "promotional_spend": {
    "cy2023": 194512.94,
