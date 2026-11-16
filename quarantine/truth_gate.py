@@ -9,8 +9,10 @@ Two static checks over the estimation path's Python:
 2. `assert_no_generator_access(*roots)`: no module imports a seeder
    (`seed_*`, the answer key by another route: compute_defect_profile
    reproduces every defect the defect ledger holds), the generation package,
-   U15's loader `realism_bundle`, or anything under vendor/realism/, and no
-   string constant reads a file there.
+   U15's loader `realism_bundle`, anything under vendor/realism/, or one of
+   the four spec generators by its bare module name (group 11's replayed
+   trial names which SKUs the world declines), and no string constant reads a
+   file there.
 
 Changes from the source, each from the plan: the needle is every truth table,
 schema-qualified, not a substring; there is no `truth.py` skip; every root
@@ -41,7 +43,9 @@ TABLE_NEEDLE = re.compile(r"\btruth\s*\.\s*\"?(" + "|".join(TRUTH_TABLES) + r")\
 SEARCH_PATH_NEEDLE = re.compile(r"search_path\s*(=|\bto\b)\s*[^;\n]*\btruth\b", re.IGNORECASE)
 
 GENERATOR_PREFIX = "seed_"
-GENERATOR_MODULES = ("generation", "realism_bundle")
+GENERATOR_MODULES = ("generation", "realism_bundle",
+                     # U15: the vendored generators import each other by bare name, so a copy can too
+                     "group8_dtc", "group9_ledger", "group10_floors", "group11_compliance")
 VENDOR_REALISM = "vendor/realism"
 
 
