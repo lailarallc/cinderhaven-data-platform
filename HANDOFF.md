@@ -9,7 +9,7 @@ For things that didn't work, see FAILURES.md.
 
 ---
 
-## 2026-11-15 (evening) — U15 code complete on branch `u15-generators` (not merged; findings for the owner)
+## 2026-11-15 (evening) — U15 DONE, merged to main; the paid-date rule built and off until U9
 
 **Base:** worktree `../cinderhaven-data-platform-u15`, cut from `origin/main` at `4e28226`.
 
@@ -32,17 +32,21 @@ For things that didn't work, see FAILURES.md.
 `costing.fct_supplier_invoices` moves in `paid_date` (and its generated `days_vs_terms`) only, proven against
 `tests/fixtures/costing_invoices_before_u15.json`.
 
-**State:** fast tier 289 passed, db tier 136 passed; coverage and canonical-drift gates clean. Nothing touched
-production.
+**The four findings, ruled (owner, 2026-11-15, relayed through the U3 session; DECISIONS, U15):**
+- `4331985`: the paid-date rule is built and OFF (`seed_costing.PAID_DATES_FROM_LEDGER = False`); it writes y2
+  days past terms up to 164 on today's lumpy invoices, against the ledger's ~48. U9 rebuilds the invoices and turns
+  it on; a test fails if U9 is DONE with it off.
+- The 142 owed parity arms only shrink (`OWED_CEILING`: U7 8, U9 86, U10 43, U13 5).
+- A10.07's exact ladder and the held co-packer's slip go to U9's Depends-on.
+- `COVERAGE_KEYS`: DTC fees to U10, drift to U9, copack fixtures to U10 (owner ruling at its start).
+  `FREIGHT_TERMS` and `PACKAGING_TERMS` are registry rows owed, routed to U9. Nothing is owed to U15.
 
-**For the owner (DECISIONS 2026-11-15, U15):**
-- Owed parity arms are pre-registered assertions, not SQL; the columns they read do not exist yet.
-- A10.07's ladder and the held co-packer's slip wait on U9.
-- The rule on today's lumpy invoices writes y2 days past terms up to 164 (ledger ~48). Ship now, or hold
-  the paid-date change until U9?
-- Nine `COVERAGE_KEYS` stay owed to U15 with no U15 landing in the plan.
+**Baseline at `4331985`:** 55 of 55 identical, 21 empty: with the rule off, nothing moves.
 
-**Next:** the owner's rulings on the findings, then "merge it".
+**State:** merged `origin/main` (U19's `9f3283a`, no overlap) in, then fast-forwarded main. Fast tier 296, db
+tier 135 + 1 xfail (the switched-off arm); coverage and canonical-drift gates clean. Nothing touched production.
+
+**Next:** U9 (turn on the paid-date rule with its rebuilt invoices; no invoice past the ledger's worst days).
 
 ---
 
