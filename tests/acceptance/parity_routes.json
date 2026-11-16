@@ -1,0 +1,3388 @@
+{
+ "group10_floors|printed|A1.01|A1.01 the second endpoint's band top, sustained y1 growth, $M": {
+  "assertion": "gross by channel, account and year equals the A1.01 ladder through A5.38's shares, to the cent (the small-account channel's arm is U7's, on N37's tables)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A1.10|A1.10's roster: retailers then distributors, group 4's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A1.10|A1.10's roster: retailers, distributors, then partners, group 5's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A10.02|A10.02's dead in-full drop line: y3's distance in quarterly sd, that sd, then y2's and y1's": {
+  "assertion": "A10.02's lines",
+  "route": "suite",
+  "suite": "survivability",
+  "writer": "U7"
+ },
+ "group10_floors|printed|A10.02|A10.02's live lines in y3: Whole Foods' 90 line's distance and adjacent-pair risk, then the on-time line's": {
+  "assertion": "A10.02's lines",
+  "route": "suite",
+  "suite": "survivability",
+  "writer": "U7"
+ },
+ "group10_floors|printed|A10.03|A10.03 A5.17's below-target shares, in-full then on-time": {
+  "assertion": "the consequence chains' stage lags",
+  "route": "suite",
+  "suite": "survivability",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A10.03|A10.03 pair risk in a year": {
+  "assertion": "the consequence chains' stage lags",
+  "route": "suite",
+  "suite": "survivability",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A10.03|A10.03 quarter risk, on-time vs 80": {
+  "assertion": "the consequence chains' stage lags",
+  "route": "suite",
+  "suite": "survivability",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A10.03|A10.03 the quarter mean's sd": {
+  "assertion": "the consequence chains' stage lags",
+  "route": "suite",
+  "suite": "survivability",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A10.03|A10.03 the quarter table, by year: one quarter, two consecutive, a pair in the year": {
+  "assertion": "the consequence chains' stage lags",
+  "route": "suite",
+  "suite": "survivability",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A10.03|A10.03 two consecutive quarters below the line": {
+  "assertion": "the consequence chains' stage lags",
+  "route": "suite",
+  "suite": "survivability",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A10.04|A10.04 Kroger below the floor per review, then its delists": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A10.04|A10.04 a stated y1 pair, as one in N": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A10.04|A10.04 the 90 line's distance in quarterly sd": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A10.04|A10.04 the y3 risks, a stated pair then any adjacent pair": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A10.05|A10.05's dollars a club-week, then the clubs they are spread over": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A10.07|A10.07's hold-cut fit: the co-pack lead it slips by": {
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.07|A10.07's hold-cut fit: the cover in days, then the net cut's ends": {
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.07|A10.07's hold-cut fit: the gross co-pack slip the cover absorbed": {
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.07|A10.07's hold-cut fit: the in-house lead the materials slip by": {
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.07|A10.07's hold-cut fit: the materials' gross slip": {
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.07|A10.07's hold-cut fit: y3's allocation_shortage budget, then A5.10's share and A5.12's rate": {
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.07|A10.07's oldest unpaid invoice at worst, y1 / y2 / y3, the line's own cash": {
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.07|A10.07's release: the held invoices the note pays, then the cash-in-advance orders": {
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.07|A10.07's y1 priority-loss day": {
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.07|A10.07's y2 days: priority loss, the late fee, the hold": {
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.07|A10.07's y2 edge: the run before, then the run after": {
+  "assertion": "days past co-packer terms by year on costing.fct_supplier_invoices reproduce A10.07's ladder exactly: invoice dollars and dates equal U16's daily ledger (U18 Q8); needs U9's COGS and A5.30's co-packers",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.08|A10.08 Walmart in-full below its tolerance line, share of months": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A10.08|A10.08 Walmart on-time below its tolerance line, share of months": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A10.08|A10.08 a three-SKU month, exactly": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A10.08|A10.08 at least three out": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A10.08|A10.08 breadth, SKUs per month": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A10.08|A10.08 the breadth mode by year": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A10.08|A10.08 the y3 mode's own probability": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A10.09|A10.16's floor delists, cited in A10.09 and A10.18": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A10.11|A10.11 Kroger's E[days | fined], then the late-cancel shares at Kroger, Walmart and Regional": {
+  "assertion": "A10.11's fines land in the chargeback tables",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A10.11|A10.11 Walmart's fine, then the correlated and exclusive totals": {
+  "assertion": "A10.11's fines land in the chargeback tables",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A10.11|A10.11 Walmart's non-compliant case share": {
+  "assertion": "A10.11's fines land in the chargeback tables",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A10.11|A10.11 late cancels a year": {
+  "assertion": "A10.11's fines land in the chargeback tables",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A10.11|A10.11 the lateness means: Walmart, Kroger, Regional": {
+  "assertion": "A10.11's fines land in the chargeback tables",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A10.11|A10.11 the ratio of A4.05's late/OTIF share to the fines": {
+  "assertion": "A10.11's fines land in the chargeback tables",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A10.11|A10.11 y3 fines as a share of the pool": {
+  "assertion": "A10.11's fines land in the chargeback tables",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A10.11|A10.11 y3 fines by account, then the total, group 10's table": {
+  "assertion": "A10.11's fines land in the chargeback tables",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A10.11|A10.11 y3 fines: the total, then by account": {
+  "assertion": "A10.11's fines land in the chargeback tables",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A10.13|A10.13 delist-to-last-PO lag, the four accounts": {
+  "assertion": "A10.13's tolerances",
+  "route": "suite",
+  "suite": "survivability",
+  "writer": "U7"
+ },
+ "group10_floors|printed|A10.13|A10.13 the OTIF-to-fill gap by year": {
+  "assertion": "A10.13's tolerances",
+  "route": "suite",
+  "suite": "survivability",
+  "writer": "U7"
+ },
+ "group10_floors|printed|A10.13|A10.13 the band that derivation gives": {
+  "assertion": "A10.13's tolerances",
+  "route": "suite",
+  "suite": "survivability",
+  "writer": "U7"
+ },
+ "group10_floors|printed|A10.13|A10.13 the gap's window mean": {
+  "assertion": "A10.13's tolerances",
+  "route": "suite",
+  "suite": "survivability",
+  "writer": "U7"
+ },
+ "group10_floors|printed|A10.13|A10.13 the in-flight term inside it": {
+  "assertion": "A10.13's tolerances",
+  "route": "suite",
+  "suite": "survivability",
+  "writer": "U7"
+ },
+ "group10_floors|printed|A10.13|A10.13 the lag's parts, lead time plus one cycle": {
+  "assertion": "A10.13's tolerances",
+  "route": "suite",
+  "suite": "survivability",
+  "writer": "U7"
+ },
+ "group10_floors|printed|A10.13|A10.13 the raw band, before the zero clip": {
+  "assertion": "A10.13's tolerances",
+  "route": "suite",
+  "suite": "survivability",
+  "writer": "U7"
+ },
+ "group10_floors|printed|A10.13|A10.13 tie-out tolerance": {
+  "assertion": "A10.13's tolerances",
+  "route": "suite",
+  "suite": "survivability",
+  "writer": "U7"
+ },
+ "group10_floors|printed|A10.14|A10.14's deduction floor: the bucket pool, A4.01's y3 line, A4.31's invalid share, the row and group 10's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A10.16|A10.16 Kroger's floor delists, row": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.16|A10.16 Walmart's floor delists, then the total, row": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.16|A10.16 authorized below the floor per review: Kroger, Walmart": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.16|A10.16 floor delists: Kroger, Walmart, total": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.16|A10.16's Kroger floor delists, group 11's owner list": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.16|A10.16's Walmart cut: the modular's bottom quintile as an index": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.16|A10.16's floor delists by banner, Kroger then Walmart, group 11's finding 1": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.16|A10.16's floor delists, group 10's summary table": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.16|A10.16's floor delists, group 11's findings": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.16|A10.16's floor delists, group 11's owner list": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.16|A10.16's floor delists, the decisions": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.16|A10.16's floor delists, the slice-1 decision": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.16|A10.16's plausibility at the registered sigma: p90 over p10, then the top decile's mean over the bottom's": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.16|A10.16's pre-period delists and the strikes carried into y1, group 11's finding 1": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.16|A10.16's pre-period delists and the strikes carried into y1, group 11's owner list": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.16|A10.16's pre-period exits and the strikes it carries into y1: Kroger, Walmart, total": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.16|A10.16's tail-band check: the bottom quintile at the catalogue multiplier": {
+  "assertion": "door and week noise in scan velocity sit within A10.16's sigmas",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.17|A10.17's bands read as absolute: the mean, then sigma read as width and read as absolute": {
+  "assertion": "deduction amounts by type sit within A10.17b's bands at A10.17's means (U18 Q1): bucket 3 on the pre-injection checkpoint (U10), every bucket on the pre-corruption one (U11)",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A10.17|A10.17's by-count filing rate at A9.19's first-registered $600, in its history": {
+  "assertion": "deduction amounts by type sit within A10.17b's bands at A10.17's means (U18 Q1): bucket 3 on the pre-injection checkpoint (U10), every bucket on the pre-corruption one (U11)",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A10.17|A10.17's by-count filing rate at A9.19's first-registered $600, then at the derived mean, group 10's doc": {
+  "assertion": "deduction amounts by type sit within A10.17b's bands at A10.17's means (U18 Q1): bucket 3 on the pre-injection checkpoint (U10), every bucket on the pre-corruption one (U11)",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A10.17|A10.17's by-count filing rate at the derived mean": {
+  "assertion": "deduction amounts by type sit within A10.17b's bands at A10.17's means (U18 Q1): bucket 3 on the pre-injection checkpoint (U10), every bucket on the pre-corruption one (U11)",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A10.17|A10.17's three moved means, late/OTIF, pricing_error and overage, each its band's log-normal mean": {
+  "assertion": "deduction amounts by type sit within A10.17b's bands at A10.17's means (U18 Q1): bucket 3 on the pre-injection checkpoint (U10), every bucket on the pre-corruption one (U11)",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A10.18|A10.18 cuts by account, then the authorizations": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A10.19|A10.19's Dec 31 draw in y2 and y3 with the note, its line interest and fees, then the annual ledger's": {
+  "assertion": "runs at the held co-packer complete no earlier than the release plus A5.29's lead time (green when U9 builds A5.30's co-packers)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.19|A10.19's cost-index term, $M for CALL_COST_POINTS of A9.16's 2023 cost level": {
+  "assertion": "runs at the held co-packer complete no earlier than the release plus A5.29's lead time (green when U9 builds A5.30's co-packers)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.19|A10.19's counterfactual date, the row and A10.07": {
+  "assertion": "runs at the held co-packer complete no earlier than the release plus A5.29's lead time (green when U9 builds A5.30's co-packers)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.19|A10.19's counterfactual: availability after it, y3 interest and fees, its coupon in y2 and y3": {
+  "assertion": "runs at the held co-packer complete no earlier than the release plus A5.29's lead time (green when U9 builds A5.30's co-packers)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.19|A10.19's coupon in y2 and y3, compounding, in $K": {
+  "assertion": "runs at the held co-packer complete no earlier than the release plus A5.29's lead time (green when U9 builds A5.30's co-packers)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.19|A10.19's cushion, A9.14's y3 trigger": {
+  "assertion": "runs at the held co-packer complete no earlier than the release plus A5.29's lead time (green when U9 builds A5.30's co-packers)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.19|A10.19's edge: y2's worst at the run before, the date and size it gives, then the run after": {
+  "assertion": "runs at the held co-packer complete no earlier than the release plus A5.29's lead time (green when U9 builds A5.30's co-packers)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.19|A10.19's hold day": {
+  "assertion": "runs at the held co-packer complete no earlier than the release plus A5.29's lead time (green when U9 builds A5.30's co-packers)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.19|A10.19's release: the held invoices it pays, then the cash-in-advance orders": {
+  "assertion": "runs at the held co-packer complete no earlier than the release plus A5.29's lead time (green when U9 builds A5.30's co-packers)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.19|A10.19's size and band, group 10's doc": {
+  "assertion": "runs at the held co-packer complete no earlier than the release plus A5.29's lead time (green when U9 builds A5.30's co-packers)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.19|A10.19's size at the signed D0, then its band over D0, and the day each band end dates the note": {
+  "assertion": "runs at the held co-packer complete no earlier than the release plus A5.29's lead time (green when U9 builds A5.30's co-packers)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.19|A10.19's y3 fixed-charge ratio with the note": {
+  "assertion": "runs at the held co-packer complete no earlier than the release plus A5.29's lead time (green when U9 builds A5.30's co-packers)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A10.19|the dates U16's daily ledger derives": {
+  "assertion": "runs at the held co-packer complete no earlier than the release plus A5.29's lead time (green when U9 builds A5.30's co-packers)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A11.05|A11.05's KeHE DCs, the row and group 11's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A11.21|the factor and the launch-free solve, group 10's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A11.21|the factor and the launch-free solve, the slice-1 decision": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A11.21|the factor on the window differs from the launch-free solve": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A11.21|the factor solved on the window, then the launch-free solve, the doc's summary": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A11.23|MAPE at 0.60": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A11.23|MAPE at the band's ends": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A11.27|A11.27's band-end solves: the account target at the door band's ends": {
+  "assertion": "the SKU x account factor in raw.scan_data spreads at the solved log-sd",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A11.27|the SKU x account factor's log-sd, solved on the window's own carried sets": {
+  "assertion": "the SKU x account factor in raw.scan_data spreads at the solved log-sd",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A11.28|A11.28's variance shares: the week term, then the door term, of A7.03's variance": {
+  "assertion": "A11.28's door and week terms in raw.scan_data",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A2.01|A2.01's Test A pass rate and its sets, the Costco-assortment marker": {
+  "assertion": "raw.product_master is A2.01's catalogue, SKU by SKU",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A2.01|A2.01's Test A pass rate where group 10 lists it open": {
+  "assertion": "raw.product_master is A2.01's catalogue, SKU by SKU",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A2.01|A2.01's Test A pass rate, then the share that fails, the row and group 2's doc": {
+  "assertion": "raw.product_master is A2.01's catalogue, SKU by SKU",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A2.01|A2.01's Test A: the sets of club designs Costco can accept, then those spanning two lines": {
+  "assertion": "raw.product_master is A2.01's catalogue, SKU by SKU",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A2.01|A2.01's window-start catalogue: recipes, those at two sizes, the spice at one, then the SKUs": {
+  "assertion": "raw.product_master is A2.01's catalogue, SKU by SKU",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A2.02|A2.02's population: designs, then the sellable SKUs at window start, the row and the worklist": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A3.01|A9.16 cost level relative to 2025, as A3.01 prints it": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A3.08|A3.08 Kroger's stepped shelf": {
+  "assertion": "raw.price_history's shelf series is A3.08's",
+  "route": "suite",
+  "suite": "price invariants",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A3.08|A3.08 margin above A3.06's ceiling, y1 and y2": {
+  "assertion": "raw.price_history's shelf series is A3.08's",
+  "route": "suite",
+  "suite": "price invariants",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A3.08|A3.08 realized margins by banner and year": {
+  "assertion": "raw.price_history's shelf series is A3.08's",
+  "route": "suite",
+  "suite": "price invariants",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A3.14|A3.14's 2024 case cost, group 3's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A3.14|A3.14's 2024 markup, group 3's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A3.14|A3.14's Walmart 2024 cost a unit, then its case cost": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A3.14|A3.14's erroneous cost per each, group 3's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A3.14|A3.14's erroneous cost per each, the 2024 markup, the erroneous price": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A3.15|A3.15's deduction a unit, group 3's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A3.15|A3.15's pricing_error deduction a unit at Walmart's 2024 cost": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A3.16|A3.16 the 60 drained stores as a share of one Walmart DC's stores, y2": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A3.28|A3.28 the tolerance window its step pattern holds over": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A4.02|A4.02's bucket 2 in gross, group 6's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A4.05|A10.11's y3 fines where A4.05 and group 4 read them: the total, its share of the pool, the ratio": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A4.05|A4.05's type mix in group 4's doc, by type": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A4.06|A4.06's count rate at 25%: the FTE of filing it needs, then the FTE registered, A4.06 and group 4's doc": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.06|A4.06's filing rate by count": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.06|A4.06's filing rate by count, then by dollar, group 4's doc": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.06|A4.06's filing rate by dollar": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.08|A4.08's achievable pair at each tier's prevention, row": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.08|A4.08's achievable pair at each tier's prevention, with its formula's inputs, group 4's doc": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.08|A4.08's achievable pair, group 6's doc": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.08|A4.08's controls-only endpoint, the chain decision": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.08|A4.08's current per bucket-pool dollar, with its formula's inputs, group 4's doc": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.08|A4.08's current, row": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.08|A4.08's y3 deltas and the pool, group 9's doc": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.08|A4.08's y3 deltas in $K, the chain decision": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.08|A4.08's y3 deltas, group 10's doc": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.08|A4.08's y3 deltas, group 6's doc": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.08|A4.08's y3 deltas, group 6's list of what it resolves": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.08|A4.08's y3 deltas, group 9's list of what it closes": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.08|A4.08's y3 deltas, per dollar and in $K, row": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.08|A4.08's y3 deltas, the A10.17-bands decision": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.08|the block: well-run pools and bucket 2's share of them": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.09|A4.09's achievable pair, the chain decision": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.09|A4.09's current write-off, and its achievable pair": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.09|A4.09's current write-off, group 4's doc": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.09|A4.09's recovered bucket-1 share, the input that went stale": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.09|A4.09's recovered bucket-1 share, then A4.07's rate it reads, group 4's doc": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A4.17|A4.17's free-fill doors at the distributor-served independents, then A7.04's doors": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A4.27|A1.10's roster: distributors, A4.27": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A4.27|A1.10's roster: retailers, A4.27": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A4.31|A4.31's and A4.33's wrong-rate term, % of billback+MCB dollars": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A4.31|A4.31's derived share of billback+MCB dollars, then of gross": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A4.31|A4.31's dollars by window year": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A4.31|A4.31's event terms: phantom, then double-funded, at A4.18's midpoints": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A4.32|A4.32 over the operational pool, then the bucket pool": {
+  "assertion": "bucket 3's dollar mix over A4.32",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A4.32|A4.32 over the operational pool, then the bucket pool, group 4's doc": {
+  "assertion": "bucket 3's dollar mix over A4.32",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A4.33|A4.33's overbill: the spread in points, then its share of the authorized claim": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A5.02|A5.02's KeHE POs, group 5's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A5.02|A5.02's POs a year, group 5's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A5.02|A5.02's Walmart POs, group 5's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A5.02|A5.02's order lines a year at A5.37's means, group 5's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A5.02|A5.02's small-account orders, group 5's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A5.02|A5.02's y3 PO value, Costco: share, POs, $K a PO, pallets": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A5.02|A5.02's y3 PO value, Walmart: share, POs, $K a PO, pallets": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A5.07|05:154's revision-presence groups: (leg, basis, [(account, one in N)]), by falling odds": {
+  "assertion": "cancels and revisions reconcile to A5.07's rate",
+  "route": "suite",
+  "suite": "R6 reconciliation",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A5.07|A5.07's late cancels: POs a year, then their share of POs, A5.07, A5.10 and group 5's doc": {
+  "assertion": "cancels and revisions reconcile to A5.07's rate",
+  "route": "suite",
+  "suite": "R6 reconciliation",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A5.07|A5.07's line-level rates by account, retailer then Cinderhaven": {
+  "assertion": "cancels and revisions reconcile to A5.07's rate",
+  "route": "suite",
+  "suite": "R6 reconciliation",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A5.07|A5.07's window miss odds, Cinderhaven order cancels": {
+  "assertion": "cancels and revisions reconcile to A5.07's rate",
+  "route": "suite",
+  "suite": "R6 reconciliation",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A5.07|A5.07's window miss odds, line-level: retailer then Cinderhaven, then Regional's Cinderhaven": {
+  "assertion": "cancels and revisions reconcile to A5.07's rate",
+  "route": "suite",
+  "suite": "R6 reconciliation",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A5.07|A5.07's window miss odds, retailer order cancels": {
+  "assertion": "cancels and revisions reconcile to A5.07's rate",
+  "route": "suite",
+  "suite": "R6 reconciliation",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A5.07|A5.07's worst in-year miss under a per-year floor": {
+  "assertion": "cancels and revisions reconcile to A5.07's rate",
+  "route": "suite",
+  "suite": "R6 reconciliation",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A5.11|A5.11's internal fill, exact": {
+  "assertion": "fills by account and quarter sit within the dispersion group 10 registers around its mean",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A5.11|A5.11's retailer-scored in-full, exact": {
+  "assertion": "fills by account and quarter sit within the dispersion group 10 registers around its mean",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A5.12|A5.12's aggregate short-ship": {
+  "assertion": "fill failures by term sit within A5.12's registered dispersion",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A5.12|A5.12's internal fill": {
+  "assertion": "fill failures by term sit within A5.12's registered dispersion",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A5.12|A5.12's retailer-scored in-full": {
+  "assertion": "fill failures by term sit within A5.12's registered dispersion",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A5.12|A5.12's retailer_increase and its band": {
+  "assertion": "fill failures by term sit within A5.12's registered dispersion",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A5.20|A1.10's roster: EDI partners, A5.20": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A5.20|A1.10's roster: retailers then distributors, A5.20": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A5.32|A5.32's DPI DCs, group 5's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A5.32|A5.32's KeHE DCs, group 5's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A5.32|A5.32's Walmart DCs, group 5's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A5.38|A5.38's account table in group 5's doc: shares, then dollars on A1.01's index, by account": {
+  "assertion": "gross by channel, account and year equals the A1.01 ladder through A5.38's shares, to the cent (the small-account channel's arm is U7's, on N37's tables)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A5.38|A5.38's surviving accounts that decline: small accounts in y2, then Whole Foods direct in y3": {
+  "assertion": "gross by channel, account and year equals the A1.01 ladder through A5.38's shares, to the cent (the small-account channel's arm is U7's, on N37's tables)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A6.02|A6.02 manual line error at the character, across the reading band, %": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.02|A6.02 manual line error disciplined, across the reading band, %": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.02|A6.02 manual-to-EDI ratio at A6.32's point, character then disciplined": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.02|A6.02 manual-to-EDI ratio at the character, across both bands": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.02|A6.02 manual-to-EDI ratio disciplined, across both bands": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.04|A6.04's invalid MCB claim rate, A4.31's share, the row and group 6's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.06|A6.06 bucket 1 in the group-6 doc": {
+  "assertion": "bucket-3 deduction dollars by type sit on group 10's unrounded b3 dollar mix, each within one deduction's amount of its type (the truth-side mix stays with the R7 ledger suite)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A6.06|A6.06 bucket 1, the within-bucket mix": {
+  "assertion": "bucket-3 deduction dollars by type sit on group 10's unrounded b3 dollar mix, each within one deduction's amount of its type (the truth-side mix stays with the R7 ledger suite)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A6.06|A6.06 bucket 2 in the group-6 doc": {
+  "assertion": "bucket-3 deduction dollars by type sit on group 10's unrounded b3 dollar mix, each within one deduction's amount of its type (the truth-side mix stays with the R7 ledger suite)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A6.06|A6.06 bucket 2, the within-bucket mix": {
+  "assertion": "bucket-3 deduction dollars by type sit on group 10's unrounded b3 dollar mix, each within one deduction's amount of its type (the truth-side mix stays with the R7 ledger suite)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group10_floors|printed|A6.11|A6.15's controls-only pool in A6.11, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.11|A6.15's full pool in A6.11, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.15|A6.15's bucket 3, group 6's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.15|A6.15's bucket 3, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.15|A6.15's bucket-1 residual, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.15|A6.15's bucket-2 residuals and the pool, group 6's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.15|A6.15's bucket-2 share of the well-run pool, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.15|A6.15's controls-only pool in A6.11, group 6's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.15|A6.15's full pool in A6.11, group 6's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.15|A6.15's pool and its buckets, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.15|A6.15's two tiers: prevention and bucket-2 residual, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.15|A6.15's well-run pools, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.15|A6.15's well-run pools, the chain decision": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.15|controls-only prevention, the chain decision": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.15|full prevention, the chain decision": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.15|the block: bucket 3": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.15|the block: bucket-1 residual": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.15|the block: bucket-2 residual by tier": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.16|A6.16 manual-vs-EDI spread floor, derived": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.26|A6.26's `none` by type, group 6's doc": {
+  "assertion": "A6.26's coverage, in truth.injection_ledger",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A6.26|A6.26's `none` by type, then reachable and structural, row": {
+  "assertion": "A6.26's coverage, in truth.injection_ledger",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A6.26|A6.26's `none` share, group 6's doc": {
+  "assertion": "A6.26's coverage, in truth.injection_ledger",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A6.26|A6.26's `none` share, the decision": {
+  "assertion": "A6.26's coverage, in truth.injection_ledger",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A6.26|A6.26's `none`, the chain decision": {
+  "assertion": "A6.26's coverage, in truth.injection_ledger",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A6.26|A6.26's coverage vector, group 6's doc": {
+  "assertion": "A6.26's coverage, in truth.injection_ledger",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A6.26|A6.26's coverage vector, row": {
+  "assertion": "A6.26's coverage, in truth.injection_ledger",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A6.26|the block: A6.26 x A6.13 by control, then controls-only prevention": {
+  "assertion": "A6.26's coverage, in truth.injection_ledger",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A6.26|the block: `none` by type, reachable and unreachable": {
+  "assertion": "A6.26's coverage, in truth.injection_ledger",
+  "route": "suite",
+  "suite": "R7 ledger",
+  "writer": "U11"
+ },
+ "group10_floors|printed|A6.31|A6.31's `none` by type, group 6's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.31|A6.31's reachable base, the `none` share and the structural types, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.31|A6.31's removal by type, weighted, in points, and the full sum, group 6's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.31|A6.31's removal by type, weighted, in points, and the full sum, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A6.31|the block: A6.31's weighted removal, its points, and full prevention": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.01|A7.01 Costco U.S. revenue a warehouse, $M": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.01|A7.01 Supercenter grocery ACV, $M": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.01|A7.01 Walmart U.S. grocery, % of net sales": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.01|A7.01 a Supercenter against a Sprouts box": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.03|A7.03 dollars per measured door-SKU-week": {
+  "assertion": "door and week noise in scan velocity sit within A7.03's decomposition",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.03|A7.03 grocery velocity and its derived bands, each year's own": {
+  "assertion": "door and week noise in scan velocity sit within A7.03's decomposition",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.03|A7.03 implied reporting door-SKUs at the band midpoint": {
+  "assertion": "door and week noise in scan velocity sit within A7.03's decomposition",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.03|A7.03 its measured live door-SKUs on A7.26's grid beside them": {
+  "assertion": "door and week noise in scan velocity sit within A7.03's decomposition",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.03|A7.03 mass velocity and its derived bands, each year's own": {
+  "assertion": "door and week noise in scan velocity sit within A7.03's decomposition",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.03|A7.03 measured live door-SKU-weeks": {
+  "assertion": "door and week noise in scan velocity sit within A7.03's decomposition",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.03|A7.03 measured retail $M": {
+  "assertion": "door and week noise in scan velocity sit within A7.03's decomposition",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.03|A7.03 measured units, millions": {
+  "assertion": "door and week noise in scan velocity sit within A7.03's decomposition",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.03|A7.03 natural velocity, against the registered band": {
+  "assertion": "door and week noise in scan velocity sit within A7.03's decomposition",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.03|A7.03 the implied-to-registered ratio": {
+  "assertion": "door and week noise in scan velocity sit within A7.03's decomposition",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.03|A7.03 the markup it reads": {
+  "assertion": "door and week noise in scan velocity sit within A7.03's decomposition",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.03|A7.03 the three channel breaches": {
+  "assertion": "door and week noise in scan velocity sit within A7.03's decomposition",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.03|A7.03 velocity, units per SKU per store per week": {
+  "assertion": "door and week noise in scan velocity sit within A7.03's decomposition",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.03|A7.03's y3 mean where group 11 reads it, and the quintiles at both sigmas": {
+  "assertion": "door and week noise in scan velocity sit within A7.03's decomposition",
+  "class": "draw",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.04|A7.04 %ACV at y3, Costco": {
+  "assertion": "raw.stores by banner and year equals A7.04's grown door plan",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.04|A7.04 %ACV at y3, Kroger": {
+  "assertion": "raw.stores by banner and year equals A7.04's grown door plan",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.04|A7.04 %ACV at y3, Sprouts": {
+  "assertion": "raw.stores by banner and year equals A7.04's grown door plan",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.04|A7.04 %ACV at y3, Walmart": {
+  "assertion": "raw.stores by banner and year equals A7.04's grown door plan",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.04|A7.04 %ACV at y3, Walmart's band top": {
+  "assertion": "raw.stores by banner and year equals A7.04's grown door plan",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.04|A7.04 %ACV at y3, Whole Foods": {
+  "assertion": "raw.stores by banner and year equals A7.04's grown door plan",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.04|A7.04 %ACV at y3, Whole Foods at the band's low": {
+  "assertion": "raw.stores by banner and year equals A7.04's grown door plan",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.04|A7.04 Supercenters per Walmart DC on the grown plan": {
+  "assertion": "raw.stores by banner and year equals A7.04's grown door plan",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.04|A7.04 the 2026-09-05 plan it was grown from": {
+  "assertion": "raw.stores by banner and year equals A7.04's grown door plan",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.04|A7.04 the door totals": {
+  "assertion": "raw.stores by banner and year equals A7.04's grown door plan",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.04|A7.04 the door totals, the doc's ladder table": {
+  "assertion": "raw.stores by banner and year equals A7.04's grown door plan",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.04|A7.04 the grown door plan by banner": {
+  "assertion": "raw.stores by banner and year equals A7.04's grown door plan",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.04|A7.04's Sprouts doors in y3, then the universe its cap reads": {
+  "assertion": "raw.stores by banner and year equals A7.04's grown door plan",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.05|A7.05 format mix at y3 by authorized doors, counts": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.05|A7.05 format mix at y3 by authorized doors, shares": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.07|A7.07 dollars beside it": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.07|A7.07 measured door-SKU-weeks and units, growth y1 to y3": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.07|A7.07 the headline, units, then y2": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.07|A7.07 velocity by year": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.09|A10.16's pre-period delists where A7.09 names them": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.14|A7.14 supplier-caused share of the not-on-shelf weeks by year, %": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.15|A7.14's supplier-caused share as A7.15 plants it, %": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.15|A7.15 gap-weeks and episodes a year (thousands), and episodes per door-SKU": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.20|A7.20 household penetration in units": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.26|A7.26 door-SKUs on the grown plan": {
+  "assertion": "authorizations in raw.distribution_log, by account and year, equal A7.26's",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.26|A7.26 door-SKUs, the doc's ladder table": {
+  "assertion": "authorizations in raw.distribution_log, by account and year, equal A7.26's",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.26|A7.26 every live door-SKU-week in the grid": {
+  "assertion": "authorizations in raw.distribution_log, by account and year, equal A7.26's",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.26|A7.26 scan rows a year and the window, the doc's ladder table": {
+  "assertion": "authorizations in raw.distribution_log, by account and year, equal A7.26's",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.26|A7.26 scan rows a year, and the window": {
+  "assertion": "authorizations in raw.distribution_log, by account and year, equal A7.26's",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A7.28|A7.28 coverage at the reporting band's ends, 50% then 70%": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.28|A7.28 the assortment ratio, door-weighted then unweighted": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.28|A7.28 the coverage parts, then the coverage": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.28|A7.28's assortment readings above the signed band's 0.7 top": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.29|A7.29 Kroger's markup by year": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.29|A7.29 Walmart's markup by year": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.29|A7.29 Whole Foods' markup by year": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.29|A7.29 the weighted markup": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A7.29|A7.29 the y3 markup by account": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.02|A9.02's achievable, group 9's doc: the residual, the pool, the line, the three terms, then both tiers against y3 EBITDA": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group10_floors|printed|A9.02|A9.02's achievable, the deduction term: A4.01's line, the bucket pool, A4.31's residual, then each tier's pool less it, the line, the points and $M": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group10_floors|printed|A9.02|A9.02's below-EBITDA coupon in y2 and y3, then the counterfactual's, in $K": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group10_floors|printed|A9.02|A9.16 cost level relative to 2025, as A9.02 prints it": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group10_floors|printed|A9.06|A4.06's count rate at 25%: the FTE of filing it needs, A9.06 and group 9's doc": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A9.06|A4.08's achievable pair, the pool and the y3 deltas, A9.06": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A9.06|A4.08's current, A9.06": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A9.06|A4.08's current, group 9's doc, the flag and the closing list": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A9.06|A9.06's deduction counts": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A9.06|A9.06's dispute FTE where group 4 cites it": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A9.06|A9.06's dollar rate in group 9's closing list": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A9.06|A9.06's dollar rate, the same capacity filing by size, A9.06 and group 9's doc": {
+  "assertion": "the filing cascade and the write-off",
+  "route": "suite",
+  "suite": "company character",
+  "writer": "U13"
+ },
+ "group10_floors|printed|A9.08|A9.08's hire-me return: the analyst's hourly cost, the bucket-1 recovery, the multiple": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.08|A9.08's loaded analyst: the wage share, then the loaded cost": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.08|A9.08's mean deduction, A10.17's derived mean": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.08|A9.08's recovery per dispute-hour, bucket-1 then achievable, each beside the rate it reads, group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.08|A9.08's recovery per dispute-hour, bucket-1 then achievable, each beside the rate it reads, the row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.12|A9.12's trough day, every window year, A9.12 and A9.13": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.13|A9.13's Dec 31 AR, then AP": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.13|A9.13's Dec 31 positions: the draw on the line, the stretch behind it, the need": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.13|A9.13's daily line interest and fees": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.13|A9.13's daily need at its peak run": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.13|A9.13's fixed-charge ratio on the daily interest": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.13|A9.13's late-fee reading": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.13|A9.13's part-held runs, then the first one's day": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.13|A9.13's spring days": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.13|the y1 exceedance: $K, days, share of a run, the run, days of invoicing, DPO, days past terms": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.13|the y1 stub, dated on the daily ledger, $K, A9.13 and group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.13|y1's DPO and its days past the co-packers' net 30, A9.13 and group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.15|A9.15's deductions per invoice, y1 -> y3": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.16|A9.16 COGS inflation by year, contract-weighted, %": {
+  "assertion": "A9.16's index in costing.fct_product_costs",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A9.16|A9.16 cost level in 2023 and 2024, 2025 = 1": {
+  "assertion": "A9.16's index in costing.fct_product_costs",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group10_floors|printed|A9.19|A9.19's dollar shares of the largest half and the largest tenth, group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group10_floors|printed|A9.19|A9.19's mean, median and sigma, group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A1.10|A1.10's net where it is published": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A1.10|A1.10: launches and club packs added, then the net": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.06|A10.06 pairs by year and over the window, group 10's summary table": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.06|A10.06 pairs in the window, their sum, and those on exiting SKUs": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.06|A10.06 the start-up SKU-DC pairs": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.09|A10.06 pairs in the window, A10.09": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.09|A10.09 the pre-window exits: 2022's lost launches and A10.16's pre-period delists": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.09|A10.09 the start-up cull: sizes, recipes, group 10's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.09|A10.09 the start-up cull: sizes, recipes, redraws": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.09|A10.09 the start-up redraws, group 10's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.09|A10.09's launch exits through A11.24, the window total, and A11.26's share of it": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.09|R4's pass mark where the gate's readers print it": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.09|catalogue exits a year and over the window, group 10's summary table": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.09|catalogue exits a year and over the window, the second rulings": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.09|catalogue exits a year, where the summaries print them": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.09|catalogue exits, the slice-1 decision": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.09|in-window exits and their sum, then each source with the tail's recipe-mates, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.09|in-window exits and their sum, then each source, A10.09": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.09|the start-up cull, the decision": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.16|A10.16's cap reading: the A:C cadence on the multiplier, then on generated volume": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.16|A10.16's sigma-2.0 alternative: the spread, its first-draw cull, and this reading's": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.16|the factor, the spread it leaves, window-start spreads and the launch-free solve, A10.16": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A10.18|A10.18's cuts in the draw, then those on launches": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.01|Amazon's dollars, own-site dollars and units": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.01|Amazon's share of A8.01's 10%, and its share of y3 gross": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.04|A11.04 Faire's fees as A9.02 reads them, $K": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.04|A11.04 brand-wide bad debt $K, then against the tier": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.04|A11.04 brand-wide bad debt against the tier": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.04|A11.04 dollars an order": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.04|A11.04 orders a year on the restated count": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.04|A11.04 the tier's dollars, $K": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.04|A11.04 the value the asserted 120 orders implied": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.08|A11.08 complaints a working day, doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.08|A11.08 complaints, doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.08|A11.08 complaints, then a working day, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.08|A11.08 kettle lots": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.08|A11.08 recall rates, then odds over the window": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.08|A11.08 units shipped, millions, doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.08|A11.08 units shipped, millions, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.09|A11.09 organic sales stand-in": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.09|A11.09 the organic certificate as A9.02 reads it, $": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.11|A11.11 the floor's reach": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.11|A11.11 the mixture's median and mean, then the floor's reach": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.12|A11.12 inventory at COGS, then write-offs": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.13|A11.13 distributor purchases": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.13|A11.13 swell against the type at the distributors' share, then retailers' damaged rate needed": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.13|A11.13 swell by year": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.13|A11.13 swell's share of the type brand-wide, y1": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.13|A11.13 swell, y1": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.13|A11.13 the swell base at UNFI and KeHE, y2 and y3, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.13|A11.13 the type brand-wide, then at the distributors' share": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.13|A11.13's multiples over the window, the envelope its plausibility keeps": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.14|A11.14 Kroger, row order: fines, other types, wholesale, rate, pool": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.14|A11.14 Kroger, table order: wholesale, fines, other types, rate, pool": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.15|A11.15 repair dollars": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.19|A11.19 buyer resets, then the share of quarters in a reset": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.20|A11.20 Pacesetter hazard": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.20|the mature hazard": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.20|the mature hazard, group 11's A11.20 section": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.21|03's gate: catalogue exits at R4's pass mark, the gates row": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|03's gate: catalogue exits at R4's pass mark, the new-products row": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|R4's 10th percentile by sigma_pred, the doc's table": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|R4: the 10th percentile, median, mean and pass mark": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|no other mature exit was carried by a retailer": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the 24-month share by sigma_pred, the doc's table": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the 24-month share sits inside the category band": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the 24-month share, the launches observed, then at sigma_pred 0.50 and 0.70, row": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the 24-month share, then at sigma_pred 0.50 and 0.70, the decision": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the factor and its spread, the decision": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the factor on the window and the spread it leaves, doc": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the factor on the window and the spread it leaves, row": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the factor, the launch-free solve and the window's spread at it, the owner's list": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the launch-free solve and the window's spread at it, row": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the launch-free solve and the window's spread at it, the decision": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the launch-free solve, the window's spread at it, and what the draw gives there, doc": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the launches observed, and the points above 29%": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the mature hazard without the rule, group 11's A11.21 section": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the mature hazard, group 11's A11.21 section": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the other mature sizes beside a declining recipe-mate, then all of them, doc": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the other mature sizes, then those beside a declining recipe-mate, the owner's list": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.21|the seven invariants hold in every quarter of every trial": {
+  "assertion": "A11.21's outcome gates on trial 0",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.22|A2.08's packaging weight, A11.22's copy": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.23|the 24-month share at sigma_pred 0.50 and 0.70, A11.23": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.24|every launch exit comes through A11.24": {
+  "assertion": "A11.24's launch exits",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.24|launch exits through A11.24": {
+  "assertion": "A11.24's launch exits",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.24|the 24-month share, A11.24": {
+  "assertion": "A11.24's launch exits",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.24|the 24-month share, doc summary": {
+  "assertion": "A11.24's launch exits",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.24|the 24-month share, group 10's owner list": {
+  "assertion": "A11.24's launch exits",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.24|the 24-month share, the slice-1 decision": {
+  "assertion": "A11.24's launch exits",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.25|A11.25 packaging alone, then both readings without the distributors, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 packaging alone: lb a unit, tons, without the distributors, the fee": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 the fee at both weights, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 the fee at both weights, the decision": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 the ruled weight's lb, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 the ruled weight's tons, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 the ruled weight: lb, tons, without the distributors, the fee": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 the units over the ruling's 2,000 jars": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 tons at both weights, the doc's summary": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 tons, the decision: both weights, then both without the distributors": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 units into Oregon, in all, doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 units into Oregon, in all, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 units into Oregon, in all, the decision": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 units into Oregon: Amazon": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 units into Oregon: DPI": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 units into Oregon: UNFI and KeHE": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 units into Oregon: Walmart": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 units into Oregon: own-site DTC jars": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|A11.25 units into Oregon: small accounts": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.25|every Oregon reading passes one metric ton": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A11.26|A11.26 is what brings the drawn catalogue back to A2.01's": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|A11.26 prunes more than a rounding": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|A11.26's prunes over the window and by year, then by kind: other mature, at-risk, fading, launches": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|A11.26's prunes still carried at an account with a set when they went": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|A11.26's spread of the y3 carried sets": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|a declining size's recipe over its floor": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|a declining size's recipe over its floor, A11.26 and its decision": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|exits over the window and by year without the rule, then R4's pass mark and median there": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|the exits table, row by row: 2022, window launches, at-risk, fading, other mature, A11.26's pruning, club packs, total": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|the live catalogue at each year's start and at window end, with the rule": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|the live catalogue without the rule, at each year's start and at window end": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|the mature hazard with the rule, two decimals": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|the mature hazard without the rule": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|the mature hazard without the rule, group 11's A11.26 section": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|the mature hazard without the rule, group 11's owner list": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|the mature hazard without the rule, group 11's summary": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|the mature hazard, group 11's summary": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.26|the mature hazard, the owner's list": {
+  "assertion": "A11.26's pruning",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A11.29|A11.29's copy of A11.14's Kroger deduction rate": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A2.01|03's gate: Test A's pass rate (A2.01, A11.18)": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A2.08|A2.08's packaging weight, the column it owes": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A2.08|A2.08's packaging weight, where it derives": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A2.08|A2.08's two weights, group 11's owner list": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A2.09|A2.09's at-risk and fading sizes, as A11.26's rule takes them": {
+  "assertion": "A2.09's decline and the mature hazard (spec DECISIONS#u15-rulings)",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A2.09|A2.09's decliners among 39": {
+  "assertion": "A2.09's decline and the mature hazard (spec DECISIONS#u15-rulings)",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A2.09|A2.09's decliners among 39, A2.09 and group 2": {
+  "assertion": "A2.09's decline and the mature hazard (spec DECISIONS#u15-rulings)",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A2.09|A2.09's exits over the window, A2.09 and group 2": {
+  "assertion": "A2.09's decline and the mature hazard (spec DECISIONS#u15-rulings)",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A2.09|A2.09's exits over the window, the decision, at-risk": {
+  "assertion": "A2.09's decline and the mature hazard (spec DECISIONS#u15-rulings)",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A2.09|A2.09's exits over the window, the decision, fading": {
+  "assertion": "A2.09's decline and the mature hazard (spec DECISIONS#u15-rulings)",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A5.28|A5.28 on both, the owner's list": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A5.28|A5.28 on generated volume, row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A5.28|A5.28 on generated volume, the decision": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A5.28|A5.28 on generated volume: the ratio, C runs, the sigmas at the widest and the midpoint": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A5.28|A5.28 on the multiplier": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A5.28|A5.28 on the multiplier then on volume, group 10's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A5.28|A5.28 on the multiplier, then on generated volume, the doc's summary": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A5.28|the generated-volume cadence falls outside A5.28's 3-4 runs": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A7.03|window-start spreads by account, group 10's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A7.09|2022's launches that leave before the window": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A7.09|2022's launches that leave before the window, group 11's owner list": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group11_compliance|printed|A7.13|A7.13 at the 90-day check at sigma_pred 0.50 and 0.70, then at the launch-free factor, the owner's list": {
+  "assertion": "A7.13's shares",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A7.13|A7.13 at the 90-day check by sigma_pred, the doc's table": {
+  "assertion": "A7.13's shares",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A7.13|A7.13 by cohort: 2022's two shares, then the window's": {
+  "assertion": "A7.13's shares",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A7.13|A7.13 derived, where A7.13 and group 7 print it": {
+  "assertion": "A7.13's shares",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A7.13|A7.13 derived: 90-day share, Walmart, Kroger, Whole Foods, two-year": {
+  "assertion": "A7.13's shares",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A7.13|A7.13 does not land near its practitioner shares": {
+  "assertion": "A7.13's shares",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A7.13|A7.13 within two years by sigma_pred, the doc's table": {
+  "assertion": "A7.13's shares",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A7.13|A7.13's causal arms where group 7 prints the 90-day pair": {
+  "assertion": "A7.13's shares",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A7.13|A7.13's causal arms: the index-100 and no-factor counterfactuals beside the baseline": {
+  "assertion": "A7.13's shares",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A7.13|A7.13's two shares, the doc's summary": {
+  "assertion": "A7.13's shares",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A7.13|A7.13's two shares, the owner's list": {
+  "assertion": "A7.13's shares",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A7.13|A7.13's two shares, the slice-1 decision": {
+  "assertion": "A7.13's shares",
+  "route": "suite",
+  "suite": "pre-registered gates",
+  "writer": "U7"
+ },
+ "group11_compliance|printed|A9.02|group 11's costs, A9.02 and group 9's doc": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group11_compliance|printed|A9.02|group 11's costs, EBITDA and the gap, revision 6 in the decision": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group11_compliance|printed|A9.02|group 11's costs, row by row, then EBITDA, group 9's P&L block": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group11_compliance|printed|A9.02|what A9.02 reads from group 11, row by row, then EBITDA": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group11_compliance|trial": {
+  "assertion": "the pinned trial's lifecycle, item by item: raw.product_master_history, raw.distribution_log and costing.fct_production_runs (launch_build) carry trial 0's launches, decliners and exits",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group8_dtc|printed|A8.02|A8.02's new customers, the row and group 8's doc": {
+  "assertion": "own-site orders by month and order type equal group 8's counts through the generator's integer rule (the order-type arm, on G4's column, is U7's)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group8_dtc|printed|A8.02|A8.02's own-site orders: one-time, S&S, then total, the row and group 8's doc": {
+  "assertion": "own-site orders by month and order type equal group 8's counts through the generator's integer rule (the order-type arm, on G4's column, is U7's)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group8_dtc|printed|A8.03|A8.03's Mastercard ratio at most": {
+  "assertion": "chargebacks by month and network equal group 8's, at the one-month lag",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group8_dtc|printed|A8.03|A8.03's Visa ratio in its worst month": {
+  "assertion": "chargebacks by month and network equal group 8's, at the one-month lag",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group8_dtc|printed|A8.03|A8.03's chargebacks a month at A8.04's rate": {
+  "assertion": "chargebacks by month and network equal group 8's, at the one-month lag",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group8_dtc|printed|A8.03|A8.03's most Visa disputes VAMP sees": {
+  "assertion": "chargebacks by month and network equal group 8's, at the one-month lag",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group8_dtc|printed|A8.03|A8.03's most Visa disputes VDMP sees at the band's worst corner, the watched near-miss": {
+  "assertion": "chargebacks by month and network equal group 8's, at the one-month lag",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group8_dtc|printed|A8.03|A8.03's most Visa disputes VDMP sees at the signed mix": {
+  "assertion": "chargebacks by month and network equal group 8's, at the one-month lag",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group8_dtc|printed|A8.03|A8.03's own-site orders a month": {
+  "assertion": "chargebacks by month and network equal group 8's, at the one-month lag",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group8_dtc|printed|A8.03|A8.03's peak-month chargebacks on the drift": {
+  "assertion": "chargebacks by month and network equal group 8's, at the one-month lag",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group8_dtc|printed|A8.06|A8.06's active own-site subscribers": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group8_dtc|printed|A8.10|A8.10's paid spend, $K": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group8_dtc|printed|A8.10|A8.10's y1 channel P&L across A3.26's band, $K": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group8_dtc|printed|A8.10|A8.10's y1 channel P&L at $22: one-time, S&S, paid spend, the result, $K": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group8_dtc|printed|A8.12|A8.12's carrier-discount sensitivity: the S&S order, then the y1 P&L, $ and $K": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group8_dtc|printed|A8.12|A8.12's unrecovered surcharges, $K": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group8_dtc|printed|A8.17|A8.17's flat month, then Q4's share of the year": {
+  "assertion": "own-site orders by month follow A8.17's month shape",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group8_dtc|series|chargebacks_by_network": {
+  "assertion": "chargebacks by month and network equal group 8's series",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group8_dtc|series|monthly_orders": {
+  "assertion": "own-site orders by month and order type equal group 8's series through the generator's integer rule",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group9_ledger|printed|A10.07|A10.07's hold-cut fit: the co-packers' share": {
+  "assertion": "the allocation_shortage cuts after y3's July hold notice fit A10.07's co-pack and materials shares, in raw.po_revisions",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group9_ledger|printed|A10.07|A10.07's hold-cut fit: the materials' share": {
+  "assertion": "the allocation_shortage cuts after y3's July hold notice fit A10.07's co-pack and materials shares, in raw.po_revisions",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group9_ledger|printed|A10.17|the gap and its band, the A10.17 bands marker": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A11.01|Amazon's fees the P&L reads, $K": {
+  "assertion": "gross by channel, account and year equals the A1.01 ladder through A5.38's shares, to the cent (the small-account channel's arm is U7's, on N37's tables)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U13"
+ },
+ "group9_ledger|printed|A11.04|DSO, A9.11 at the ruled 60 days": {
+  "assertion": "gross by channel, account and year equals the A1.01 ladder through A5.38's shares, to the cent (the small-account channel's arm is U7's, on N37's tables)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U13"
+ },
+ "group9_ledger|printed|A11.09|the organic inspection dollars": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A11.09|the organic inspection hours": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A11.12|A11.12's write-offs as A9.02 reads them, group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A11.22|A11.22's referral blended over A11.03's mix, $K": {
+  "assertion": "N22's fee rows by year and fee type equal group 9's seven marketplace_fees(t) components, to the cent (U7 writes the arm on U8's N22 table; U13 writes the rows)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U7"
+ },
+ "group9_ledger|printed|A11.25|A11.25 revenue test, 2024 gross $M": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A11.30|A11.30's ACoS point": {
+  "assertion": "N22's fee rows by year and fee type equal group 9's seven marketplace_fees(t) components, to the cent (U7 writes the arm on U8's N22 table; U13 writes the rows)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U7"
+ },
+ "group9_ledger|printed|A11.31|A11.31's FBA fulfilment at the non-peak rate, which the row publishes beside it": {
+  "assertion": "N22's fee rows by year and fee type equal group 9's seven marketplace_fees(t) components, to the cent (U7 writes the arm on U8's N22 table; U13 writes the rows)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U7"
+ },
+ "group9_ledger|printed|A11.31|A11.31's fee a jar against A3.18's price, and its share of it, the plausibility anchor": {
+  "assertion": "N22's fee rows by year and fee type equal group 9's seven marketplace_fees(t) components, to the cent (U7 writes the arm on U8's N22 table; U13 writes the rows)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U7"
+ },
+ "group9_ledger|printed|A11.31|A11.31's fee a jar, weighted over A11.03's mix": {
+  "assertion": "N22's fee rows by year and fee type equal group 9's seven marketplace_fees(t) components, to the cent (U7 writes the arm on U8's N22 table; U13 writes the rows)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U7"
+ },
+ "group9_ledger|printed|A11.31|A11.31's three pack fees, single / 2-pack / 3-pack": {
+  "assertion": "N22's fee rows by year and fee type equal group 9's seven marketplace_fees(t) components, to the cent (U7 writes the arm on U8's N22 table; U13 writes the rows)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U7"
+ },
+ "group9_ledger|printed|A11.31|A8.13's own-site 3PL on a one-time order and a jar, and A8.12's y1 parcel rate, in A11.31's plausibility anchor": {
+  "assertion": "N22's fee rows by year and fee type equal group 9's seven marketplace_fees(t) components, to the cent (U7 writes the arm on U8's N22 table; U13 writes the rows)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U7"
+ },
+ "group9_ledger|printed|A11.32|A11.32 on the P&L's basis, by window year": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A11.32|A11.32 on the mart's basis, by window year": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A11.32|A11.32 over the window, the mart's all-time row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A11.32|A11.32's gap in dollars, $K": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A11.32|A11.32's gap, landed less standard on Amazon's units, points of Amazon sales": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A11.32|A11.32's window band, from A11.30's ACoS band": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A3.01|EBITDA at the 2025 base, A3.01": {
+  "assertion": "costing.fct_product_costs carries group 9's COGS: A3.01's cost by A9.16's index and A9.17's tariff",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group9_ledger|printed|A3.02|A3.02's fully loaded cost over gross by channel, the row and group 3's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A3.04|A3.04's back-cast unit uplift, whole then to one decimal, the correction marker": {
+  "assertion": "wholesale list prices by SKU and year equal A3.04's",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group9_ledger|printed|A3.04|A3.04's back-cast unit uplift, y1 and y2": {
+  "assertion": "wholesale list prices by SKU and year equal A3.04's",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U9"
+ },
+ "group9_ledger|printed|A3.29|A3.29's rolled standard, the mart's cost a jar": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A4.15|the y3 zero crossing in A4.15's band": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A8.11|A8.11's DTC COGS by window year": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A8.11|A8.11's achievable contribution, group 8's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A8.11|A8.11's blended product margin y1 -> y3, the row and group 8's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A8.11|A8.11's contribution before marketing y1 -> y3, group 8's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A8.11|A8.11's contribution before marketing y1 -> y3, group 8's opening summary": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A8.15|A8.15's unfiled carrier-claim dollars, $K": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A8.18|A8.18's tickets, then their cost $K": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A11.22's referral blended over A11.03's mix, $M": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A11.30's advertising, A9.01 and its own row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A11.31's FBA fulfilment, peak uplift included": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A11.31's peak charge on the window's days": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A11.31's peak fee a jar": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A9.01 DTC 3PL, own-site orders": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A9.01 G&A": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A9.01 broker commission and retainers": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A9.01 marketing": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A9.01 marketplace": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A9.01 non-production payroll": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A9.01 outbound freight": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A9.01 total opex and its share of gross": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A9.01 total opex and its share of gross y1 -> y3, group 9's P&L block": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A9.01 warehousing supplies": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A9.01's Establish check and its shares of net revenue": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A9.01's Establish shares, group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A9.01's copy of A9.02's EBITDA % of gross and A9.13's y3 funding gap": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A9.01's marketing line and its share of gross y1 -> y3, group 9's P&L block": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A9.01's payroll line and its share of gross y1 -> y3, group 9's P&L block": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|A9.01's warehouse payroll, the Establish numerator's first term": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|marketplace_fees(t)'s seven components by year, $M": {
+  "assertion": "N22's fee rows by year and fee type equal group 9's seven marketplace_fees(t) components, to the cent (U7 writes the arm on U8's N22 table; U13 writes the rows)",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U7"
+ },
+ "group9_ledger|printed|A9.01|the Amazon parcel carved out of the freight line": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.01|the carve at A5.24's flat rate, the reading not applied": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.02|A9.02's COGS, $M, the row and group 9's P&L block": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's DTC COGS by year": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's EBITDA and its share of gross, group 9's P&L block": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's EBITDA as a percent of gross, the row": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's EBITDA share of gross, group 9's headline": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's achievable, owed: A4.31's residual, the full tier if A4.31 sits in A4.15's excess, and A6.15's recovery on A4.31": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's achievable, settlement then own-site DTC, then the total at each tier against y3 EBITDA": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's copy of A9.01's opex": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's derivation of A8.11's contribution: y3 margin, shipping, fulfilment, payment, achievable, current y3": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's gross profit and its shares of gross and net y1 -> y3, group 9's P&L block": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's gross profit as a share of gross, y1 -> y3": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's gross profit, net revenue less COGS, the row and group 9's doc": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's price band, EBITDA % of gross at the low corner then the high, the row and group 9's doc": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's slotting deducted, free-fill, then net revenue, group 9's P&L block": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's slotting deducted, free-fill, then net revenue, the row": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's slotting invoiced, the row and group 9's P&L block": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's wholesale COGS ratio, group 9's P&L block": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|A9.02's wholesale COGS ratio, the row and A3.02's copy": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|EBITDA as a percent of gross, group 9's A9.02 paragraph": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|EBITDA at the 2025 base, the markers": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|EBITDA is a loss in every window year": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|EBITDA, $M": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|EBITDA, $M, A9.02 (the row writes the sign before the dollar sign; the percent series carries it)": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|EBITDA, its share of gross, the gap and its band, the decision": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|group 11's costs, group 9's A9.02 paragraph": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|the y3 funding gap's band, A9.02": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|y1 EBITDA, the undated-sources decision": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|y3 EBITDA at every point of the band": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.02|y3 EBITDA at every point of the price band, A9.02 and group 9's doc": {
+  "assertion": "A9.02's derived EBITDA restates the canonical figures",
+  "route": "suite",
+  "suite": "U12's canonical restatement",
+  "writer": "U12"
+ },
+ "group9_ledger|printed|A9.09|A9.09's broker cost, the row and group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.09|A9.09's broker-managed share, group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.09|A9.09's broker-managed share, restated on A5.38's DPI move": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.11|A9.11's DSO on net sales, the filers' basis": {
+  "assertion": "remittance dates land at A9.11's days to pay, by account",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group9_ledger|printed|A9.11|A9.11's mix-weighted wholesale days, then blended at A8.01's DTC share": {
+  "assertion": "remittance dates land at A9.11's days to pay, by account",
+  "class": "exact",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group9_ledger|printed|A9.11|the AP-run schedule, A10.19's note in it, $M": {
+  "class": "exact",
+  "route": "arm",
+  "test": "test_every_copack_invoice_is_paid_on_the_daily_ledgers_schedule",
+  "writer": "U15"
+ },
+ "group9_ledger|printed|A9.12|A9.12's Q4 build, +40% of finished goods, the row and group 9's doc": {
+  "assertion": "finished goods and the Q4 build, valued at the P&L's landed cost, reproduce A9.12's within one minimum co-packed run (A5.29's 5,000 units at that year's landed cost; U18 Q8)",
+  "class": "tolerance",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group9_ledger|printed|A9.12|A9.12's build on the line, in months": {
+  "assertion": "finished goods and the Q4 build, valued at the P&L's landed cost, reproduce A9.12's within one minimum co-packed run (A5.29's 5,000 units at that year's landed cost; U18 Q8)",
+  "class": "tolerance",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group9_ledger|printed|A9.12|A9.12's cash conversion cycle y1 -> y3, group 9's doc": {
+  "assertion": "finished goods and the Q4 build, valued at the P&L's landed cost, reproduce A9.12's within one minimum co-packed run (A5.29's 5,000 units at that year's landed cost; U18 Q8)",
+  "class": "tolerance",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group9_ledger|printed|A9.12|A9.12's cash conversion cycle, DSO + DIO - DPO, the row": {
+  "assertion": "finished goods and the Q4 build, valued at the P&L's landed cost, reproduce A9.12's within one minimum co-packed run (A5.29's 5,000 units at that year's landed cost; U18 Q8)",
+  "class": "tolerance",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group9_ledger|printed|A9.12|A9.12's finished goods, the row": {
+  "assertion": "finished goods and the Q4 build, valued at the P&L's landed cost, reproduce A9.12's within one minimum co-packed run (A5.29's 5,000 units at that year's landed cost; U18 Q8)",
+  "class": "tolerance",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group9_ledger|printed|A9.12|A9.12's inventory at COGS, then AP, the row and group 9's doc": {
+  "assertion": "finished goods and the Q4 build, valued at the P&L's landed cost, reproduce A9.12's within one minimum co-packed run (A5.29's 5,000 units at that year's landed cost; U18 Q8)",
+  "class": "tolerance",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group9_ledger|printed|A9.12|A9.12's trough: the mean DSO at which Q4 collects": {
+  "assertion": "finished goods and the Q4 build, valued at the P&L's landed cost, reproduce A9.12's within one minimum co-packed run (A5.29's 5,000 units at that year's landed cost; U18 Q8)",
+  "class": "tolerance",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group9_ledger|printed|A9.12|AR on the restated DSO": {
+  "assertion": "finished goods and the Q4 build, valued at the P&L's landed cost, reproduce A9.12's within one minimum co-packed run (A5.29's 5,000 units at that year's landed cost; U18 Q8)",
+  "class": "tolerance",
+  "route": "owed",
+  "suite": "generator parity",
+  "writer": "U10"
+ },
+ "group9_ledger|printed|A9.13|A9.02's achievable against current, then its deduction and settlement points of all its points, A9.13 and group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|A9.13's FCCR, the row and group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|A9.13's accrual in unpaid invoices, then the residual net of recovery, the row and group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|A9.13's cash from operations": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|A9.13's excess availability": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|A9.13's interest and fees": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|A9.13's peak need": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|A9.13's standing draw at year end": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|A9.13's working-capital growth by component, y2 then y3": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|A9.13's y1 FCCR where group 9's doc prints it alone": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|A9.13's y1 commitment shortfall: the peak need, the base, the collateral unused": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|A9.14's +200bp default-rate charge, y2 and y3, A9.13": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|NWC and the pre-window balance, group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|NWC, the pre-window balance, then its growth, A9.13": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|collateral unused behind the y1 draw": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|net working capital": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|the collateral in $K, the marker": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|the daily ledger on the line's own cash": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|the daily ledger, A10.19's note in it": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|the ladder group 10 inherits: days of COGS, then DPO, A9.13 and group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|the ladder, DPO, and the base passed from y2, the marker": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|the loan under the base at the y1 peak, A9.13 and group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|the peak need over the base in y2 and y3, A9.13": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|the y1 exceedance absorbed by payment timing: $M, days of COGS, share of an AP run, the run, days of invoicing": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|the y1 exceedance in $M": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|the y1 shortfall in days, share of an AP run, the run, days of invoicing": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|the y3 funding gap and its band, A9.13 and group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|the y3 funding gap, doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|the y3 funding gap, the undated-sources decision": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.13|the y3 gap at capex 0.15 / 0.30 / 0.45, A9.13": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|A9.14's +200bp default-rate charge, y2 and y3, group 9's doc and the A9.14 fees marker": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|A9.14's November y1 peak need, group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|A9.14's November y1 peak need, the row": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|A9.14's November-peak base by year, group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|A9.14's all-in rate, each year's mean plus the spread, the row and group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|A9.14's base examined at the November y1 peak": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|A9.14's finished goods at the November peak": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|A9.14's prime annual means, each the mean of its year's published months, the row and group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|A9.14's prime annual means, group 9's sources table": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|A9.14's prime annual means, its sources entry": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|A9.14's prime annual means, the row's figure field": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|A9.14's sizing, the November y1 amendment's present note: the y2 base, the margin, the upsize against the base examined, that base": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|A9.14's sizing: the projected y2 base, and the margin the $4.5M commitment clears it by": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|A9.14's y3 base": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|borrowing base": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|the base passed from y2, unfunded": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|the gap, its band, then y1's exceedance and days, the A9.14 fees marker": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|the peak need against the base from y2, A9.14 and group 9's doc": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ },
+ "group9_ledger|printed|A9.14|the upsize against the base examined": {
+  "route": "unread",
+  "why": "printed for the spec gate's figure checks; no seeder reads it (plan U15's landings table)"
+ }
+}
