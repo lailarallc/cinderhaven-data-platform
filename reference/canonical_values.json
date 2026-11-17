@@ -2,7 +2,7 @@
  "_generated": {
   "generated": "2026-11-17",
   "generator": "scripts/verify_canonical.py",
-  "platform_head": "561b4e7",
+  "platform_head": "1f20fa4",
   "source": "reference/canonical_values.yml",
   "verified_against_production": "2026-07-29"
  },
@@ -824,6 +824,12 @@
   },
   "all_in_rate_pct": {
    "trailing_52w": 11.0
+  },
+  "all_in_retailer_annual": {
+   "trailing_52w": 3520331.21
+  },
+  "all_in_retailer_rate_pct": {
+   "trailing_52w": 10.89
   },
   "all_in_total": {
    "trailing_36m": 10669827.87
