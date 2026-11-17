@@ -158,6 +158,21 @@ jobs:
             OR sc.relname LIKE 'fct\_attribute%' OR sc.relname LIKE 'fct\_dimension\_cost'
             OR sc.relname LIKE 'fct\_freight\_class%' OR sc.relname LIKE 'fct\_governed%')
           ORDER BY 3, 1;
+          \echo '=== every relation in the public_public_* schemas (a dbt run without the schema macro) ==='
+          SELECT n.nspname AS schema, c.relname, c.relkind, pg_get_userbyid(c.relowner) AS owner,
+                 c.reltuples::bigint AS est_rows
+          FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+          WHERE n.nspname LIKE 'public\_public\_%' AND c.relkind IN ('r','p','v','m','S') ORDER BY 1, 2;
+          \echo '=== anything outside public_public_* that depends on a relation inside it ==='
+          SELECT DISTINCT dn.nspname || '.' || dc.relname AS dependent, sn.nspname || '.' || sc.relname AS depends_on
+          FROM pg_depend d JOIN pg_rewrite w ON w.oid = d.objid
+          JOIN pg_class dc ON dc.oid = w.ev_class JOIN pg_namespace dn ON dn.oid = dc.relnamespace
+          JOIN pg_class sc ON sc.oid = d.refobjid JOIN pg_namespace sn ON sn.oid = sc.relnamespace
+          WHERE sn.nspname LIKE 'public\_public\_%' AND dn.nspname NOT LIKE 'public\_public\_%' ORDER BY 1;
+          \echo '=== every relation in public (DWI loads its sources there) ==='
+          SELECT c.relname, c.relkind, pg_get_userbyid(c.relowner) AS owner
+          FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+          WHERE n.nspname = 'public' AND c.relkind IN ('r','p','v','m','S') ORDER BY 1;
           \echo '=== schemas and their owners ==='
           SELECT nspname, pg_get_userbyid(nspowner) AS owner FROM pg_namespace
           WHERE nspname NOT LIKE 'pg\_%' AND nspname <> 'information_schema' ORDER BY 1;
