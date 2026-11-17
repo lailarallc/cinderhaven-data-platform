@@ -537,3 +537,15 @@ UNION ALL SELECT 'retailer_requirements.required.all_time|'||COUNT(*) FILTER (WH
 UNION ALL SELECT 'products.distinct_unit_weights.'||lower(replace(product_line, ' ', '_'))||'.all_time|'||
   COUNT(DISTINCT ROUND(unit_weight_lbs, 4))::text FROM raw.product_master GROUP BY product_line
 UNION ALL SELECT 'revenue_invoiced.gross_invoiced_retailer.all_time|'||SUM(gross_amount)::numeric(16,2)::text FROM public_marts.fct_retailer_payments;
+
+-- ── KEYS BATCH 3: THE TWO TERMS OF THE WASTE BRIDGE (U19, 2026-11-17) ─
+-- trade.op_waste_annual (all partners, the 36-month corpus / 3) split by
+-- partner: every non-promo_billback retailer deduction / 3, and every
+-- non-promo_billback distributor deduction / 3. They sum to op_waste_annual.
+-- trade-spend-data-diagnostic prints the bridge from its own figure,
+-- trade.op_waste_retailer (retailers, last 12 months), to op_waste_annual:
+-- retailer 3-year average + distributor 3-year average (owner, 2026-11-17).
+SELECT 'trade.op_waste_retailer_3yr_avg.trailing_36m|'||ROUND(SUM(amount) / 3.0, 2)::text
+  FROM raw.retailer_deductions WHERE deduction_type <> 'promo_billback'
+UNION ALL SELECT 'trade.op_waste_distributor_3yr_avg.trailing_36m|'||ROUND(SUM(amount) / 3.0, 2)::text
+  FROM raw.distributor_deductions WHERE deduction_type <> 'promo_billback';
