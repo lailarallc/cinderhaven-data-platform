@@ -30,6 +30,20 @@ failed and may have its own entry below]
 
 ## Entries
 
+### 2026-11-17 — U5 merged without the drift check; canonical-drift went red on main
+
+**Attempted:** I merged the U5 branch after the coverage gate, the spec gate and both pytest tiers passed.
+
+**Why it didn't work:** `canonical-drift.yml` runs on every push, but `ci.yml` and the local gates do not run `scripts/check_canonical_drift.py`. The vendored `vendor/realism/anchors.yml` brought in `$32.5M`, which the drift check flags.
+
+**What we tried instead:** a token-scoped allowlist entry (`dfbd88f`), recorded in DECISIONS (`be1782d`). CI was green after that. From now on, run `python scripts/check_canonical_drift.py` before every merge to main.
+
+**Status:** Resolved
+
+**Tags:** canonical-drift, merge, gate, allowlist, ci
+
+---
+
 ### 2026-07-02 — flyctl ssh console -C "sh -c \"...\$VAR...\"" silently corrupts inline secrets
 
 **Attempted:** Passing a password through nested shell layers inline —

@@ -9,6 +9,42 @@ For things that didn't work, see FAILURES.md.
 
 ---
 
+## 2026-11-17 18:06 — merge rule rewritten; U5/U8/U15 landed; U7 started in its own session
+
+**Started from:** A side session for the merge rule. The job was to back up global CLAUDE.md, rewrite its merge rule and merge the waiting branches.
+
+**Did:**
+- **Global CLAUDE.md:**
+  - backed up to spec `d7c544a`;
+  - step 3 is now the gated self-merge rule, with exceptions for consumer repos that deploy on push, production, and branches with owner findings;
+  - the registry-copy clause is added (DECISIONS `9991cc0`);
+  - step 4 now says branches already on main, or superseded by it, are deleted without asking and reported after.
+- **Merged:** U5, U8, u8-followups and u8-status (spec `c43bf9d`). Platform CI is green at `84e3d4b`.
+- **Canonical-drift went red** after the U5 merge. Fixed with a token-scoped allowlist entry, `$32.5M @ vendor/realism/anchors.yml` (`dfbd88f`, DECISIONS `be1782d`).
+- **Deleted:** origin `u8-status`, origin and local `u15-status`, and the stray `u8-status-rebased`.
+- **U7 start** runs in its own session. So far it has produced:
+  - an 18-item ruling batch, of which items 9, 10 and 11 were already signed;
+  - spec branch `pre-window-2022` at `f8dee41`, holding the 2022 start values for A3.04, A5.38, A7.26 and A8.02;
+  - group 11 before/after figures.
+- **U7's current orders** (owner):
+  - commit the batch to spec `docs/plans/u7-working/` on a docs-only branch;
+  - apply the group 11 generator patch on `pre-window-2022`, then restate the flagged rows, run the cold gate, probes and sweep, re-pin packet pages 4 and 6, and print the re-sign table.
+  That session holds the spec generators until the branch lands.
+
+**State:**
+- Both mains are green.
+- `pre-window-2022` is unmerged and stays so until signed.
+- The other sessions have not been told about the step-4 deletion rule.
+- Leftovers: an empty, locked `cinderhaven-data-platform-u8f` folder, and the stale `claude/*` and `feat/*` platform branches.
+
+**Next:**
+1. Read U7's re-sign table.
+2. Sign A3.04 (`34:aea5755f71a3`), A5.38 (`62:0e6e41172502`) and the ten downstream rows: A2.09, A10.04, A10.06, A10.09, A10.16, A10.18, A11.21, A11.23, A11.24 and A11.26.
+3. Say "merge it" for `pre-window-2022`.
+4. Rule the U7 batch in one paste.
+
+---
+
 ## 2026-11-15 (evening) — U15 DONE, merged to main; the paid-date rule built and off until U9
 
 **Base:** worktree `../cinderhaven-data-platform-u15`, cut from `origin/main` at `4e28226`.
