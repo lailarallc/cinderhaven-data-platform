@@ -468,6 +468,12 @@ trade:
     trailing_36m: 324533.24
   op_waste_distributor_3yr_avg:
     trailing_36m: 55025.54
+  # All-in trade on one basis: structural_annual + op_waste_retailer, six retailers, last 12 months (the waste
+  # window a day longer). Not all_in_*, which adds the all-partner 3-year waste (owner, 2026-11-17).
+  all_in_retailer_annual:
+    trailing_52w: 3520331.21
+  all_in_retailer_rate_pct:
+    trailing_52w: 10.89
   promotional_spend:
     cy2023: 194512.94
     cy2024: 134377.94

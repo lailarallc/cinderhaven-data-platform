@@ -549,3 +549,30 @@ SELECT 'trade.op_waste_retailer_3yr_avg.trailing_36m|'||ROUND(SUM(amount) / 3.0,
   FROM raw.retailer_deductions WHERE deduction_type <> 'promo_billback'
 UNION ALL SELECT 'trade.op_waste_distributor_3yr_avg.trailing_36m|'||ROUND(SUM(amount) / 3.0, 2)::text
   FROM raw.distributor_deductions WHERE deduction_type <> 'promo_billback';
+
+-- ── KEYS BATCH 4: ALL-IN TRADE, RETAILERS, LAST 12 MONTHS (U19, 2026-11-17) ─
+-- trade.structural_annual (six scan retailers, 52 scan weeks) plus
+-- trade.op_waste_retailer (the same retailers, the 365 days to the last scan
+-- week), over the trailing-52-week scan revenue: parts of one scope, windows a
+-- day apart (owner, 2026-11-17). trade-spend-data-diagnostic's workbook prints
+-- it as "All-in trade - retailers, last 12 months". Not trade.all_in_*, which
+-- adds the all-partner 3-year waste.
+WITH w AS (SELECT DISTINCT week_ending FROM raw.scan_data ORDER BY week_ending DESC LIMIT 52),
+mx AS (SELECT MAX(week_ending) AS d FROM raw.scan_data),
+rev52 AS (SELECT r.name, SUM(sd.dollars_sold) AS rev
+          FROM raw.scan_data sd JOIN raw.stores st ON st.store_id = sd.store_id
+          JOIN raw.retailers r ON r.retailer_id = st.retailer_id
+          WHERE sd.week_ending >= (SELECT MIN(week_ending) FROM w) GROUP BY r.name),
+rate AS (SELECT AVG(trade_spend_pct_walmart) wm, AVG(trade_spend_pct_costco) co, AVG(trade_spend_pct_whole_foods) wf,
+                AVG(trade_spend_pct_sprouts) sp, AVG(trade_spend_pct_kroger) kr, AVG(trade_spend_pct_regional) rg
+         FROM raw.sku_costs),
+x AS (
+  SELECT (SELECT SUM(rev) FROM rev52) AS rev,
+         (SELECT SUM(rev52.rev * CASE rev52.name WHEN 'Walmart' THEN rate.wm WHEN 'Costco' THEN rate.co
+                 WHEN 'Whole Foods' THEN rate.wf WHEN 'Sprouts' THEN rate.sp WHEN 'Kroger' THEN rate.kr
+                 WHEN 'Regional Group' THEN rate.rg END) FROM rev52, rate) AS struct,
+         (SELECT SUM(amount) FROM raw.retailer_deductions, mx
+          WHERE deduction_type <> 'promo_billback' AND deduction_date > mx.d - 365 AND deduction_date <= mx.d) AS waste
+)
+SELECT 'trade.all_in_retailer_annual.trailing_52w|'||ROUND(struct + waste, 2)::text FROM x
+UNION ALL SELECT 'trade.all_in_retailer_rate_pct.trailing_52w|'||ROUND(100 * (struct + waste) / rev, 2)::text FROM x;
