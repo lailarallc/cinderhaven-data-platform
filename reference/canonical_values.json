@@ -1,8 +1,8 @@
 {
  "_generated": {
-  "generated": "2026-11-15",
+  "generated": "2026-11-17",
   "generator": "scripts/verify_canonical.py",
-  "platform_head": "9f3283a",
+  "platform_head": "561b4e7",
   "source": "reference/canonical_values.yml",
   "verified_against_production": "2026-07-29"
  },
@@ -831,11 +831,17 @@
   "op_waste_annual": {
    "trailing_365d": 379558.78
   },
+  "op_waste_distributor_3yr_avg": {
+   "trailing_36m": 55025.54
+  },
   "op_waste_rate_pct": {
    "trailing_52w": 1.17
   },
   "op_waste_retailer": {
    "trailing_365d": 343280.7
+  },
+  "op_waste_retailer_3yr_avg": {
+   "trailing_36m": 324533.24
   },
   "op_waste_retailer_events": {
    "trailing_365d": 4772
