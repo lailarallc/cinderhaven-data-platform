@@ -103,6 +103,68 @@ jobs:
           fi
           echo "connected as a non-superuser reader with no truth access"
 
+      # Plan U19a: the five writer moves. Catalog only (pg_class, pg_attribute, pg_depend, pg_roles), no table
+      # read: where each writer's relation sits today, its owner, its columns, what depends on it, and the logins.
+      - name: "Writer moves: the writers' relations in production (plan U19a, read-only catalog)"
+        run: |
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          \echo '=== relations by name, any schema ==='
+          SELECT n.nspname AS schema, c.relname, c.relkind, pg_get_userbyid(c.relowner) AS owner,
+                 c.reltuples::bigint AS est_rows
+          FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+          WHERE c.relkind IN ('r','p','v','m','S','i')
+            AND n.nspname NOT IN ('pg_catalog','information_schema') AND (
+              c.relname IN ('shopify_transactions','shopify_refunds','shopify_chargebacks','shopify_payouts',
+                            'netsuite_items','wms_dimensions','gdsn_published','shopify_products',
+                            'stg_gdsn_published','stg_netsuite_items','stg_wms_dimensions','stg_shopify_products',
+                            'int_dim_and_billable','int_freight_class_by_system','int_measurement_of_record',
+                            'int_system_attribute_divergence','fct_attribute_divergence','fct_dimension_cost',
+                            'fct_freight_class_by_system','fct_governed_product_master',
+                            'stg_category_benchmarks','idx_benchmarks_cat_ret',
+                            'q12_summary','q12_by_sku','idx_scan_sku_store',
+                            'forecast_snapshot','forecast_week_snapshot','doom_loop_snapshot','snapshot_meta',
+                            'snapshot_meta_id_seq')
+              OR c.relname LIKE 'stg_category%' OR c.relname LIKE 'q12%')
+          ORDER BY 2, 1;
+          \echo '=== columns of the shopify, benchmark and q12 tables (which shape is live) ==='
+          SELECT n.nspname || '.' || c.relname AS relation, string_agg(a.attname, ',' ORDER BY a.attnum) AS columns
+          FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+          JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum > 0 AND NOT a.attisdropped
+          WHERE c.relkind IN ('r','p','v','m')
+            AND (c.relname LIKE 'shopify\_%' OR c.relname LIKE 'stg_category%' OR c.relname LIKE 'q12%'
+                 OR c.relname LIKE '%snapshot%')
+            AND n.nspname NOT IN ('pg_catalog','information_schema')
+          GROUP BY 1 ORDER BY 1;
+          \echo '=== dim_products columns (seed_benchmarks adds category) ==='
+          SELECT n.nspname || '.' || c.relname AS relation, c.relkind,
+                 bool_or(a.attname = 'category') AS has_category
+          FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+          JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum > 0 AND NOT a.attisdropped
+          WHERE c.relname = 'dim_products' GROUP BY 1, 2;
+          \echo '=== views and rules that depend on a writer relation (what a SET SCHEMA carries along) ==='
+          SELECT DISTINCT dn.nspname || '.' || dc.relname AS dependent, pg_get_userbyid(dc.relowner) AS owner,
+                 sn.nspname || '.' || sc.relname AS depends_on
+          FROM pg_depend d JOIN pg_rewrite w ON w.oid = d.objid
+          JOIN pg_class dc ON dc.oid = w.ev_class JOIN pg_namespace dn ON dn.oid = dc.relnamespace
+          JOIN pg_class sc ON sc.oid = d.refobjid JOIN pg_namespace sn ON sn.oid = sc.relnamespace
+          WHERE dc.oid <> sc.oid AND (
+            sc.relname IN ('shopify_transactions','shopify_refunds','shopify_chargebacks','shopify_payouts',
+                           'netsuite_items','wms_dimensions','gdsn_published','shopify_products',
+                           'stg_category_benchmarks','q12_summary','q12_by_sku','forecast_snapshot',
+                           'forecast_week_snapshot','doom_loop_snapshot','snapshot_meta')
+            OR sc.relname LIKE 'stg\_gdsn%' OR sc.relname LIKE 'stg\_netsuite%' OR sc.relname LIKE 'stg\_wms%'
+            OR sc.relname LIKE 'int\_dim\_and%' OR sc.relname LIKE 'int\_freight\_class%'
+            OR sc.relname LIKE 'int\_measurement%' OR sc.relname LIKE 'int\_system\_attribute%'
+            OR sc.relname LIKE 'fct\_attribute%' OR sc.relname LIKE 'fct\_dimension\_cost'
+            OR sc.relname LIKE 'fct\_freight\_class%' OR sc.relname LIKE 'fct\_governed%')
+          ORDER BY 3, 1;
+          \echo '=== schemas and their owners ==='
+          SELECT nspname, pg_get_userbyid(nspowner) AS owner FROM pg_namespace
+          WHERE nspname NOT LIKE 'pg\_%' AND nspname <> 'information_schema' ORDER BY 1;
+          \echo '=== login roles (names and attributes only) ==='
+          SELECT rolname, rolsuper, rolcreatedb, rolcreaterole FROM pg_roles WHERE rolcanlogin ORDER BY 1;
+          SQL
+
       - name: "Canonical gather — every metric by basis and period"
         run: |
           echo "=== BEGIN CANONICAL GATHER ==="
