@@ -136,7 +136,7 @@ def survey(conn) -> dict:
             wanted = list(r.move)
             for name in r.find:
                 cur.execute("SELECT n.nspname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace "
-                            "WHERE c.relname = %s AND n.nspname = ANY(%s) AND c.relkind IN ('r','p','v','m')",
+                            "WHERE c.relname = %s AND n.nspname = ANY(%s) AND c.relkind IN ('r','p','v','m') ORDER BY 1",
                             (name, list(PLATFORM_SCHEMAS)))
                 found = [s for (s,) in cur.fetchall()]
                 wanted += [(s, name) for s in found] or [(None, name)]
@@ -364,28 +364,40 @@ def main(argv: list[str]) -> int:
     conn = psycopg2.connect(admin, connect_timeout=10)
     try:
         s = survey(conn)
+    finally:
+        conn.close()  # not held open through the backup and the prompt: the proxy drops an idle connection
+    problems = [f"{r.name}: {p}" for r in REPOS for p in s[r.name]["problems"]]
+    if problems:
+        print("STOP: production is not in a state this plan carries. Nothing changed.")
+        for x in problems:
+            print(f"  {x}")
+        return 1
+    out = args.backup_dir / f"backup-prod-{datetime.now().strftime('%Y%m%d-%H%M%S-%f')}.dump"
+    print(f"\nBacking up the database to {out.name} (a few minutes) ...", flush=True)
+    ok, detail = backup(creds, args.port, out, args.docker.split("|"))
+    if not ok:
+        print(f"STOP: backup failed: {detail}. Nothing changed.")
+        return 1
+    print(f"Backup: {detail}")
+    print_plan(s)
+    if input(f"\nType {CONFIRM} to do this: ").strip() != CONFIRM:
+        print("Not confirmed: nothing changed.")
+        return 1
+    conn = psycopg2.connect(admin, connect_timeout=10)
+    try:
+        if survey(conn) != s:
+            conn.rollback()
+            print("STOP: production changed between the plan above and the confirmation. Nothing changed; "
+                  "run the script again for a fresh plan.")
+            return 1
         conn.rollback()
-        problems = [f"{r.name}: {p}" for r in REPOS for p in s[r.name]["problems"]]
-        if problems:
-            print("STOP: production is not in a state this plan carries. Nothing changed.")
-            for x in problems:
-                print(f"  {x}")
-            return 1
-        out = args.backup_dir / f"backup-prod-{datetime.now().strftime('%Y%m%d-%H%M%S-%f')}.dump"
-        print(f"\nBacking up the database to {out.name} (a few minutes) ...", flush=True)
-        ok, detail = backup(creds, args.port, out, args.docker.split("|"))
-        if not ok:
-            print(f"STOP: backup failed: {detail}. Nothing changed.")
-            return 1
-        print(f"Backup: {detail}")
-        print_plan(s)
-        if input(f"\nType {CONFIRM} to do this: ").strip() != CONFIRM:
-            print("Not confirmed: nothing changed.")
-            return 1
         try:
             apply(conn, s)
         except Exception as e:  # noqa: BLE001 - any failure rolls the whole move back
-            conn.rollback()
+            try:
+                conn.rollback()
+            except psycopg2.Error:
+                pass  # a lost connection never committed: the server rolled the transaction back
             print(f"FAILED, rolled back, nothing changed: {str(e).strip().splitlines()[0]}")
             return 1
         print("Committed.")

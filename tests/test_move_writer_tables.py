@@ -39,6 +39,12 @@ from pathlib import Path
 if (Path(sys.argv[0]).parent / "docker_fails").exists():
     sys.exit(1)
 if "pg_dump" in sys.argv:
+    during = Path(sys.argv[0]).parent / "during_dump.sql"  # what production does while the dump runs
+    if during.exists():
+        import psycopg2
+        with psycopg2.connect((Path(sys.argv[0]).parent / "dsn").read_text()) as conn, conn.cursor() as c:
+            c.execute(during.read_text())
+        conn.close()
     sys.stdout.write("fake dump")
 elif "pg_restore" in sys.argv:
     sys.stdin.read()
@@ -227,6 +233,27 @@ def test_a_failure_inside_the_transaction_rolls_all_of_it_back(world):
         c.execute("SELECT count(*) FROM pg_namespace WHERE nspname = ANY(%s)", (list(MOVED),))
         assert c.fetchone()[0] == 0
     conn.close()
+
+
+def test_a_connection_dropped_during_the_backup_does_not_stop_the_move(world):
+    """Production, 2026-11-17: the Fly proxy dropped the survey's connection while the dump and the prompt ran."""
+    probe, tmp = world
+    (tmp / "dsn").write_text(harness.dsn(probe))
+    (tmp / "during_dump.sql").write_text("SELECT pg_terminate_backend(pid) FROM pg_stat_activity "
+                                         "WHERE datname = current_database() AND pid <> pg_backend_pid()")
+    r = _run(probe, tmp, "MOVE\n")
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert r.stdout.count("  PASS  ") == 5
+
+
+def test_production_changed_after_the_plan_stops_with_nothing_changed(world):
+    probe, tmp = world
+    (tmp / "dsn").write_text(harness.dsn(probe))
+    (tmp / "during_dump.sql").write_text("INSERT INTO copack.snapshot_meta (sku_count) VALUES (51)")
+    before = _where(probe)
+    r = _run(probe, tmp, "MOVE\n")
+    assert r.returncode == 1 and "STOP: production changed between the plan above and the confirmation" in r.stdout
+    assert _where(probe) == before
 
 
 def test_a_table_in_both_schemas_or_an_unnamed_stale_relation_stops(world):
