@@ -30,6 +30,34 @@ failed and may have its own entry below]
 
 ## Entries
 
+### 2026-11-15 — The drop-guard test's reference was moved to the pre-U8 DDL, which the harness world is not built from
+
+**Attempted:** U8 added 21 raw tables, and `tests/test_drop_guard.py` failed on its hard-coded "41 raw tables". The first fix built the test's reference from deploy-costing's `RAW_REFERENCE_COMMIT` (`934785e`), mirroring Step 0.
+
+**Why it didn't work:** Production holds the pre-U8 tables, so Step 0's reference is the pre-U8 DDL. The harness world is rebuilt from today's DDL. Against the pre-U8 reference, the guard's column arm refused every U8 column (9 failures). A second error showed up along the way: the DDL's ownership block walks the real `raw` schema, so applying a 41-table reference beside a 62-table world aborted the fixture's transaction.
+
+**What we tried instead:** Reverted. The harness reference stays today's DDL, now asserted equal to the rebuilt world's own raw tables, and the populated list counts only tables that hold rows (still 54). Fixed in `1c2914c`.
+
+**Status:** Resolved. U12 must still move `RAW_REFERENCE_COMMIT` when it rebuilds production on U8's DDL (spec plan, U12 Dependencies).
+
+**Tags:** drop-guard, raw-reference, harness, U8, U12, test-fixture
+
+---
+
+### 2026-11-15 — Branch work went on while other sessions changed the same branches
+
+**Attempted:** I held U8's merge, then the follow-ups and cleanup, on a fetch taken minutes earlier.
+
+**Why it didn't work:** Other sessions merged `u8-schema`, rebased `u8-followups` (`0bb0ceb` became `2cb4bae`) and deleted remote branches in between. My view was stale: I asked about a merge that had already happened, U15's first brief named a commit that no longer existed, and a remote delete failed on a branch already gone.
+
+**What we tried instead:** Fetch with `--prune` and check ancestry (`git merge-base --is-ancestor`) right before each merge, delete or brief that names a commit.
+
+**Status:** Resolved in practice. The rule: never act on a branch state older than the current step.
+
+**Tags:** parallel-sessions, stale-fetch, merge, branch-cleanup
+
+---
+
 ### 2026-11-17 — U5 merged without the drift check; canonical-drift went red on main
 
 **Attempted:** I merged the U5 branch after the coverage gate, the spec gate and both pytest tiers passed.
