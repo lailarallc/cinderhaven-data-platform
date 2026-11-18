@@ -634,3 +634,25 @@ UNION ALL SELECT 'revenue.dtc_net.trailing_36m|'||ROUND(dnet, 2)::text FROM x
 UNION ALL SELECT 'lifecycle.retailer_dtc_gross.trailing_36m|'||ROUND(bgross + gross, 2)::text FROM x
 UNION ALL SELECT 'lifecycle.retailer_dtc_net.trailing_36m|'||ROUND(bnet + dnet, 2)::text FROM x
 UNION ALL SELECT 'lifecycle.retailer_dtc_cents_per_dollar.trailing_36m|'||ROUND(100 * (bnet + dnet) / (bgross + gross), 2)::text FROM x;
+
+-- ── KEYS BATCH 7: SKU SCORING THRESHOLDS; RETAILER DEDUCTION TYPES (U19, 2026-11-17) ─
+-- sku-rationalization-framework's calibration (scripts/calibrate.py
+-- PERCENTILE_SQLS), the five thresholds its methodology prints: velocity p25
+-- (mean units per store-week per SKU over all scan rows), loaded margin p25
+-- (as a percent), annual shelf-space cost p75, production complexity p75
+-- (landed cost / MSRP), cannibalization risk p75 (pairs with >= 3 solo
+-- stores). And the distinct retailer deduction types contract-to-cash's
+-- waterfall itemizes.
+SELECT 'sku_scoring.velocity_uspw_p25.all_time|'||ROUND((SELECT percentile_cont(0.25) WITHIN GROUP (ORDER BY uspw)
+  FROM (SELECT sku, AVG(units_sold) AS uspw FROM raw.scan_data GROUP BY sku) t)::numeric, 4)::text
+UNION ALL SELECT 'sku_scoring.loaded_margin_pct_p25.all_time|'||ROUND(100 * (SELECT percentile_cont(0.25) WITHIN GROUP
+  (ORDER BY loaded_margin_pct) FROM public_intermediate.int_loaded_contribution_by_sku WHERE loaded_margin_pct IS NOT NULL)::numeric, 2)::text
+UNION ALL SELECT 'sku_scoring.shelf_cost_p75.all_time|'||ROUND((SELECT percentile_cont(0.75) WITHIN GROUP
+  (ORDER BY annual_shelf_space_cost) FROM public_intermediate.int_shelf_space_cost_by_sku)::numeric, 2)::text
+UNION ALL SELECT 'sku_scoring.complexity_ratio_p75.all_time|'||ROUND((SELECT percentile_cont(0.75) WITHIN GROUP
+  (ORDER BY c.landed_cost_per_unit / NULLIF(pm.msrp, 0)) FROM raw.sku_costs c JOIN raw.product_master pm ON c.sku = pm.sku
+  WHERE pm.msrp > 0)::numeric, 4)::text
+UNION ALL SELECT 'sku_scoring.cannibalization_risk_p75.all_time|'||ROUND((SELECT percentile_cont(0.75) WITHIN GROUP
+  (ORDER BY GREATEST(0, COALESCE(-velocity_delta_pct, 0))) FROM public_intermediate.int_cannibalization_pairs
+  WHERE solo_stores >= 3)::numeric, 5)::text  -- 0.07455 exactly; a double prints 0.0745499..., which rounds to .0745
+UNION ALL SELECT 'deductions.retailer_types.all_time|'||COUNT(DISTINCT deduction_type)::text FROM raw.retailer_deductions;

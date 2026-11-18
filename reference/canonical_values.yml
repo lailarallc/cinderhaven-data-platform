@@ -176,6 +176,8 @@ deductions:
     all_time: 10906
   cross_channel_annualized:
     all_time: 436804.72
+  retailer_types:  # keys batch 7: distinct retailer deduction types (contract-to-cash's waterfall)
+    all_time: 9
 
 distribution:
   authorizations:
@@ -646,6 +648,12 @@ deductions_recovery:
   cross_channel_recovered_per_disputed_pct: {all_time: 41.92}
   cross_channel_recovered_per_deduction_pct: {all_time: 14.60}
   cross_channel_dispute_rate_pct: {all_time: 35.53}  # disputes filed / deduction rows
+sku_scoring:  # keys batch 7 (U19, 2026-11-17): sku-rationalization-framework's calibrated thresholds
+  velocity_uspw_p25: {all_time: 4.3606}
+  loaded_margin_pct_p25: {all_time: 48.43}
+  shelf_cost_p75: {all_time: 119627.83}
+  complexity_ratio_p75: {all_time: 0.3012}
+  cannibalization_risk_p75: {all_time: 0.07455}
 disputes:
   cross_channel_filed: {all_time: 6011}
   cross_channel_recovered: {all_time: 196694.71}
