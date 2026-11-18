@@ -2,7 +2,7 @@
  "_generated": {
   "generated": "2026-11-17",
   "generator": "scripts/verify_canonical.py",
-  "platform_head": "6369fd3",
+  "platform_head": "bc10ad2",
   "source": "reference/canonical_values.yml",
   "verified_against_production": "2026-07-29"
  },
@@ -200,6 +200,9 @@
    "trailing_12m": 396833.39,
    "trailing_24m": 793678.88,
    "trailing_36m": 1116467.53
+  },
+  "retailer_types": {
+   "all_time": 9
   }
  },
  "deductions_recovery": {
@@ -700,6 +703,23 @@
  "shipments": {
   "asn_late_rate": {
    "all_time": 0.0857
+  }
+ },
+ "sku_scoring": {
+  "cannibalization_risk_p75": {
+   "all_time": 0.07455
+  },
+  "complexity_ratio_p75": {
+   "all_time": 0.3012
+  },
+  "loaded_margin_pct_p25": {
+   "all_time": 48.43
+  },
+  "shelf_cost_p75": {
+   "all_time": 119627.83
+  },
+  "velocity_uspw_p25": {
+   "all_time": 4.3606
   }
  },
  "supersedes": [
