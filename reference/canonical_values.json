@@ -2,7 +2,7 @@
  "_generated": {
   "generated": "2026-11-17",
   "generator": "scripts/verify_canonical.py",
-  "platform_head": "a8384bf",
+  "platform_head": "6369fd3",
   "source": "reference/canonical_values.yml",
   "verified_against_production": "2026-07-29"
  },
@@ -414,6 +414,15 @@
   "retailer_cents_per_dollar": {
    "all_time": 87.22
   },
+  "retailer_dtc_cents_per_dollar": {
+   "trailing_36m": 87.21
+  },
+  "retailer_dtc_gross": {
+   "trailing_36m": 50448871.83
+  },
+  "retailer_dtc_net": {
+   "trailing_36m": 43994135.21
+  },
   "wholesale_cents_per_dollar": {
    "all_time": 89.08
   }
@@ -563,6 +572,9 @@
   "defect_sku_ttm": {
    "ttm_through_2025_12_27": 19487913.16
   },
+  "dtc_chargebacks_lost": {
+   "trailing_36m": 1162.49
+  },
   "dtc_gross": {
    "cy2023": 189654.73,
    "cy2024": 191510.62,
@@ -570,6 +582,15 @@
    "trailing_12m": 182672.08,
    "trailing_24m": 374182.7,
    "trailing_36m": 563837.43
+  },
+  "dtc_net": {
+   "trailing_36m": 523794.2
+  },
+  "dtc_processing_fees": {
+   "trailing_36m": 16913.95
+  },
+  "dtc_refunds": {
+   "trailing_36m": 21966.79
   },
   "gross_payments_distributor": {
    "cy2023": 7363461.6,
