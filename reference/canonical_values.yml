@@ -371,6 +371,16 @@ revenue:
     trailing_12m: 182672.08
     trailing_24m: 374182.70
     trailing_36m: 563837.43
+  # Keys batch 6 (U19, 2026-11-17): the DTC orders placed in CY2023-2025 (dtc_gross's cohort), each order's
+  # processing fees, refunds and lost chargebacks whenever they fell; net = gross less the three.
+  dtc_processing_fees:
+    trailing_36m: 16913.95
+  dtc_refunds:
+    trailing_36m: 21966.79
+  dtc_chargebacks_lost:
+    trailing_36m: 1162.49
+  dtc_net:
+    trailing_36m: 523794.20
   gross_payments_distributor:
     cy2023: 7363461.60
     cy2024: 8481750.96
@@ -615,6 +625,15 @@ lifecycle:  # cents remitted per invoiced dollar: net / gross x100
     all_time: 93.13
   wholesale_cents_per_dollar:  # retailer and distributor combined
     all_time: 89.08
+  # Keys batch 6 (U19, 2026-11-17): contract-to-cash's lifecycle on one window, CY2023-2025 (owner, 2026-11-17):
+  # retailer remittances received (gross_payments_retailer, net_collected_retailer) plus the DTC order cohort
+  # (dtc_gross, dtc_net). Not wholesale_*: no distributors, and a window rather than all time.
+  retailer_dtc_gross:
+    trailing_36m: 50448871.83
+  retailer_dtc_net:
+    trailing_36m: 43994135.21
+  retailer_dtc_cents_per_dollar:
+    trailing_36m: 87.21
 
 # Keys batch 2 (U19, 2026-11-15): counts and ratios consumers query, given keys so a regen that moves them is
 # seen. Producers: sql/canonical_gather.sql, "KEYS BATCH 2".

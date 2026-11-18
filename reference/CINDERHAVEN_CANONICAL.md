@@ -398,9 +398,9 @@ See each repo for derivation details.
 | SKU rationalization — fix-or-kill | 13 of 50 | sku-rationalization-framework | ✅ Corrected 2026-09-28 — case-pack COGS fix (platform 4e9f37a, rescore d9795c5): 19 kill / 13 fix-or-kill / 15 maintain / 3 double-down; kill membership changed (out SB-001/004/005/007/009; in AS-009, DG-010, PS-004, PS-010, SC-004) |
 | Product data — annualized cost | **$93K** | product-data-health-audit | ✅ Confirmed (causal attribution; 281 of 2,873 retailer chargebacks are data-defect) |
 | Deductions — total backlog | $1.35M | retailer-deduction-recovery | ✅ Confirmed (16,917 rows cross-channel) |
-| Deductions — recovery per all deduction $ | ~15% | retailer-deduction-recovery | ✅ Confirmed (14.69%) |
-| Deductions — win rate per disputed $ | ~42% | retailer-deduction-recovery | ✅ Confirmed (41.80%; tier-conditioned) |
-| Deductions — dispute rate | ~35% | retailer-deduction-recovery | ✅ Confirmed (35.5%) |
+| Deductions — recovery per all deduction $ | ~15% | retailer-deduction-recovery | ✅ Restated to production 2026-11-17: 14.60% (`deductions_recovery.cross_channel_recovered_per_deduction_pct`; was 14.69%) |
+| Deductions — win rate per disputed $ | ~42% | retailer-deduction-recovery | ✅ Restated to production 2026-11-17: 41.92% (`deductions_recovery.cross_channel_recovered_per_disputed_pct`; was 41.80%, "tier-conditioned", no producer found) |
+| Deductions — dispute rate | ~35% | retailer-deduction-recovery | ✅ Confirmed (35.53%, `deductions_recovery.cross_channel_dispute_rate_pct`) |
 | Deductions — silent write-offs (no dispute) | $877,620 | retailer-deduction-recovery | ✅ Regenerated 2026-07-30 (10,906 of 16,917 rows undisputed = 64.5%) |
 | Fulfillment — portfolio fill rate (retailer) | 99.2% | cinderhaven-data-platform | ✅ Confirmed (tuned 2026-06-20; verified 2026-06-26) |
 | Fulfillment — portfolio fill rate (distributor) | 99.5% | cinderhaven-data-platform | ✅ Confirmed (tuned 2026-06-20; verified 2026-06-26) |

@@ -609,3 +609,28 @@ UNION ALL SELECT 'deductions_recovery.cross_channel_dispute_rate_pct.all_time|'|
   ROUND(100.0 * s.n / d.n, 2)::text FROM s, d
 UNION ALL SELECT 'chargebacks.all_count.all_time|'||
   ((SELECT COUNT(*) FROM raw.retailer_chargebacks) + (SELECT COUNT(*) FROM raw.distributor_chargebacks))::text;
+
+-- ── KEYS BATCH 6: CONTRACT-TO-CASH ON ONE WINDOW (U19, 2026-11-17) ──
+-- The owner's ruling (b), 2026-11-17: contract-to-cash reads canon keys,
+-- every part on CY2023-2025. B2B on remittances received in the window
+-- (revenue.gross_payments_retailer / net_collected_retailer, already keyed);
+-- DTC on the orders placed in the window (revenue.dtc_gross's cohort), with
+-- each order's processing fees, refunds and lost chargebacks, whenever they
+-- fell. Net = gross - fees - refunds - lost chargebacks. The combined lifecycle
+-- adds the two: gross, net, and net / gross in cents.
+WITH o AS (SELECT order_id, total FROM raw.shopify_orders WHERE created_at::date BETWEEN DATE '2023-01-01' AND DATE '2025-12-31'),
+dtc AS (SELECT (SELECT SUM(total) FROM o) AS gross,
+               (SELECT SUM(t.processing_fee) FROM raw.shopify_transactions t JOIN o USING (order_id)) AS fees,
+               (SELECT SUM(r.refund_amount) FROM raw.shopify_refunds r JOIN o USING (order_id)) AS refunds,
+               (SELECT SUM(c.chargeback_amount) FROM raw.shopify_chargebacks c JOIN o USING (order_id)
+                 WHERE c.outcome = 'lost') AS cb),
+b2b AS (SELECT SUM(gross_amount) AS gross, SUM(net_amount) AS net FROM raw.retailer_remittances
+        WHERE received_date BETWEEN DATE '2023-01-01' AND DATE '2025-12-31'),
+x AS (SELECT dtc.*, dtc.gross - dtc.fees - dtc.refunds - dtc.cb AS dnet, b2b.gross AS bgross, b2b.net AS bnet FROM dtc, b2b)
+SELECT 'revenue.dtc_processing_fees.trailing_36m|'||ROUND(fees, 2)::text FROM x
+UNION ALL SELECT 'revenue.dtc_refunds.trailing_36m|'||ROUND(refunds, 2)::text FROM x
+UNION ALL SELECT 'revenue.dtc_chargebacks_lost.trailing_36m|'||ROUND(cb, 2)::text FROM x
+UNION ALL SELECT 'revenue.dtc_net.trailing_36m|'||ROUND(dnet, 2)::text FROM x
+UNION ALL SELECT 'lifecycle.retailer_dtc_gross.trailing_36m|'||ROUND(bgross + gross, 2)::text FROM x
+UNION ALL SELECT 'lifecycle.retailer_dtc_net.trailing_36m|'||ROUND(bnet + dnet, 2)::text FROM x
+UNION ALL SELECT 'lifecycle.retailer_dtc_cents_per_dollar.trailing_36m|'||ROUND(100 * (bnet + dnet) / (bgross + gross), 2)::text FROM x;
