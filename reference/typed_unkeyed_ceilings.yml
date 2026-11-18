@@ -1,7 +1,7 @@
 # Ceilings on each consumer's reference/typed_unkeyed.tsv (owner, 2026-11-15): the row count may only fall.
 # scripts/check_gate_presence.py fails a repo whose ledger exceeds its ceiling, and one whose ledger has
 # fallen below it until the ceiling is lowered to match. Raising a ceiling is an owner's call.
-MsShawnP: 8
+MsShawnP: 7
 channel-profitability-analysis: 247
 chargeback-prediction-model: 81
 cinderhaven-promo-response: 142
@@ -22,16 +22,16 @@ product-data-health-audit: 9
 product-master-data-model: 21
 production-demand-forecast: 9
 recall-blast-radius: 24
-remittance-stub-parsing: 26
+remittance-stub-parsing: 20
 retail-velocity-decision-tool: 22
-retailer-deduction-recovery: 48
+retailer-deduction-recovery: 31
 retailer-scorecard-renegotiation-simulator: 137
 short-ship-cost: 72
 sku-rationalization-framework: 80
 slotmath-fair-share: 21
 spinrate-sales-penetration: 11
-the-question-engine: 7
-the-ten-decisions: 85
+the-question-engine: 6
+the-ten-decisions: 79
 trade-spend-data-diagnostic: 226
 trade-spend-leakage: 12
 trial-vs-repeat: 61
