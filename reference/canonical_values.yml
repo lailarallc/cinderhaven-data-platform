@@ -51,6 +51,8 @@ price_history:
   grain: 'sku x retailer x effective_date (2023-01-01 baseline + subsequent price-change events)'
 
 chargebacks:
+  all_count:  # keys batch 5 (U19, 2026-11-17): retailer + distributor, as four consumers print it
+    all_time: 3357
   distributor_count:
     all_time: 484
   retailer_amount:
@@ -166,6 +168,14 @@ deductions:
     all_time: 1346814.55
   cross_channel_rows:
     all_time: 16917
+  # Keys batch 5 (U19, 2026-11-17): retailer-deduction-recovery's funnel. Uncontested: no dispute names the
+  # deduction. Annualized: x 12 / 37, the window's inclusive calendar months.
+  cross_channel_uncontested_total:
+    all_time: 877620.26
+  cross_channel_uncontested_rows:
+    all_time: 10906
+  cross_channel_annualized:
+    all_time: 436804.72
 
 distribution:
   authorizations:
@@ -612,6 +622,14 @@ concentration:
   top_retailer_share_of_orders: {all_time: 0.2070}   # the-question-engine q01, prints ~21%
 deductions_recovery:
   retailer_recovery_rate: {all_time: 0.1421}         # recovered / gross; the-question-engine q10, prints ~15%
+  # Keys batch 5 (U19, 2026-11-17): retailer and distributor together (int_all_*), as retailer-deduction-recovery
+  # prints them. Per disputed dollar: recovered / (all deduction $ - uncontested $).
+  cross_channel_recovered_per_disputed_pct: {all_time: 41.92}
+  cross_channel_recovered_per_deduction_pct: {all_time: 14.60}
+  cross_channel_dispute_rate_pct: {all_time: 35.53}  # disputes filed / deduction rows
+disputes:
+  cross_channel_filed: {all_time: 6011}
+  cross_channel_recovered: {all_time: 196694.71}
 shipments:
   asn_late_rate: {all_time: 0.0857}                  # the-question-engine q13, prints ~8.6%
 payments:

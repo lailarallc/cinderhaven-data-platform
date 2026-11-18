@@ -576,3 +576,36 @@ x AS (
 )
 SELECT 'trade.all_in_retailer_annual.trailing_52w|'||ROUND(struct + waste, 2)::text FROM x
 UNION ALL SELECT 'trade.all_in_retailer_rate_pct.trailing_52w|'||ROUND(100 * (struct + waste) / rev, 2)::text FROM x;
+
+-- ── KEYS BATCH 5: THE CROSS-CHANNEL DISPUTE FUNNEL (U19, 2026-11-17) ─
+-- retailer-deduction-recovery's summary (scripts/20_export_json.py
+-- build_summary), retailer and distributor together: int_all_deductions and
+-- int_all_disputes. Uncontested: deductions no dispute names. Recovered per
+-- disputed dollar: recovered / (all deduction dollars - uncontested
+-- dollars). Recovered per deduction dollar: recovered / all deduction
+-- dollars. Dispute rate: disputes filed / deduction rows. Annualized: all
+-- deduction dollars x 12 / the window's inclusive calendar months (37 on
+-- the first and last deduction_date). And every chargeback, retailer and
+-- distributor (2,873 + 484), as four consumers print it.
+WITH d AS (SELECT SUM(deduction_amount) AS amt, COUNT(*) AS n,
+                  MIN(deduction_date) AS d0, MAX(deduction_date) AS d1
+           FROM public_intermediate.int_all_deductions),
+u AS (SELECT SUM(d.deduction_amount) AS amt, COUNT(*) AS n
+      FROM public_intermediate.int_all_deductions d
+      LEFT JOIN public_intermediate.int_all_disputes disp ON disp.deduction_id = d.deduction_id
+      WHERE disp.dispute_id IS NULL),
+s AS (SELECT COUNT(*) AS n, SUM(recovered_amount) AS rec FROM public_intermediate.int_all_disputes),
+m AS (SELECT (EXTRACT(YEAR FROM d1) - EXTRACT(YEAR FROM d0)) * 12 + EXTRACT(MONTH FROM d1) - EXTRACT(MONTH FROM d0) + 1 AS months FROM d)
+SELECT 'deductions.cross_channel_uncontested_total.all_time|'||ROUND(u.amt, 2)::text FROM u
+UNION ALL SELECT 'deductions.cross_channel_uncontested_rows.all_time|'||u.n::text FROM u
+UNION ALL SELECT 'deductions.cross_channel_annualized.all_time|'||ROUND(d.amt * 12 / m.months, 2)::text FROM d, m
+UNION ALL SELECT 'disputes.cross_channel_filed.all_time|'||s.n::text FROM s
+UNION ALL SELECT 'disputes.cross_channel_recovered.all_time|'||ROUND(s.rec, 2)::text FROM s
+UNION ALL SELECT 'deductions_recovery.cross_channel_recovered_per_disputed_pct.all_time|'||
+  ROUND(100 * s.rec / (d.amt - u.amt), 2)::text FROM s, d, u
+UNION ALL SELECT 'deductions_recovery.cross_channel_recovered_per_deduction_pct.all_time|'||
+  ROUND(100 * s.rec / d.amt, 2)::text FROM s, d
+UNION ALL SELECT 'deductions_recovery.cross_channel_dispute_rate_pct.all_time|'||
+  ROUND(100.0 * s.n / d.n, 2)::text FROM s, d
+UNION ALL SELECT 'chargebacks.all_count.all_time|'||
+  ((SELECT COUNT(*) FROM raw.retailer_chargebacks) + (SELECT COUNT(*) FROM raw.distributor_chargebacks))::text;
