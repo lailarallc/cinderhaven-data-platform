@@ -9,6 +9,35 @@ For things that didn't work, see FAILURES.md.
 
 ---
 
+## 2026-11-17 — U8 session closed (the U8 side session)
+
+**Started from:** A side session started for plan unit U8 (schema for the origin-R7 write targets). U5 was code complete but not merged.
+
+**Did:**
+- **Owner rulings:** you ruled U8's five start rows. They are recorded in DECISIONS and spec `DECISIONS#u8-rulings`.
+- **U8 built:**
+  - `banner_type` on every account table;
+  - N8's chargeback keys and G4's subscriptions;
+  - 19 more tables (N22, N35, N37, N17, N11) and three staging models;
+  - `AWAITING_WRITER`.
+  
+  Each step had a baseline check: five tables gained columns and are identical on their old ones, and 21 tables are new and empty.
+- **Spec restated:** A6.04 and A6.23 cut to the streams the window generates. No signature lapsed.
+- **Follow-ups:**
+  - `AWAITING_WRITER` is shrink-only, with a test;
+  - the bundle now carries `unit_status.json`;
+  - the registry is re-vendored at spec `6b5a663` (platform `4e28226`);
+  - U8 is DONE and U12's dependencies gained the `RAW_REFERENCE_COMMIT` move (spec `e2cced2`).
+- **U15:** started in its own session, which is DONE and merged (platform `84e3d4b`, spec `03016c6`).
+
+**State:** U5, U8 and U15 are DONE and on both mains. All branches are cleaned up. An empty, locked folder `../cinderhaven-data-platform-u8f` remains; delete it once nothing holds it.
+
+**Next:**
+- U7 is running in its own session (`u7-start-ruling-batch-20`).
+- U12 must move deploy-costing's `RAW_REFERENCE_COMMIT` when it rebuilds production on U8's DDL.
+
+---
+
 ## 2026-11-17 18:06 — merge rule rewritten; U5/U8/U15 landed; U7 started in its own session
 
 **Started from:** A side session for the merge rule. The job was to back up global CLAUDE.md, rewrite its merge rule and merge the waiting branches.
